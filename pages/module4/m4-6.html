@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M4.6: Method Overriding (Leg)</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m4-5.html">« M4.5: Override (Kind)</a>
+            <a href="m4-7.html">M4.7: Polymorfisme »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 4: Overerving & Polymorfisme</h1>
+            <p>De "IS EEN" relatie. Ouders, kinderen, en gedrag overschrijven.</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m4-1.html">M4.1: Basis Klasse (Ouder)</a></li>
+                <li><a href="m4-2.html">M4.2: Overerving</a></li>
+                <li><a href="m4-3.html">M4.3: super()</a></li>
+                <li><a href="m4-4.html">M4.4: Ouder-methode</a></li>
+                <li><a href="m4-5.html">M4.5: Override (Kind)</a></li>
+                <li><a href="m4-6.html" class="active">M4.6: Override (Delegatie)</a></li>
+                <li><a href="m4-7.html">M4.7: Polymorfisme</a></li>
+                <li><a href="m4-8.html">M4.8: Protected (Overerving)</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M4.6: Method Overriding (Leg)</h2>
+
+        <h3>Theorie: Overerving + Delegatie</h3>
+        <p>
+            We combineren nu twee concepten: Overerving (M4.5) en Compositie/Delegatie (M1.9).
+        </p>
+        <p>
+            Wat betekent een <code>reset()</code> voor een <code>Leg</code> (poot)?
+            Een <code>Leg</code> reset betekent: "Vertel *al jouw onderdelen* (de 3 servo's) dat *zij* moeten resetten."
+        </p>
+        <ol>
+            <li><strong>Overerving:** We <em>overschrijven</em> de standaard <code>.reset()</code> die <code>Leg</code> van <code>RobotComponent</code> erft.</li>
+            <li><strong>Delegatie:** De <em>nieuwe</em> <code>.reset()</code> methode <em>delegeert</em> het werk aan de servo-objecten die de <code>Leg</code> *heeft* (Compositie).</li>
+        </ol>
+        <p>De <code>Leg.reset()</code> is een 'manager' die zijn 3 'werknemers' (de <code>Servo</code>s) aanstuurt om *hun* <code>reset()</code> te doen.</p>
+
+        <hr>
+        <h3>Python Voorbeeld (`leg.py`)</h3>
+        <p>We overschrijven nu ook de <code>reset</code> methode in <code>Leg</code>.</p>
+
+        <pre><code class="language-python"># In spiderpi_core/leg.py
+class Leg(RobotComponent):
+    # ... (init, move_to_angles, getters...)
+
+    # DIT IS DE OVERRIDE:
+    def reset(self) -> None:
+        """
+        Overschrijft de standaard reset.
+        Een Leg reset delegeert de reset aan zijn 3 servo's.
+        """
+        print(f"LEG RESET: {self.name} reset al zijn servo's.")
+
+        # Delegatie! (We roepen de .reset() van de kinderen aan)
+        self._hip_servo.reset()
+        self._knee_servo.reset()
+        self._ankle_servo.reset()
+
+# --- In main.py ---
+# test_leg = my_robot.leg_front_r
+# test_leg.reset()
+
+# Output (Kettingreactie):
+# LEG RESET: Leg_1_2_3 reset al zijn servo's.
+# SERVO RESET: Servo_1 gaat naar 90 graden.
+# SERVO RESET: Servo_2 gaat naar 90 graden.
+# SERVO RESET: Servo_3 gaat naar 90 graden.</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

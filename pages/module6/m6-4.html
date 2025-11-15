@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M6.4: Integratie (SpiderPi Compositie)</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m6-3.html">« M6.3: .get_frame()</a>
+            <a href="m6-5.html">M6.5: Videostream CLI »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 6: Camera Vision</h1>
+            <p>De camera aansturen, beelden (frames) lezen en simpele detectie.</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m6-1.html">M6.1: De Camera Klasse</a></li>
+                <li><a href="m6-2.html">M6.2: VideoCapture</a></li>
+                <li><a href="m6-3.html">M6.3: .get_frame()</a></li>
+                <li><a href="m6-4.html" class="active">M6.4: Integratie Camera</a></li>
+                <li><a href="m6-5.html">M6.5: Videostream CLI</a></li>
+                <li><a href="m6-6.html">M6.6: HSV Theorie</a></li>
+                <li><a href="m6-7.html">M6.7: Detectie (Pixels)</a></li>
+                <li><a href="m6-8.html">M6.8: Debuggen (Vision)</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M6.4: Integratie (SpiderPi Compositie)</h2>
+
+        <h3>Theorie: De Ogen in de Robot Zetten</h3>
+        <p>
+            We hebben nu twee losse "hoofd-objecten":
+            <code>my_robot = SpiderPi()</code> en <code>cam = Camera()</code>.
+        </p>
+        <p>
+            Dit is niet logisch. De camera is <em>onderdeel</em> van de robot.
+            De relatie is: Een <code>SpiderPi</code> <em>HEEFT EEN</em> <code>Camera</code>.
+        </p>
+        <p>
+            Dit is <strong>Compositie</strong> (herhaling van M1.8 en M1.10). [cite: 247-248] We passen de <code>__init__</code> van <code>SpiderPi</code> aan zodat deze *automatisch* een <code>Camera</code>-object aanmaakt en beheert.
+        </p>
+
+        <hr>
+        <h3>Python Voorbeeld (`robot.py`)</h3>
+        <p>We passen <code>robot.py</code> aan om de <code>Camera</code> te 'bevatten'.</p>
+
+        <pre><code class="language-python"># In spiderpi_core/robot.py
+from .leg import Leg
+from .component import RobotComponent
+from .camera import Camera # Stap 1: Importeer de Camera
+import cv2 # Nodig voor de IOError
+
+class SpiderPi(RobotComponent):
+    # ... (alle _leg... properties)
+    _camera: Camera | None # Stap 2: Voeg de property type hint toe
+
+    def __init__(self) -> None:
+        super().__init__(name="SpiderPi_Robot")
+        # ... (alle 6 de poten aanmaken) ...
+
+        # Stap 3: Maak het Camera object (met foutafhandeling)
+        try:
+            self._camera = Camera()
+        except (IOError, cv2.error) as e:
+            print(f"WAARSCHUWING: Kon camera niet starten: {e}")
+            self._camera = None # Robot werkt door, maar zonder camera
+
+    # Stap 4: Maak een 'getter'
+    @property
+    def camera(self) -> Camera | None:
+        return self._camera
+
+# --- In main.py (om te testen) ---
+# my_robot = SpiderPi() # Maakt nu ook de camera aan
+# if my_robot.camera:
+#     frame = my_robot.camera.get_frame()
+#     if frame is not None:
+#         print("Test geslaagd: Frame gelezen *via de robot*.")</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

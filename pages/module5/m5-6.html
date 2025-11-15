@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M5.6: Unit Testing (Pytest)</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m5-5.html">« M5.5: Abstractie (Sensor)</a>
+            <a href="m5-7.html">M5.7: Static Methoden »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 5: Abstractie & Utilities</h1>
+            <p>Contracten afdwingen (ABC) en gedeelde (static) logica bouwen.</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m5-1.html">M5.1: Abstract Base Class (ABC)</a></li>
+                <li><a href="m5-2.html">M5.2: Abstracte Methoden</a></li>
+                <li><a href="m5-3.html">M5.3: Implementatie (Simpel)</a></li>
+                <li><a href="m5-4.html">M5.4: Implementatie (Complex)</a></li>
+                <li><a href="m5-5.html">M5.5: Abstractie voor Sensoren</a></li>
+                <li><a href="m5-6.html" class="active">M5.6: Unit Testing (Pytest)</a></li>
+                <li><a href="m5-7.html">M5.7: Static Methoden</a></li>
+                <li><a href="m5-8.html">M5.8: Class Variables</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M5.6: Unit Testing (Pytest)</h2>
+
+        <h3>Theorie: Code Automatisch Testen</h3>
+        <p>
+            <strong>Probleem:</strong> We hebben <code>set_angle(9000)</code> (M1.4) [cite: 58-59] opgelost. Maar hoe weten we <em>zeker</em> dat het nog werkt na al onze aanpassingen? Moeten we <code>main.py</code> *elke keer* handmatig aanpassen en runnen? Dat is traag en foutgevoelig.
+        </p>
+        <p>
+            <strong>Oplossing: Unit Tests</strong>. Een "Unit Test" is een klein, automatisch script dat één "unit" (één methode) van je code test. We gebruiken de <code>pytest</code> library.
+        </p>
+        <p>
+            De kern is het <code>assert</code> (beweren) statement: <code>assert motor.current_angle == 100</code>. Als de bewering onwaar is, faalt de test.
+        </p>
+        <p>
+            Om fouten te testen, refactoren we de methode zodat deze een <code>Exception</code> (fout) "gooit" (<code>raise</code>), en we vangen deze met <code>pytest.raises</code>.
+        </p>
+
+        <hr>
+        <h3>Python Voorbeeld</h3>
+
+        <h4>1. Code Refactor (in <code>servo.py</code>)</h4>
+        <p>We moeten <code>set_angle</code> aanpassen zodat het een *testbare* fout gooit.</p>
+        <pre><code class="language-python"># In spiderpi_core/servo.py
+def set_angle(self, new_angle: float) -> None:
+    if not (self.MIN_ANGLE <= new_angle <= self.MAX_ANGLE):
+        # OUD: print("FOUT...")
+        # NIEUW:
+        raise ValueError(f"Hoek {new_angle} is ongeldig")
+    self._current_angle = new_angle</code></pre>
+
+        <h4>2. De Test (in <code>tests/test_servo.py</code>)</h4>
+        <p>Maak een <code>tests/</code> map (met <code>__init__.py</code>) en daarin <code>test_servo.py</code>.</p>
+        <pre><code class="language-python">import pytest
+from spiderpi_core.servo import Servo
+
+def test_set_angle_valid():
+    """Test of een *geldige* hoek correct wordt ingesteld."""
+    s = Servo(start_id=1, start_angle=90.0)
+    s.set_angle(120.0)
+    assert s.current_angle == 120.0 # Bewering
+
+def test_set_angle_invalid_too_high():
+    """Test of een *te hoge* hoek een ValueError gooit."""
+    s = Servo(start_id=2, start_angle=90.0)
+
+    # Beweer dat de code HIERBINNEN een ValueError 'gooit'
+    with pytest.raises(ValueError):
+        s.set_angle(200.0) # Dit MOET een ValueError gooien
+
+def test_set_angle_invalid_too_low():
+    """Test of een *te lage* hoek ook faalt."""
+    s = Servo(start_id=3, start_angle=90.0)
+    with pytest.raises(ValueError):
+        s.set_angle(-10.0)</code></pre>
+
+        <h4>3. Terminal</h4>
+        <pre><code class="language-bash"># 1. Installeer pytest
+(venv) C:\...&gt; pip install pytest
+(venv) C:\...&gt; pip freeze > requirements.txt
+
+# 2. Draai pytest (in de hoofdmap)
+(venv) C:\...&gt; pytest
+# Output:
+# ...
+# tests/test_servo.py ... [100%]
+# 3 passed in 0.01s</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

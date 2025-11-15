@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M3.7: CLI Acties Koppelen</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m3-6.html">« M3.6: Simple CLI</a>
+            <a href="m3-8.html">M3.8: Linting (Pylint) »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 3: Encapsulatie & Kwaliteit</h1>
+            <p>Code afschermen (encapsulatie) en de kwaliteit controleren (lint, debug).</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m3-1.html">M3.1: Type Hints</a></li>
+                <li><a href="m3-2.html">M3.2: Docstrings</a></li>
+                <li><a href="m3-3.html">M3.3: Protected ('_')</a></li>
+                <li><a href="m3-4.html">M3.4: Private ('__')</a></li>
+                <li><a href="m3-5.html">M3.5: Debuggen (Basis)</a></li>
+                <li><a href="m3-6.html">M3.6: Simple CLI</a></li>
+                <li><a href="m3-7.html" class="active">M3.7: CLI Acties</a></li>
+                <li><a href="m3-8.html">M3.8: Linting (Pylint)</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M3.7: CLI Acties Koppelen</h2>
+
+        <h3>Theorie: De 'Router' Bouwen</h3>
+        <p>
+            In de vorige les (M3.6) hebben we de 'input' (<code>args.action</code>) opgevangen. Nu moeten we die input *omzetten* in een *actie*.
+        </p>
+        <p>
+            We hebben: <code>if args.action == "wave": print("Doet niks...")</code>
+            <br>
+            We *willen*: <code>if args.action == "wave": my_robot.wave()</code>
+        </p>
+        <p>
+            Dit is de 'controller'-logica die de gebruikers-input (de CLI) koppelt aan ons 'model' (de <code>SpiderPi</code> klasse). We moeten hiervoor een <code>wave()</code> methode in onze <code>SpiderPi</code> klasse (<code>robot.py</code>) bouwen.
+        </p>
+
+        <hr>
+        <h3>Python Voorbeeld</h3>
+
+        <h4>1. De Actie bouwen (in <code>robot.py</code>)</h4>
+        <pre><code class="language-python"># In spiderpi_core/robot.py
+from .leg import Leg
+import time # Nodig voor de pauzes
+
+class SpiderPi(RobotComponent):
+    # ... (init en andere methoden) ...
+
+    def wave(self) -> None:
+        """Laat de robot zwaaien met de poot rechts-voor."""
+        print("--- ACTIE: Zwaaien! ---")
+        # (We gaan ervan uit dat 'leg_front_r' een getter heeft)
+        poot = self.leg_front_r
+
+        poot.move_to_angles(hip=90, knee=45, ankle=45)
+        # time.sleep(0.5)
+        poot.move_to_angles(hip=90, knee=90, ankle=90)
+        # time.sleep(0.5)
+        poot.move_to_angles(hip=90, knee=45, ankle=45)
+        # time.sleep(0.5)
+        poot.move_to_angles(hip=90, knee=90, ankle=90)</code></pre>
+
+        <h4>2. De Router bouwen (in <code>main.py</code>)</h4>
+        <pre><code class="language-python"># In main.py
+import argparse
+from spiderpi_core.robot import SpiderPi
+
+# --- Setup ---
+my_robot = SpiderPi() # Maak de robot ECHT aan
+parser = argparse.ArgumentParser()
+parser.add_argument("--action", default="stand")
+args = parser.parse_args()
+
+# --- De 'Router' ---
+if args.action == "wave":
+    # Input ('wave') wordt gekoppeld aan een Methode
+    my_robot.wave()
+elif args.action == "stand":
+    print("Actie: Staan...")
+    # my_robot.stand_up() # (Nog te bouwen)
+else:
+    print(f"Actie '{args.action}' niet herkend.")</code></pre>
+
+        <h4>Testen in de terminal:</h4>
+        <pre><code class="language-bash">(venv) C:\...&gt; python main.py --action wave
+# Output:
+# --- ACTIE: Zwaaien! ---
+# Poot (ID 1) beweegt...
+# Motor 1 beweegt naar 90 gr.
+# Motor 2 beweegt naar 45 gr.
+# ... (etc)</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

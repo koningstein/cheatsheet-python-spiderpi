@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M5.3: Implementatie (Simpel)</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m5-2.html">« M5.2: Abstracte Methoden</a>
+            <a href="m5-4.html">M5.4: Implementatie (Complex) »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 5: Abstractie & Utilities</h1>
+            <p>Contracten afdwingen (ABC) en gedeelde (static) logica bouwen.</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m5-1.html">M5.1: Abstract Base Class (ABC)</a></li>
+                <li><a href="m5-2.html">M5.2: Abstracte Methoden</a></li>
+                <li><a href="m5-3.html" class="active">M5.3: Implementatie (Simpel)</a></li>
+                <li><a href="m5-4.html">M5.4: Implementatie (Complex)</a></li>
+                <li><a href="m5-5.html">M5.5: Abstractie voor Sensoren</a></li>
+                <li><a href="m5-6.html">M5.6: Unit Testing (Pytest)</a></li>
+                <li><a href="m5-7.html">M5.7: Static Methoden</a></li>
+                <li><a href="m5-8.html">M5.8: Class Variables</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M5.3: Implementatie (Simpel)</h2>
+
+        <h3>Theorie: Het Contract Vervullen</h3>
+        <p>
+            Een abstracte klasse (contract) is nutteloos totdat een 'concrete' (niet-abstracte) kind-klasse het <strong>implementeert</strong>.
+        </p>
+        <p>
+            Om het contract te vervullen, moet de kind-klasse:
+        </p>
+        <ol>
+            <li>Erven van de abstracte klasse.</li>
+            <li>Een <em>echte</em> methode (met code) implementeren voor <em>elke</em> <code>@abstractmethod</code> van de ouder.</li>
+        </ol>
+        <p>
+            Omdat <code>WalkAction</code> de <code>execute()</code> methode netjes implementeert, is het <em>geen</em> abstracte klasse meer, en kun je er <em>wel</em> objecten van maken.
+        </p>
+
+        <hr>
+        <h3>Python Voorbeeld (`actions.py`)</h3>
+        <p>We voegen een *concrete* klasse toe die het contract vervult.</p>
+
+        <pre><code class="language-python"># In spiderpi_core/actions.py
+# ... (imports en AbstractRobotAction) ...
+
+class WalkAction(AbstractRobotAction):
+    """
+    Een CONCRETE actie. Vervult het contract.
+    (Heeft geen __init__ nodig, erft die van de ouder)
+    """
+
+    def execute(self) -> None:
+        """
+        Implementatie van het 'execute' contract.
+        """
+        print("Actie: Lopen...")
+        # We kunnen de robot (die we in de __init__ kregen) besturen:
+        # (We gaan ervan uit dat robot een 'leg_front_r' getter heeft)
+        self._robot.leg_front_r.move_to_angles(100, 100, 100)
+
+# --- In main.py ---
+from spiderpi_core.actions import WalkAction
+
+# Dit crasht NIET, want het contract is vervuld:
+loop_actie = WalkAction(my_robot)
+loop_actie.execute()
+
+# Output:
+# Actie: Lopen...
+# (gevolgd door de servo-prints)</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

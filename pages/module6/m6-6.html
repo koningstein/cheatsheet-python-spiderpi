@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M6.6: Kleurbereik (HSV Theorie)</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m6-5.html">« M6.5: Videostream CLI</a>
+            <a href="m6-7.html">M6.7: Detectie (Pixels) »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 6: Camera Vision</h1>
+            <p>De camera aansturen, beelden (frames) lezen en simpele detectie.</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m6-1.html">M6.1: De Camera Klasse</a></li>
+                <li><a href="m6-2.html">M6.2: VideoCapture</a></li>
+                <li><a href="m6-3.html">M6.3: .get_frame()</a></li>
+                <li><a href="m6-4.html">M6.4: Integratie Camera</a></li>
+                <li><a href="m6-5.html">M6.5: Videostream CLI</a></li>
+                <li><a href="m6-6.html" class="active">M6.6: HSV Theorie</a></li>
+                <li><a href="m6-7.html">M6.7: Detectie (Pixels)</a></li>
+                <li><a href="m6-8.html">M6.8: Debuggen (Vision)</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M6.6: Kleurbereik Functie (HSV)</h2>
+
+        <h3>Theorie: Hoe 'Ziet' een Computer Kleur?</h3>
+        <p>
+            <strong>Probleem:</strong> We willen "rood" detecteren. Maar wat is "rood" in <strong>RGB</strong> (Rood, Groen, Blauw)?
+        </p>
+        <ul>
+            <li><code>(255, 0, 0)</code> is felrood.</li>
+            <li><code>(180, 0, 0)</code> is donkerrood.</li>
+            <li><code>(255, 100, 100)</code> is lichtrood.</li>
+        </ul>
+        <p>Dit is heel moeilijk te vangen in <code>if</code>-statements, omdat je met *lichtinval* te maken hebt (een schaduw maakt rood donkerder).</p>
+
+        <p>
+            <strong>Oplossing: HSV (Hue, Saturation, Value)</strong><br>
+            We gebruiken een ander kleurmodel (een andere 'taal') om kleur te beschrijven:
+        </p>
+        <ul>
+            <li><strong>H (Hue):</strong> De <strong>kleurtoon</strong> (0-179 in OpenCV). Rood zit *altijd* rond 0-10 en 170-179.</li>
+            <li><strong>S (Saturation):</strong> De <strong>intensiteit/verzadiging</strong> (0-255). 0 = grijs, 255 = volle kleur.</li>
+            <li><strong>V (Value):</strong> De <strong>helderheid</strong> (0-255). 0 = zwart, 255 = helder.</li>
+        </ul>
+        <p>
+            <strong>Het Voordeel:</strong> In HSV kunnen we zeggen: "Ik wil *alle* soorten rood, ongeacht de schaduw":
+            <br><code>Hue</code> <em>moet</em> tussen 0-10 liggen, <code>Saturation</code> <em>moet</em> feller zijn dan 100, en <code>Value</code> <em>moet</em> helderder zijn dan 100.
+        </p>
+        <p>Dit vangen we in twee *grenzen*: een <code>lower_bound</code> (ondergrens) en een <code>upper_bound</code> (bovengrens).</p>
+
+        <hr>
+        <h3>Python Voorbeeld (`camera.py`)</h3>
+        <p>We voegen een 'hulpfunctie' toe die een <code>frame</code> omzet naar <code>HSV</code> en filtert met <code>cv2.inRange</code>.</p>
+        <pre><code class="language-python"># In spiderpi_core/camera.py
+import cv2
+import numpy as np
+
+class Camera:
+    # ... (init, get_frame) ...
+
+    def _check_hsv_range(self, frame: np.ndarray, lower_bound: np.ndarray, upper_bound: np.ndarray) -> np.ndarray:
+        """
+        Controleert een heel frame tegen HSV-grenzen.
+        Dit is de basis voor kleurdetectie.
+
+        Returns:
+            np.ndarray: Een 'mask' (zwart-wit beeld) waar wit
+                        is 'ja, kleur gevonden' en zwart is 'nee'.
+        """
+
+        # 1. Converteer het beeld van BGR (standaard OpenCV) naar HSV
+        hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+        # 2. Maak de 'mask' (het filter)
+        #    Zoekt alle pixels die TUSSEN de grenzen vallen.
+        mask = cv2.inRange(hsv_frame, lower_bound, upper_bound)
+
+        return mask
+</code></pre>
+        <p><strong>Testen:</strong> Deze methode is lastig los te testen. De "win" van deze les is het begrijpen van HSV en het correct *definiëren* van de methode. We *gebruiken* hem in de volgende les.</p>
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

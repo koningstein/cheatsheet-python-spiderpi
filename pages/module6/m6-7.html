@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M6.7: Basale Detectie (Pixels Tellen)</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m6-6.html">« M6.6: HSV Theorie</a>
+            <a href="m6-8.html">M6.8: Debuggen (Vision) »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 6: Camera Vision</h1>
+            <p>De camera aansturen, beelden (frames) lezen en simpele detectie.</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m6-1.html">M6.1: De Camera Klasse</a></li>
+                <li><a href="m6-2.html">M6.2: VideoCapture</a></li>
+                <li><a href="m6-3.html">M6.3: .get_frame()</a></li>
+                <li><a href="m6-4.html">M6.4: Integratie Camera</a></li>
+                <li><a href="m6-5.html">M6.5: Videostream CLI</a></li>
+                <li><a href="m6-6.html">M6.6: HSV Theorie</a></li>
+                <li><a href="m6-7.html" class="active">M6.7: Detectie (Pixels)</a></li>
+                <li><a href="m6-8.html">M6.8: Debuggen (Vision)</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M6.7: Basale Detectie (Pixels Tellen)</h2>
+
+        <h3>Theorie: Het Masker Tellen</h3>
+        <p>
+            In Les 6.6 hebben we een "mask" (masker) gemaakt.
+        </p>
+        <ul>
+            <li><strong>Mask:</strong> Een zwart-wit plaatje.</li>
+            <li><strong>Wit (waarde 255):</strong> De pixels die *wel* voldeden aan ons HSV-kleurbereik.</li>
+            <li><strong>Zwart (waarde 0):</strong> De pixels die *niet* voldeden.</li>
+        </ul>
+        <p>
+            <strong>Probleem:</strong> We hebben een plaatje, maar we willen een *getal*. Hoeveel rood *is* er?
+        </p>
+        <p>
+            <strong>Oplossing:</strong> <strong><code>cv2.countNonZero()</code></strong>.
+            Deze <code>OpenCV</code> functie telt simpelweg alle pixels die *niet nul* (dus wit) zijn in een masker.
+        </p>
+        <ul>
+            <li>Als <code>cv2.countNonZero(mask)</code> <code>0</code> teruggeeft -> Geen rood gezien.</li>
+            <li>Als <code>cv2.countNonZero(mask)</code> <code>5000</code> teruggeeft -> 5000 rode pixels gezien.</li>
+        </ul>
+
+        <hr>
+        <h3>Python Voorbeeld (`robot.py` en `main.py`)</h3>
+        <p>We maken een <code>get_color_amount()</code> methode en tonen het getal in onze <code>stream</code>.</p>
+
+        <h4>1. De methode (in <code>camera.py</code>)</h4>
+        <pre><code class="language-python"># In spiderpi_core/camera.py
+class Camera:
+    # ... (init, get_frame, _check_hsv_range) ...
+
+    def get_color_amount(self, frame: np.ndarray, lower_bound: np.ndarray, upper_bound: np.ndarray) -> int:
+        """
+        Detecteert en telt pixels van een specifieke kleur.
+
+        Returns:
+            int: Het aantal pixels dat de kleur matcht.
+        """
+        # Stap 1: Krijg het masker (herhaling Les 6.6)
+        mask = self._check_hsv_range(frame, lower_bound, upper_bound)
+
+        # Stap 2: Tel de witte pixels
+        pixel_count = cv2.countNonZero(mask)
+
+        return pixel_count</code></pre>
+
+        <h4>2. De stream (in <code>robot.py</code>)</h4>
+        <pre><code class="language-python"># In spiderpi_core/robot.py
+import numpy as np
+import cv2
+
+# Definieer 'rood' als class variable
+LOWER_RED = np.array([0, 120, 70])
+UPPER_RED = np.array([10, 255, 255])
+
+class SpiderPi(RobotComponent):
+    # ...
+    def stream(self) -> None:
+        # ... (while True loop)
+        frame = self._camera.get_frame()
+        if frame is None: break
+
+        # --- NIEUW ---
+        pixel_aantal = self._camera.get_color_amount(frame, LOWER_RED, UPPER_RED)
+
+        # Zet dit aantal op het scherm
+        cv2.putText(frame, f"Rode Pixels: {pixel_aantal}", (10, 30),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        # --- EINDE NIEUW ---
+
+        cv2.imshow("SpiderPi Stream", frame)
+        # ... (waitKey)</code></pre>
+
+        <p><strong>Testen:</strong> <code>python main.py --action stream</code>. Houd iets roods voor de camera en het getal moet omhoog schieten.</p>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M8.6: AI Logica (Gebaar Deep Dive)</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m8-5.html">« M8.5: AI Logica (Gezicht)</a>
+            <a href="m8-7.html">M8.7: Code Kwaliteit »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 8: Integratie & Eindopdracht</h1>
+            <p>Alles samenbrengen in een 'Sense-Think-Act' loop.</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m8-1.html">M8.1: Integratie (Stop op Rood)</a></li>
+                <li><a href="m8-2.html">M8.2: Sturing (Lijnvolgen)</a></li>
+                <li><a href="m8-3.html">M8.3: Integratie (Gezicht Volgen)</a></li>
+                <li><a href="m8-4.html">M8.4: Integratie (Gebaar Actie)</a></li>
+                <li><a href="m8-5.html">M8.5: AI Logica (Gezicht)</a></li>
+                <li><a href="m8-6.html" class="active">M8.6: AI Logica (Gebaar)</a></li>
+                <li><a href="m8-7.html">M8.7: Code Kwaliteit</a></li>
+                <li><a href="m8-8.html">M8.8: Eindopdracht</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M8.6: AI Logica (Gebaar Deep Dive)</h2>
+
+        <h3>Theorie: De Knoppen van 'Vorm'</h3>
+        <p>
+            Net als bij de <code>FaceDetector</code>, heeft onze <code>GestureDetector</code> (M7.5) [cite: 253-254] "magic numbers" die we kunnen 'tunen'.
+        </p>
+        <ol>
+            <li><strong><code>cv2.threshold(blur, 70, ...)</code></strong>: De drempel <code>70</code> is *globaal*. Als het lichter of donkerder wordt in de kamer, werkt deze drempel niet meer.</li>
+            <li><strong><code>if cv2.contourArea(...) > 5000:</code></strong>: Het getal <code>5000</code> is een 'magic number'.</li>
+        </ol>
+        <p>
+            <strong>Oplossing 1: Adaptive Thresholding</strong><br>
+            We vervangen <code>cv2.threshold</code> (globale drempel) door <strong><code>cv2.adaptiveThreshold</code></strong>. Deze berekent de drempel *niet* voor het hele beeld, maar *per regio*. Het past zich aan aan schaduwen en fel licht.
+        </p>
+        <p>
+            <strong>Oplossing 2: Parameter in <code>__init__</code></strong><br>
+            We maken <code>min_area=5000</code> een parameter in de constructor.
+        </p>
+
+        <hr>
+        <h3>Python Voorbeeld (`vision.py`)</h3>
+        <p>We refactoren <code>GestureDetector</code> voor tuning.</p>
+
+        <pre><code class="language-python"># In spiderpi_core/vision.py
+class GestureDetector:
+    _min_area: int
+
+    def __init__(self, min_area: int = 5000) -> None:
+        """Accepteert nu een 'magic number' als parameter."""
+        self._min_area = min_area
+
+    def analyze_frame(self, frame: np.ndarray) -> tuple[np.ndarray, bool]:
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        blur = cv2.GaussianBlur(gray, (5, 5), 0)
+
+        # OUD:
+        # _, thresh = cv2.threshold(blur, 70, 255, cv2.THRESH_BINARY_INV)
+
+        # NIEUW: Adaptive Threshold
+        thresh = cv2.adaptiveThreshold(
+            blur, 255, # Max waarde
+            cv2.ADAPTIVE_THRESH_GAUSSIAN_C, # Methode
+            cv2.THRESH_BINARY_INV, # Zwart-wit omgekeerd
+            11, # Block size (moet oneven zijn)
+            2   # 'C' (een fijnafstelling)
+        )
+
+        contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+        gesture_found = False
+        if contours:
+            biggest_contour = max(contours, key=cv2.contourArea)
+
+            # Gebruik de parameter ipv 'magic number'
+            if cv2.contourArea(biggest_contour) > self._min_area:
+                cv2.drawContours(frame, [biggest_contour], -1, (0, 255, 0), 3)
+                gesture_found = True
+
+        return frame, gesture_found
+
+# --- In main.py ---
+# Nu kun je 'tunen':
+# processor = GestureDetector(min_area=10000) # Minder gevoelig</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

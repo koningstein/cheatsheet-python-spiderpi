@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M4.3: super()</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m4-2.html">« M4.2: Overerving</a>
+            <a href="m4-4.html">M4.4: Ouder-methode »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 4: Overerving & Polymorfisme</h1>
+            <p>De "IS EEN" relatie. Ouders, kinderen, en gedrag overschrijven.</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m4-1.html">M4.1: Basis Klasse (Ouder)</a></li>
+                <li><a href="m4-2.html">M4.2: Overerving</a></li>
+                <li><a href="m4-3.html" class="active">M4.3: super()</a></li>
+                <li><a href="m4-4.html">M4.4: Ouder-methode</a></li>
+                <li><a href="m4-5.html">M4.5: Override (Kind)</a></li>
+                <li><a href="m4-6.html">M4.6: Override (Delegatie)</a></li>
+                <li><a href="m4-7.html">M4.7: Polymorfisme</a></li>
+                <li><a href="m4-8.html">M4.8: Protected (Overerving)</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M4.3: <code>super()</code> Gebruiken</h2>
+
+        <h3>Theorie: De Ouder Constructor Aanroepen</h3>
+        <p>
+            <strong>Probleem:</strong> We crashten in Les 4.2. Waarom?
+            Wanneer een 'kind'-klasse (<code>Servo</code>) zijn *eigen* <code>__init__</code> definieert, "vervangt" (override) het de <code>__init__</code> van de 'ouder' (<code>RobotComponent</code>). De <code>__init__</code> van de ouder (die de <code>name</code> instelt) wordt dus *nooit* aangeroepen.
+        </p>
+        <p>
+            <strong>Oplossing:</strong> We moeten de <code>__init__</code> van het kind *ook* de <code>__init__</code> van de ouder laten aanroepen. Dit doen we met <code>super()</code>.
+        </p>
+        <p><code>super()</code> verwijst naar de "ouder-klasse". <code>super().__init__(...)</code> roept de constructor van de ouder aan.</p>
+
+        <hr>
+        <h3>Python Voorbeeld (`servo.py`)</h3>
+        <p>We repareren de <code>__init__</code> in <code>Servo</code> (en ook in <code>Leg</code> en <code>SpiderPi</code>).</p>
+        <pre><code class="language-python">from .component import RobotComponent
+
+class Servo(RobotComponent):
+
+    def __init__(self, start_id: int, start_angle: float) -> None:
+
+        # 1. Roep EERST de __init__ van de OUDER aan
+        # We geven het een logische naam
+        super().__init__(name=f"Servo_{start_id}")
+
+        # 2. Doe DAN je eigen kind-specifieke dingen
+        self._id = start_id
+        self._current_angle = start_angle
+        print(f"Servo {self.name} specifiek geïnitialiseerd.")
+
+    # ... (rest van de Servo klasse)
+
+# --- In main.py ---
+# (Nadat je dit ook voor Leg en SpiderPi hebt gedaan)
+# my_robot = SpiderPi()
+# print(f"De naam van de poot is: {my_robot.leg_front_r.name}")
+# Output: De naam van de poot is: Leg_1_2_3
+# (Het bewijs dat de 'name' property is geërfd én ingesteld!)</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

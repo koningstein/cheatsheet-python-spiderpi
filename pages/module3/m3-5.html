@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M3.5: Debuggen (Basis)</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m3-4.html">« M3.4: Private ('__')</a>
+            <a href="m3-6.html">M3.6: Simple CLI »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 3: Encapsulatie & Kwaliteit</h1>
+            <p>Code afschermen (encapsulatie) en de kwaliteit controleren (lint, debug).</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m3-1.html">M3.1: Type Hints</a></li>
+                <li><a href="m3-2.html">M3.2: Docstrings</a></li>
+                <li><a href="m3-3.html">M3.3: Protected ('_')</a></li>
+                <li><a href="m3-4.html">M3.4: Private ('__')</a></li>
+                <li><a href="m3-5.html" class="active">M3.5: Debuggen (Basis)</a></li>
+                <li><a href="m3-6.html">M3.6: Simple CLI</a></li>
+                <li><a href="m3-7.html">M3.7: CLI Acties</a></li>
+                <li><a href="m3-8.html">M3.8: Linting (Pylint)</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M3.5: Debuggen (Basis)</h2>
+
+        <h3>Theorie: Stoppen met <code>print()</code></h3>
+        <p>
+            <strong>Probleem:</strong> Fouten zoeken met <code>print("DEBUG: waarde is", x)</code> is traag, rommelig en je vergeet ze weg te halen.
+        </p>
+        <p>
+            <strong>Oplossing:</strong> Een <strong>Visuele Debugger</strong>. Dit is een tool in je IDE (zoals VS Code of PyCharm) waarmee je:
+        </p>
+        <ul>
+            <li><strong>Breakpoints</strong> kunt zetten: Rode stippen naast de code die zeggen "Pauzeer hier!".</li>
+            <li><strong>Stap-voor-stap</strong> door je code kunt lopen (Step Over, Step Into).</li>
+            <li>Live alle <strong>Variabelen</strong> (zoals <code>self</code> of <code>new_angle</code>) kunt bekijken.</li>
+        </ul>
+
+        <hr>
+        <h3>Python Voorbeeld (Debugger Stappen)</h3>
+        <p>Dit is een opdracht *zonder* nieuwe code. De opdracht is om de debugger te *gebruiken*.</p>
+
+        <pre><code class="language-python"># In main.py
+from spiderpi_core.robot import SpiderPi
+
+# 1. Zet een Breakpoint op de volgende regel:
+my_robot = SpiderPi()
+
+# 2. Start de Debugger (F5 in VS Code)
+# 3. Code pauzeert. Druk Step Into (F11).
+# 4. Je springt nu IN de __init__ van SpiderPi (in robot.py).
+# 5. Druk op Step Over (F10) om regel voor regel te gaan.
+# 6. Ga naar het 'VARIABLES' / 'VARIABLES' venster om 'self' te inspecteren.
+# 7. Druk nogmaals Step Into als je op self._leg_front_r = Leg(...) staat.
+# 8. Je springt nu IN de __init__ van Leg (in leg.py).
+# 9. Druk nogmaals Step Into als je op self._hip_servo = Servo(...) staat.
+# 10. Je springt nu IN de __init__ van Servo (in servo.py).
+
+print("Debuggen voltooid.")</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

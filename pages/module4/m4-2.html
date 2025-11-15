@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M4.2: Overerving Toepassen</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m4-1.html">« M4.1: Basis Klasse</a>
+            <a href="m4-3.html">M4.3: super() »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 4: Overerving & Polymorfisme</h1>
+            <p>De "IS EEN" relatie. Ouders, kinderen, en gedrag overschrijven.</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m4-1.html">M4.1: Basis Klasse (Ouder)</a></li>
+                <li><a href="m4-2.html" class="active">M4.2: Overerving</a></li>
+                <li><a href="m4-3.html">M4.3: super()</a></li>
+                <li><a href="m4-4.html">M4.4: Ouder-methode</a></li>
+                <li><a href="m4-5.html">M4.5: Override (Kind)</a></li>
+                <li><a href="m4-6.html">M4.6: Override (Delegatie)</a></li>
+                <li><a href="m4-7.html">M4.7: Polymorfisme</a></li>
+                <li><a href="m4-8.html">M4.8: Protected (Overerving)</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M4.2: Overerving Toepassen</h2>
+
+        <h3>Theorie: Het 'Kind' Koppelen</h3>
+        <p>
+            Nu we de Ouder (<code>RobotComponent</code>) hebben, moeten we de kinderen (<code>Servo</code>, <code>Leg</code>) vertellen wie hun ouder is.
+        </p>
+        <p>
+            In Python gebruiken we hiervoor <strong>haakjes <code>()</code></strong> achter de klassenaam. Dit vertelt Python dat <code>Servo</code> nu <em>automatisch</em> alle methoden en properties van <code>RobotComponent</code> "erft".
+        </p>
+        <p><code>class Servo(RobotComponent):</code> betekent: "Ik ben een <code>Servo</code>, en ik <em>ben ook een</em> <code>RobotComponent</code>."</p>
+
+        <hr>
+        <h3>Python Voorbeeld</h3>
+        <p>We passen <code>servo.py</code>, <code>leg.py</code> en <code>robot.py</code> aan.</p>
+
+        <h4>In <code>spiderpi_core/servo.py</code>:</h4>
+        <pre><code class="language-python"># Importeer de Ouder-klasse
+from .component import RobotComponent
+
+# Geef de Ouder aan tussen de haakjes
+class Servo(RobotComponent):
+    """
+    Servo 'IS EEN' RobotComponent.
+    Het erft nu .name en .__init__(name)
+    """
+
+    def __init__(self, start_id: int, start_angle: float) -> None:
+        # ... (doet nog niks met de ouder, dit crasht!)
+        self._id = start_id
+        # ...</code></pre>
+
+        <h4>In <code>spiderpi_core/leg.py</code>:</h4>
+        <pre><code class="language-python"># Importeer de Ouder-klasse
+from .component import RobotComponent
+from .servo import Servo
+
+# Geef de Ouder aan tussen de haakjes
+class Leg(RobotComponent):
+    # ... (de rest van de klasse)</code></pre>
+
+        <h4>Testen (CRASH!)</h4>
+        <p>Als je nu <code>main.py</code> draait, crasht de code. Dit is de *bedoeling*!</p>
+        <pre><code class="language-bash">(venv) C:\...&gt; python main.py
+# ...
+# TypeError: __init__() missing 1 required positional argument: 'name'</code></pre>
+        <p>Dit gebeurt omdat de <code>__init__</code> van <code>Servo</code> wordt aangeroepen, maar Python weet dat zijn Ouder (<code>RobotComponent</code>) een <code>name</code> verwacht in *zijn* <code>__init__</code>. Die geven we nog niet mee. Dat lossen we in de volgende les op.</p>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

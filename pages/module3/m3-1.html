@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M3.1: Type Hints</title>
+
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="../module2/m2-6.html">« M2.6: Hoofdprogramma</a>
+            <a href="m3-2.html">M3.2: Docstrings »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 3: Encapsulatie & Kwaliteit</h1>
+            <p>Code afschermen (encapsulatie) en de kwaliteit controleren (lint, debug).</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m3-1.html" class="active">M3.1: Type Hints</a></li>
+                <li><a href="m3-2.html">M3.2: Docstrings</a></li>
+                <li><a href="m3-3.html">M3.3: Protected ('_')</a></li>
+                <li><a href="m3-4.html">M3.4: Private ('__')</a></li>
+                <li><a href="m3-5.html">M3.5: Debuggen (Basis)</a></li>
+                <li><a href="m3-6.html">M3.6: Simple CLI</a></li>
+                <li><a href="m3-7.html">M3.7: CLI Acties</a></li>
+                <li><a href="m3-8.html">M3.8: Linting (Pylint)</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M3.1: Type Hints</h2>
+
+        <h3>Theorie: Zeggen Wat Je Verwacht</h3>
+        <p>
+            <strong>Probleem:</strong> Python is 'dynamically typed'. Dat betekent dat je dit kan doen: <code>mijn_motor.set_angle("honderd")</code>. De code crasht pas *tijdens het uitvoeren* (run-time), diep in je <code>if</code>-statement.
+        </p>
+        <p>
+            <strong>Oplossing:</strong> Met <strong>Type Hints</strong> vertel je *vooraf* wat je verwacht. Het is een contract. Een moderne IDE (zoals VS Code) zal de student nu **direct waarschuwen** met een rood lijntje onder <code>"honderd"</code>, nog *voordat* de code draait.
+        </p>
+        <p>We geven het type aan met <code>:</code> en de return-waarde met <code>-></code>.</p>
+
+        <hr>
+        <h3>Python Voorbeeld</h3>
+        <p>We passen <code>servo.py</code> aan om overal type hints toe te voegen.</p>
+
+        <pre><code class="language-python"># In spiderpi_core/servo.py
+
+# Importeer de Ouder-klasse voor type hinting
+from .component import RobotComponent
+
+class Servo(RobotComponent):
+    # Class-level type hints
+    _id: int
+    _current_angle: float
+    MIN_ANGLE: float = 0.0
+    MAX_ANGLE: float = 180.0
+
+    # Method-level type hints
+    def __init__(self, start_id: int, start_angle: float) -> None:
+        super().__init__(name=f"Servo_{start_id}")
+        self._id = start_id
+        # We negeren de return value van set_angle hier
+        self.set_angle(start_angle)
+
+    def set_angle(self, new_angle: float) -> None:
+        """Stelt de hoek in."""
+        if not (self.MIN_ANGLE <= new_angle <= self.MAX_ANGLE):
+            raise ValueError("Ongeldige hoek")
+        self._current_angle = new_angle
+
+    @property
+    def current_angle(self) -> float:
+        return self._current_angle
+
+    @property
+    def id(self) -> int:
+        return self._id
+
+# In main.py
+# motor.set_angle("tachtig")
+# ^^^ Je IDE zal hier nu een waarschuwing geven.</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

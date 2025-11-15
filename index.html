@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OOP Curriculum: Python & SpiderPi</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+
+    <script src="script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="index.html" style="font-weight: bold; background-color: var(--c-hover-link);">Overzicht</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="intro">
+        <h2>Welkom bij het OOP Curriculum</h2>
+        <p>Dit is een interactieve cheatsheet voor het MBO-4 curriculum Object-Oriented Programming (OOP) met Python en de SpiderPi robot. Elke module bouwt voort op de vorige, van de absolute basis tot geavanceerde AI-integraties.</p>
+    </div>
+
+    <div class="modules-grid">
+
+        <div class="module-card">
+            <h2>Module 1: Fundamenten</h2>
+            <p>De basisbouwstenen: Classes, Objecten, Methoden, en Compositie.</p>
+            <ul>
+                <li><a href="pages/module1/m1-1.html">M1.1: Classes en Objecten</a></li>
+                <li><a href="pages/module1/m1-2.html">M1.2: Properties</a></li>
+                <li><a href="pages/module1/m1-3.html">M1.3: Methoden</a></li>
+                <li><a href="pages/module1/m1-4.html">M1.4: Setters met Validatie</a></li>
+                <li><a href="pages/module1/m1-5.html">M1.5: Getters (Read-Only)</a></li>
+                <li><a href="pages/module1/m1-6.html">M1.6: Constructor (__init__)</a></li>
+                <li><a href="pages/module1/m1-7.html">M1.7: Named Arguments</a></li>
+                <li><a href="pages/module1/m1-8.html">M1.8: Compositie (Basis)</a></li>
+                <li><a href="pages/module1/m1-9.html">M1.9: Compositie Methoden</a></li>
+                <li><a href="pages/module1/m1-10.html">M1.10: Hoofd-Klasse</a></li>
+            </ul>
+        </div>
+
+        <div class="module-card">
+            <h2>Module 2: Structuur</h2>
+            <p>Het project organiseren met mappen, environments en imports.</p>
+            <ul>
+                <li><a href="pages/module2/m2-1.html">M2.1: Virtual Environment</a></li>
+                <li><a href="pages/module2/m2-2.html">M2.2: Dependency Management</a></li>
+                <li><a href="pages/module2/m2-3.html">M2.3: Modules (Bestanden)</a></li>
+                <li><a href="pages/module2/m2-4.html">M2.4: Packages (__init__.py)</a></li>
+                <li><a href="pages/module2/m2-5.html">M2.5: Relative Imports</a></li>
+                <li><a href="pages/module2/m2-6.html">M2.6: Hoofdprogramma</a></li>
+            </ul>
+        </div>
+
+        <div class="module-card">
+            <h2>Module 3: Kwaliteit</h2>
+            <p>Code afschermen (encapsulatie) en de kwaliteit controleren (lint, debug).</p>
+            <ul>
+                <li><a href="pages/module3/m3-1.html">M3.1: Type Hints</a></li>
+                <li><a href="pages/module3/m3-2.html">M3.2: Docstrings</a></li>
+                <li><a href="pages/module3/m3-3.html">M3.3: Protected ('_')</a></li>
+                <li><a href="pages/module3/m3-4.html">M3.4: Private ('__')</a></li>
+                <li><a href="pages/module3/m3-5.html">M3.5: Debuggen (Basis)</a></li>
+                <li><a href="pages/module3/m3-6.html">M3.6: Simple CLI (argparse)</a></li>
+                <li><a href="pages/module3/m3-7.html">M3.7: CLI Acties Koppelen</a></li>
+                <li><a href="pages/module3/m3-8.html">M3.8: Linting (Pylint)</a></li>
+            </ul>
+        </div>
+
+        <div class="module-card">
+            <h2>Module 4: Overerving</h2>
+            <p>De "IS EEN" relatie. Ouders, kinderen, en gedrag overschrijven.</p>
+            <ul>
+                <li><a href="pages/module4/m4-1.html">M4.1: Basis Klasse (Ouder)</a></li>
+                <li><a href="pages/module4/m4-2.html">M4.2: Overerving (extends)</a></li>
+                <li><a href="pages/module4/m4-3.html">M4.3: super()</a></li>
+                <li><a href="pages/module4/m4-4.html">M4.4: Methode Definitie (Ouder)</a></li>
+                <li><a href="pages/module4/m4-5.html">M4.5: Method Overriding (Kind)</a></li>
+                <li><a href="pages/module4/m4-6.html">M4.6: Method Overriding (Delegatie)</a></li>
+                <li><a href="pages/module4/m4-7.html">M4.7: Polymorfisme</a></li>
+                <li><a href="pages/module4/m4-8.html">M4.8: Protected (in Overerving)</a></li>
+            </ul>
+        </div>
+
+        <div class="module-card">
+            <h2>Module 5: Abstractie</h2>
+            <p>Contracten afdwingen (ABC) en gedeelde (static) logica bouwen.</p>
+            <ul>
+                <li><a href="pages/module5/m5-1.html">M5.1: Abstract Base Class (ABC)</a></li>
+                <li><a href="pages/module5/m5-2.html">M5.2: Abstracte Methoden</a></li>
+                <li><a href="pages/module5/m5-3.html">M5.3: Implementatie (Simpel)</a></li>
+                <li><a href="pages/module5/m5-4.html">M5.4: Implementatie (Complex)</a></li>
+                <li><a href="pages/module5/m5-5.html">M5.5: Abstractie voor Sensoren</a></li>
+                <li><a href="pages/module5/m5-6.html">M5.6: Unit Testing (Pytest)</a></li>
+                <li><a href="pages/module5/m5-7.html">M5.7: Static Methoden</a></li>
+                <li><a href="pages/module5/m5-8.html">M5.8: Class Variables</a></li>
+            </ul>
+        </div>
+
+        <div class="module-card">
+            <h2>Module 6: Camera Vision</h2>
+            <p>De camera aansturen, beelden (frames) lezen en simpele detectie.</p>
+            <ul>
+                <li><a href="pages/module6/m6-1.html">M6.1: De Camera Klasse</a></li>
+                <li><a href="pages/module6/m6-2.html">M6.2: Compositie (VideoCapture)</a></li>
+                <li><a href="pages/module6/m6-3.html">M6.3: De .get_frame() Methode</a></li>
+                <li><a href="pages/module6/m6-4.html">M6.4: Integratie (SpiderPi Compositie)</a></li>
+                <li><a href="pages/module6/m6-5.html">M6.5: Videostream CLI</a></li>
+                <li><a href="pages/module6/m6-6.html">M6.6: Kleurbereik (HSV Theorie)</a></li>
+                <li><a href="pages/module6/m6-7.html">M6.7: Basale Detectie (Pixels Tellen)</a></li>
+                <li><a href="pages/module6/m6-8.html">M6.8: Debuggen Vision (NumPy)</a></li>
+            </ul>
+        </div>
+
+        <div class="module-card">
+            <h2>Module 7: Abstracte Vision</h2>
+            <p>Een 'plug-and-play' vision-systeem bouwen met Interfaces (Protocols).</p>
+            <ul>
+                <li><a href="pages/module7/m7-1.html">M7.1: Interfaces (Protocol)</a></li>
+                <li><a href="pages/module7/m7-2.html">M7.2: Implementatie (Kleurdetector)</a></li>
+                <li><a href="pages/module7/m7-3.html">M7.3: Implementatie (Lijnvolger)</a></li>
+                <li><a href="pages/module7/m7-4.html">M7.4: Implementatie (Gezichtsherkenning)</a></li>
+                <li><a href="pages/module7/m7-5.html">M7.5: Implementatie (Gebaren)</a></li>
+                <li><a href="pages/module7/m7-6.html">M7.6: Polymorfische Koppeling</a></li>
+                <li><a href="pages/module7/m7-7.html">M7.7: Abstracte Sensor Integratie</a></li>
+                <li><a href="pages/module7/m7-8.html">M7.8: Testing (Detectors)</a></li>
+            </ul>
+        </div>
+
+        <div class="module-card">
+            <h2>Module 8: Integratie</h2>
+            <p>Het eindproject. Alles samenbrengen in een 'Sense-Think-Act' loop.</p>
+            <ul>
+                <li><a href="pages/module8/m8-1.html">M8.1: Integratie (Stop op Rood)</a></li>
+                <li><a href="pages/module8/m8-2.html">M8.2: Sturing (Lijnvolgen)</a></li>
+                <li><a href="pages/module8/m8-3.html">M8.3: Integratie (Gezicht Volgen)</a></li>
+                <li><a href="pages/module8/m8-4.html">M8.4: Integratie (Gebaar Actie)</a></li>
+                <li><a href="pages/module8/m8-5.html">M8.5: AI Logica (Gezicht Deep Dive)</a></li>
+                <li><a href="pages/module8/m8-6.html">M8.6: AI Logica (Gebaar Deep Dive)</a></li>
+                <li><a href="pages/module8/m8-7.html">M8.7: Code Kwaliteit (Refactoring)</a></li>
+                <li><a href="pages/module8/m8-8.html">M8.8: Eindopdracht (Polymorfisme Totaal)</a></li>
+            </ul>
+        </div>
+
+    </div> </div> <footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>
+    // Activeer highlighting
+    hljs.highlightAll();
+</script>
+</body>
+</html>

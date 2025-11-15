@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M7.4: Implementatie (Gezichtsherkenning)</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m7-3.html">« M7.3: Implementatie (Lijn)</a>
+            <a href="m7-5.html">M7.5: Implementatie (Gebaar) »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 7: Abstracte Vision & Interfaces</h1>
+            <p>Een 'plug-and-play' vision-systeem bouwen met Interfaces (Protocols).</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m7-1.html">M7.1: Interfaces (Protocol)</a></li>
+                <li><a href="m7-2.html">M7.2: Implementatie (Kleur)</a></li>
+                <li><a href="m7-3.html">M7.3: Implementatie (Lijn)</a></li>
+                <li><a href="m7-4.html" class="active">M7.4: Implementatie (Gezicht)</a></li>
+                <li><a href="m7-5.html">M7.5: Implementatie (Gebaar)</a></li>
+                <li><a href="m7-6.html">M7.6: Poly-koppeling</a></li>
+                <li><a href="m7-7.html">M7.7: Sensor Integratie</a></li>
+                <li><a href="m7-8.html">M7.8: Testing (Detectors)</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M7.4: Implementatie (Gezichtsherkenning)</h2>
+
+        <h3>Theorie: AI-Model (Haar Cascades)</h3>
+        <p>
+            We hoeven niet *alle* logica zelf te schrijven. <code>OpenCV</code> komt met kant-en-klare, getrainde modellen voor o.a. gezichtsherkenning. De klassieke (en snelste) heet <strong>Haar Cascade</strong>.
+        </p>
+        <p>
+            Het is een <code>.xml</code> bestand dat je moet downloaden. We maken een *derde* processor, <code>FaceDetector</code>, die dit model gebruikt en ook het <code>analyze_frame</code> contract volgt.
+        </p>
+        <p><strong>Logica:</strong></p>
+        <ol>
+            <li><strong><code>__init__</code>:</strong> Je *laadt* het model: <code>cv2.CascadeClassifier('haar_cascade_file.xml')</code>.</li>
+            <li><strong><code>analyze_frame</code>:</strong>
+                <ul>
+                    <li>Converteer het beeld naar <strong>Grayscale</strong> (zwart-wit), want dat werkt beter.</li>
+                    <li>Vraag het model: "Vind alle gezichten": <code>self._cascade.detectMultiScale(gray_frame)</code>.</li>
+                    <li>Dit geeft een lijst van rechthoeken: <code>(x, y, breedte, hoogte)</code>.</li>
+                    <li>Loop door de lijst en teken de rechthoeken op het *originele* frame.</li>
+                    <li>Geef het *originele* frame terug.</li>
+                </ul>
+            </li>
+        </ol>
+
+        <hr>
+        <h3>Python Voorbeeld (`vision.py`)</h3>
+        <p>We voegen een *derde* implementatie toe aan <code>vision.py</code>. (Het <code>.xml</code> bestand moet je in de hoofdmap van je project zetten).</p>
+
+        <pre><code class="language-python"># In spiderpi_core/vision.py
+# ... (LineFollowProcessor) ...
+
+class FaceDetector:
+    """Een derde 'stekker'. Gebruikt een pre-trained AI-model."""
+    _cascade: cv2.CascadeClassifier
+
+    def __init__(self, cascade_xml_path: str):
+        self._cascade = cv2.CascadeClassifier(cascade_xml_path)
+        if self._cascade.empty():
+            raise IOError(f"Kan cascade model niet laden: {cascade_xml_path}")
+
+    def analyze_frame(self, frame: np.ndarray) -> np.ndarray:
+        """
+        Implementeert het protocol.
+        Vindt gezichten en tekent er een rechthoek omheen.
+        """
+        # 1. Converteer naar Grayscale
+        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        # 2. Detecteer gezichten
+        faces = self._cascade.detectMultiScale(gray_frame, 1.1, 4)
+
+        # 3. Teken rechthoeken
+        for (x, y, w, h) in faces:
+            cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2) # Blauw
+
+        # 4. Geef originele frame terug
+        return frame
+</code></pre>
+        <p><strong>Testen in <code>main.py</code>:</strong></p>
+        <pre><code class="language-python"># processor = FaceDetector("haarcascade_frontalface_default.xml")
+# my_robot.set_vision_processor(processor)
+# my_robot.stream()</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

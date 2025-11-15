@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M2.2: Dependency Management</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m2-1.html">« M2.1: venv</a>
+            <a href="m2-3.html">M2.3: Modules »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 2: Structuur & Modules</h1>
+            <p>Het project organiseren met mappen, environments en imports.</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m2-1.html">M2.1: venv</a></li>
+                <li><a href="m2-2.html" class="active">M2.2: Requirements</a></li>
+                <li><a href="m2-3.html">M2.3: Modules</a></li>
+                <li><a href="m2-4.html">M2.4: Packages</a></li>
+                <li><a href="m2-5.html">M2.5: Relative Imports</a></li>
+                <li><a href="m2-6.html">M2.6: Hoofdprogramma</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M2.2: Dependency Management (requirements.txt)</h2>
+
+        <h3>Theorie: De Inventarislijst</h3>
+        <p>
+            <strong>Probleem:</strong> Je <code>venv</code> (gereedschapskist) is klaar en je project werkt. Nu wil je collega aan hetzelfde project werken. Hoe weet hij <em>precies</em> welke libraries (en welke versies!) hij moet installeren in <em>zijn</em> <code>venv</code>?
+        </p>
+        <p>
+            <strong>Oplossing:</strong> Het <code>requirements.txt</code> bestand. Dit is een simpele <strong>inventarislijst</strong> (of 'boodschappenlijst') van je project. Je collega kan deze lijst pakken en met één commando (<code>pip install -r requirements.txt</code>) exact dezelfde 'gereedschapskist' krijgen.
+        </p>
+        <ul>
+            <li><strong>Vergelijking (Koken):</strong> <code>requirements.txt</code> is het <strong>recept</strong>. Het vertelt je precies welke ingrediënten (<code>lewansoul-servo-bus==1.0.0</code>) je nodig hebt.</li>
+        </ul>
+
+        <hr>
+        <h3>Python Voorbeeld (Terminal)</h3>
+        <p>Je maakt de lijst met <code>pip freeze</code> en installeert het met <code>pip install -r</code>.</p>
+
+        <h4>De lijst genereren:</h4>
+        <pre><code class="language-bash"># Zorg dat je venv actief is
+(venv) C:\...&gt; pip install lewansoul-servo-bus
+
+# Genereer de lijst
+(venv) C:\...&gt; pip freeze > requirements.txt</code></pre>
+        <p>Inhoud van <code>requirements.txt</code> is nu:</p>
+        <pre><code class="language-text">lewansoul-servo-bus==1.0.0
+# ... (en andere dependencies)</code></pre>
+
+        <h4>De lijst installeren (op een nieuwe computer):</h4>
+        <pre><code class="language-bash"># 1. Maak en activeer een lege venv
+(venv) C:\NieuweMap&gt;
+
+# 2. Installeer alles van de lijst
+(venv) C:\NieuweMap&gt; pip install -r requirements.txt
+# ... installeert lewansoul-servo-bus ...</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

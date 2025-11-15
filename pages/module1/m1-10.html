@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M1.10: Hoofd-Klasse</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m1-9.html">« M1.9: Delegatie</a>
+            <a href="../module2/m2-1.html">Module 2: Structuur »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 1: Fundamenten van OOP</h1>
+            <p>De basisbouwstenen: Classes, Objecten, Methoden, en Compositie.</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m1-1.html">M1.1: Class & Object</a></li>
+                <li><a href="m1-2.html">M1.2: Properties</a></li>
+                <li><a href="m1-3.html">M1.3: Methoden</a></li>
+                <li><a href="m1-4.html">M1.4: Setters</a></li>
+                <li><a href="m1-5.html">M1.5: Getters</a></li>
+                <li><a href="m1-6.html">M1.6: Constructor</a></li>
+                <li><a href="m1-7.html">M1.7: Named Arguments</a></li>
+                <li><a href="m1-8.html">M1.8: Compositie</a></li>
+                <li><a href="m1-9.html">M1.9: Delegatie</a></li>
+                <li><a href="m1-10.html" class="active">M1.10: Hoofd-Klasse</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M1.10: Hoofd-Klasse (Integratie)</h2>
+
+        <h3>Theorie: Het Totaalplaatje</h3>
+        <p>
+            We passen het Compositie-principe (M1.8) nog een laatste keer toe om de structuur compleet te maken. We bouwen de 'top' van de piramide: de <code>SpiderPi</code>-klasse.
+        </p>
+        <ul>
+            <li>De <code>SpiderPi</code>-robot <em>heeft</em> 6 <code>Leg</code>-objecten. </li>
+            <li>Elke <code>Leg</code> <em>heeft</em> 3 <code>Servo</code>-objecten. </li>
+        </ul>
+        <p>
+            De <code>__init__</code> van de <code>SpiderPi</code> maakt 6 <code>Leg</code>-objecten aan, die op hun beurt 18 <code>Servo</code>-objecten aanmaken. Dit is een "cascade" van constructors.
+        </p>
+
+        <hr>
+        <h3>Python Voorbeeld</h3>
+        <p>We maken een nieuw bestand, <code>robot.py</code> (in M2 verplaatsen we dit naar <code>spiderpi_core/robot.py</code>).</p>
+
+        <pre><code class="language-python"># In robot.py
+from .leg import Leg # (Uitgaande van package-structuur M2)
+
+class SpiderPi:
+    """Modelleert de complete robot."""
+    _leg_front_r: Leg
+    _leg_mid_r: Leg
+    _leg_rear_r: Leg
+    _leg_front_l: Leg
+    _leg_mid_l: Leg
+    _leg_rear_l: Leg
+
+    def __init__(self):
+        """Bouwt de robot door alle 6 poten aan te maken."""
+        print("SpiderPi robot wordt geassembleerd...")
+
+        # Compositie van Leg-objecten
+        # (De ID's 1-18 zijn specifiek voor de hardware)
+        self._leg_front_r = Leg(id_hip=1, id_knee=2, id_ankle=3)
+        self._leg_mid_r = Leg(id_hip=4, id_knee=5, id_ankle=6)
+        self._leg_rear_r = Leg(id_hip=7, id_knee=8, id_ankle=9)
+        self._leg_front_l = Leg(id_hip=10, id_knee=11, id_ankle=12)
+        self._leg_mid_l = Leg(id_hip=13, id_knee=14, id_ankle=15)
+        self._leg_rear_l = Leg(id_hip=16, id_knee=17, id_ankle=18)
+
+        print("Robot is klaar voor gebruik!")
+
+    # ... (Getters voor de poten)
+    @property
+    def leg_front_r(self) -> Leg:
+        return self._leg_front_r
+
+# --- In main.py ---
+from spiderpi_core.robot import SpiderPi
+
+# Dit ene commando start een kettingreactie van __init__ aanroepen!
+my_robot = SpiderPi()
+
+# We kunnen nu de *hele* keten aanroepen (via getters):
+my_robot.leg_front_r.move_to_angles(100, 100, 100)</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

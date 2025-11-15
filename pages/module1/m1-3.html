@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M1.3: Methoden</title>
+
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m1-2.html">« M1.2: Properties</a>
+            <a href="m1-4.html">M1.4: Setters »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 1: Fundamenten van OOP</h1>
+            <p>De basisbouwstenen: Classes, Objecten, Methoden, en Compositie.</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m1-1.html">M1.1: Class & Object</a></li>
+                <li><a href="m1-2.html">M1.2: Properties</a></li>
+                <li><a href="m1-3.html" class="active">M1.3: Methoden</a></li>
+                <li><a href="m1-4.html">M1.4: Setters</a></li>
+                <li><a href="m1-5.html">M1.5: Getters</a></li>
+                <li><a href="m1-6.html">M1.6: Constructor</a></li>
+                <li><a href="m1-7.html">M1.7: Named Arguments</a></li>
+                <li><a href="m1-8.html">M1.8: Compositie</a></li>
+                <li><a href="m1-9.html">M1.9: Delegatie</a></li>
+                <li><a href="m1-10.html">M1.10: Hoofd-Klasse</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M1.3: Methoden (Gedrag)</h2>
+
+        <h3>Theorie: Gedrag Toevoegen</h3>
+        <p>
+            We hebben data (Properties). Nu hebben we <strong>gedrag</strong> nodig. <strong>Methoden</strong> zijn functies die <em>in</em> een klasse leven en het gedrag van objecten van die klasse definiëren.
+        </p>
+        <ul>
+            <li><strong>Vergelijking (Auto):</strong> Een <code>Auto</code>-object heeft data (<code>kleur</code>). Het heeft ook gedrag: <code>.start_motor()</code> of <code>.toeteren()</code>.</li>
+            <li><strong>SpiderPi:</strong> Ons <code>Servo</code>-object heeft data (<code>current_angle</code>). Het heeft gedrag nodig, zoals <code>.set_angle(hoek)</code>.</li>
+        </ul>
+
+        <h4>Het <code>self</code> Keyword</h4>
+        <p>
+            Methoden binnen een klasse hebben <em>altijd</em> <code>self</code> als hun eerste parameter. Het <code>self</code> keyword verwijst naar het *specifieke object zelf* dat de methode aanroept. Hiermee kan de methode de <em>eigen</em> properties van dat object lezen of aanpassen.
+        </p>
+
+        <hr>
+        <h3>Python Voorbeeld</h3>
+        <p>We passen <code>servo.py</code> aan om gedrag toe te voegen.</p>
+
+        <pre><code class="language-python"># In servo.py
+class Servo:
+    """Modelleert een enkele motor (servo)."""
+
+    # Dit is een methode (een functie binnen een klasse)
+    def set_angle(self, new_angle):
+        """
+        Stelt de hoek van deze specifieke servo in.
+        'self' verwijst naar het object dat deze methode aanroept.
+        """
+
+        # Gebruik 'self' om de property van DIT object aan te passen
+        self.current_angle = new_angle
+
+        # We gebruiken 'self.id' (aangemaakt in main.py)
+        print(f"Motor {self.id} beweegt nu naar {self.current_angle} graden.")
+
+# In main.py
+from servo import Servo
+
+motor = Servo()
+motor.id = 1
+motor.current_angle = 90.0
+print(f"Beginhoek: {motor.current_angle}")
+
+# Roep de methode aan op het object
+motor.set_angle(110.0)
+
+# De property is nu aangepast
+print(f"Nieuwe hoek: {motor.current_angle}")</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M4.7: Polymorfisme</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m4-6.html">« M4.6: Override (Delegatie)</a>
+            <a href="m4-8.html">M4.8: Protected (Overerving) »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 4: Overerving & Polymorfisme</h1>
+            <p>De "IS EEN" relatie. Ouders, kinderen, en gedrag overschrijven.</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m4-1.html">M4.1: Basis Klasse (Ouder)</a></li>
+                <li><a href="m4-2.html">M4.2: Overerving</a></li>
+                <li><a href="m4-3.html">M4.3: super()</a></li>
+                <li><a href="m4-4.html">M4.4: Ouder-methode</a></li>
+                <li><a href="m4-5.html">M4.5: Override (Kind)</a></li>
+                <li><a href="m4-6.html">M4.6: Override (Delegatie)</a></li>
+                <li><a href="m4-7.html" class="active">M4.7: Polymorfisme</a></li>
+                <li><a href="m4-8.html">M4.8: Protected (Overerving)</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M4.7: Polymorfisme</h2>
+
+        <h3>Theorie: Vele Vormen</h3>
+        <p>
+            <strong>Polymorfisme</strong> (een moeilijk woord voor een simpel idee) betekent <strong>"vele vormen"</strong>.
+        </p>
+        <p>
+            Dankzij overerving (<code>Servo</code> <em>IS EEN</em> <code>RobotComponent</code> en <code>Leg</code> <em>IS EEN</em> <code>RobotComponent</code>), mogen we ze *allemaal* simpelweg "RobotComponent" noemen.
+        </p>
+        <p>
+            <strong>De Kracht:</strong> Je kunt een lijst maken met *gemixte* objecten (<code>Leg</code>s en <code>Servo</code>s door elkaar) en ze *exact* hetzelfde behandelen. Als je <code>component.reset()</code> aanroept, kiest Python *automatisch* de juiste (overschreven) methode. Dit is de 'magie' en het hoofddoel van overerving.
+        </p>
+
+        <hr>
+        <h3>Python Voorbeeld (`main.py`)</h3>
+        <p>We maken een gemixte lijst en roepen op alles <code>.reset()</code> aan.</p>
+
+        <pre><code class="language-python"># In main.py
+my_robot = SpiderPi()
+
+print("--- Componenten aanmaken ---")
+
+# Een 'gemixte' lijst. Beiden ZIJN EEN 'RobotComponent'.
+componenten_lijst = [
+    my_robot.leg_front_r,       # Dit is een Leg object
+    my_robot.leg_mid_l.hip_servo, # Dit is een Servo object
+    my_robot.leg_rear_r         # Dit is nog een Leg object
+]
+
+print("\n--- START POLYMORFISCHE RESET ---")
+for component in componenten_lijst:
+    # We weten niet wat 'component' is (Leg? Servo?)
+    # ...en het BOEIT NIET! Python kiest de juiste .reset().
+    print(f"--- Volgende component: {component.name} ---")
+    component.reset()
+
+# Output:
+# --- Volgende component: Leg_1_2_3 ---
+# LEG RESET: Leg_1_2_3 reset al zijn servo's.
+# SERVO RESET: Servo_1 gaat naar 90 graden.
+# ...
+# --- Volgende component: Servo_13 ---
+# SERVO RESET: Servo_13 gaat naar 90 graden.
+# --- Volgende component: Leg_7_8_9 ---
+# LEG RESET: Leg_7_8_9 reset al zijn servo's.
+# ...</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M5.1: Abstract Base Class (ABC)</title>
+
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="../module4/m4-8.html">« M4.8: Protected</a>
+            <a href="m5-2.html">M5.2: Abstracte Methoden »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 5: Abstractie & Utilities</h1>
+            <p>Contracten afdwingen (ABC) en gedeelde (static) logica bouwen.</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m5-1.html" class="active">M5.1: Abstract Base Class (ABC)</a></li>
+                <li><a href="m5-2.html">M5.2: Abstracte Methoden</a></li>
+                <li><a href="m5-3.html">M5.3: Implementatie (Simpel)</a></li>
+                <li><a href="m5-4.html">M5.4: Implementatie (Complex)</a></li>
+                <li><a href="m5-5.html">M5.5: Abstractie voor Sensoren</a></li>
+                <li><a href="m5-6.html">M5.6: Unit Testing (Pytest)</a></li>
+                <li><a href="m5-7.html">M5.7: Static Methoden</a></li>
+                <li><a href="m5-8.html">M5.8: Class Variables</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M5.1: Abstract Base Class (ABC)</h2>
+
+        <h3>Theorie: Het 'Contract' (Deel 1)</h3>
+        <p>
+            <strong>Probleem:</strong> In Module 4 (Polymorfisme) [cite: 247-248] maakten we een <code>for</code>-loop die <code>component.reset()</code> aanriep. Dit *werkte* alleen omdat we *toevallig* in <code>Servo</code> en <code>Leg</code> een <code>reset()</code> methode hadden geïmplementeerd. Wat als we het vergeten? De code crasht.
+        </p>
+        <p>
+            <strong>Oplossing:</strong> Een <strong>Abstract Base Class (ABC)</strong>. Dit is een 'ouder'-klasse die dient als een <strong>contract</strong>. We kunnen deze klasse "abstract" maken om later regels af te dwingen.
+        </p>
+        <p>
+            In Python doen we dit door de klasse te laten erven van <code>ABC</code> (die we moeten importeren). Dit is stap 1.
+        </p>
+
+        <hr>
+        <h3>Python Voorbeeld (`actions.py`)</h3>
+        <p>We maken een nieuw bestand <code>spiderpi_core/actions.py</code> voor al onze robot-acties.</p>
+
+        <pre><code class="language-python"># We importeren ABC (Abstract Base Class)
+from abc import ABC, abstractmethod
+from spiderpi_core.robot import SpiderPi # Aanname dat robot.py bestaat
+
+# Stap 1: Laat de klasse erven van ABC
+class AbstractRobotAction(ABC):
+    """
+    Dit is nu een 'abstracte' klasse.
+    Het dient als een contract voor alle acties.
+    """
+    _robot: SpiderPi
+
+    def __init__(self, robot: SpiderPi) -> None:
+        """Initialiseert de actie met de robot die hij moet besturen."""
+        self._robot = robot
+        print("Abstracte actie wordt voorbereid...")
+
+# --- In main.py ---
+# Dit werkt nu nog gewoon!
+# actie = AbstractRobotAction(my_robot)
+# We hebben de 'eis' (M5.2) nog niet toegevoegd.</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

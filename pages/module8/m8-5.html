@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M8.5: AI Logica (Gezicht Deep Dive)</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m8-4.html">« M8.4: Integratie (Gebaar)</a>
+            <a href="m8-6.html">M8.6: AI Logica (Gebaar) »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 8: Integratie & Eindopdracht</h1>
+            <p>Alles samenbrengen in een 'Sense-Think-Act' loop.</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m8-1.html">M8.1: Integratie (Stop op Rood)</a></li>
+                <li><a href="m8-2.html">M8.2: Sturing (Lijnvolgen)</a></li>
+                <li><a href="m8-3.html">M8.3: Integratie (Gezicht Volgen)</a></li>
+                <li><a href="m8-4.html">M8.4: Integratie (Gebaar Actie)</a></li>
+                <li><a href="m8-5.html" class="active">M8.5: AI Logica (Gezicht)</a></li>
+                <li><a href="m8-6.html">M8.6: AI Logica (Gebaar)</a></li>
+                <li><a href="m8-7.html">M8.7: Code Kwaliteit</a></li>
+                <li><a href="m8-8.html">M8.8: Eindopdracht</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M8.5: AI Logica (Gezicht Deep Dive)</h2>
+
+        <h3>Theorie: De Knoppen van de AI</h3>
+        <p>
+            In M7.4 [cite: 253-254] gebruikten we <code>self._cascade.detectMultiScale(gray_frame)</code>. We gebruikten de <em>standaard</em> instellingen. Maar deze methode heeft meer "knoppen" (parameters) om hem te <strong>tunen</strong> voor betere prestaties.
+        </p>
+        <p><code>detectMultiScale(image, scaleFactor, minNeighbors, minSize)</code></p>
+        <ul>
+            <li><strong><code>scaleFactor</code></strong> (bv. <code>1.1</code>): Hoeveel het beeld verkleind wordt bij elke 'zoek-pas'.
+                <ul>
+                    <li>Dichter bij <code>1.0</code> = Langzamer, maar vindt *meer* gezichten (ook vage).</li>
+                    <li>Groter (bv. <code>1.3</code>) = Sneller, maar vindt alleen *duidelijke* gezichten.</li>
+                </ul>
+            </li>
+            <li><strong><code>minNeighbors</code></strong> (bv. <code>5</code>): Hoeveel "stemmen" (buur-rechthoeken) een detectie nodig heeft om te tellen als "echt gezicht".
+                <ul>
+                    <li>Hoger (<code>8</code>) = Minder *valse* detecties (false positives), maar mist misschien echte gezichten.</li>
+                    <li>Lager (<code>3</code>) = Vindt alles, maar ook veel *valse* detecties.</li>
+                </ul>
+            </li>
+            <li><strong><code>minSize</code></strong> (bv. <code>(30, 30)</code>): Negeer alle detecties *kleiner* dan dit (in pixels).</li>
+        </ul>
+
+        <hr>
+        <h3>Python Voorbeeld (`vision.py` en `main.py`)</h3>
+        <p>We refactoren <code>FaceDetector</code> zodat we deze 'knoppen' in <code>main.py</code> kunnen instellen.</p>
+
+        <h4>1. Refactor (in <code>vision.py</code>)</h4>
+        <pre><code class="language-python"># In spiderpi_core/vision.py
+class FaceDetector:
+    # ...
+    def __init__(self,
+                 cascade_xml_path: str,
+                 scaleFactor: float = 1.1,
+                 minNeighbors: int = 5,
+                 minSize: tuple[int, int] = (30, 30)
+                 ) -> None:
+        self._cascade = cv2.CascadeClassifier(cascade_xml_path)
+        if self._cascade.empty():
+            raise IOError(f"Kan cascade model niet laden: {cascade_xml_path}")
+
+        # Sla de parameters op
+        self._scaleFactor = scaleFactor
+        self._minNeighbors = minNeighbors
+        self._minSize = minSize
+
+    def analyze_frame(self, frame: np.ndarray) -> ...:
+        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        # Gebruik de opgeslagen parameters
+        faces = self._cascade.detectMultiScale(
+            gray_frame,
+            scaleFactor=self._scaleFactor,
+            minNeighbors=self._minNeighbors,
+            minSize=self._minSize
+        )
+        # ... (rest van de logica om (frame, center) terug te geven) ...</code></pre>
+
+        <h4>2. Tunen (in <code>main.py</code>)</h4>
+        <pre><code class="language-python"># In main.py
+
+# Test 1 (Standaard):
+processor_default = FaceDetector(cascade_xml_path="haarcascade_frontalface_default.xml")
+
+# Test 2 (Streng & Stabiel):
+processor_strict = FaceDetector(
+    cascade_xml_path="haarcascade_frontalface_default.xml",
+    scaleFactor=1.3,
+    minNeighbors=10
+)
+
+# Test 3 (Gevoelig & Snel):
+processor_sensitive = FaceDetector(
+    cascade_xml_path="haarcascade_frontalface_default.xml",
+    scaleFactor=1.1,
+    minNeighbors=3,
+    minSize=(80, 80) # Negeer kleine gezichten
+)
+
+# my_robot.set_vision_processor(processor_strict)
+# ...</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

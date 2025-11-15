@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M1.8: Compositie (Basis)</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m1-7.html">« M1.7: Named Args</a>
+            <a href="m1-9.html">M1.9: Delegatie »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 1: Fundamenten van OOP</h1>
+            <p>De basisbouwstenen: Classes, Objecten, Methoden, en Compositie.</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m1-1.html">M1.1: Class & Object</a></li>
+                <li><a href="m1-2.html">M1.2: Properties</a></li>
+                <li><a href="m1-3.html">M1.3: Methoden</a></li>
+                <li><a href="m1-4.html">M1.4: Setters</a></li>
+                <li><a href="m1-5.html">M1.5: Getters</a></li>
+                <li><a href="m1-6.html">M1.6: Constructor</a></li>
+                <li><a href="m1-7.html">M1.7: Named Arguments</a></li>
+                <li><a href="m1-8.html" class="active">M1.8: Compositie</a></li>
+                <li><a href="m1-9.html">M1.9: Delegatie</a></li>
+                <li><a href="m1-10.html">M1.10: Hoofd-Klasse</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M1.8: Compositie (Basis)</h2>
+
+        <h3>Theorie: 'Heeft een...' Relatie</h3>
+        <p>
+            Objecten in de echte wereld zijn vaak <em>opgebouwd</em> uit andere objecten. Dit heet <strong>Compositie</strong> (samenstelling), de "Heeft een..." relatie.
+        </p>
+        <ul>
+            <li><strong>Vergelijking (Auto):</strong> Een <code>Auto</code>-object <em>heeft een</em> <code>Motor</code>-object en vier <code>Wiel</code>-objecten.</li>
+            <li><strong>SpiderPi:</strong> Een <code>Leg</code>-object <em>heeft drie</em> <code>Servo</code>-objecten. </li>
+        </ul>
+        <p>
+            We implementeren dit door in de <code>__init__</code> van de 'container'-klasse (<code>Leg</code>) objecten aan te maken van de 'inhoud'-klasse (<code>Servo</code>) en die op te slaan als properties.
+        </p>
+
+        <hr>
+        <h3>Python Voorbeeld</h3>
+        <p>We maken een nieuw bestand, <code>leg.py</code>, dat <code>servo.py</code> importeert.</p>
+
+        <pre><code class="language-python"># In leg.py
+# (We gaan ervan uit dat we in een package 'spiderpi_core' zitten)
+from .servo import Servo
+
+class Leg:
+    """Modelleert een poot, opgebouwd uit 3 servo's."""
+    _hip_servo: Servo
+    _knee_servo: Servo
+    _ankle_servo: Servo
+
+    def __init__(self, id_hip: int, id_knee: int, id_ankle: int):
+        """Maakt de 3 servo-objecten aan die deze poot bevat."""
+
+        # COMPOSITIE:
+        # Deze properties zijn zelf objecten
+        self._hip_servo = Servo(start_id=id_hip, start_angle=90.0)
+        self._knee_servo = Servo(start_id=id_knee, start_angle=90.0)
+        self._ankle_servo = Servo(start_id=id_ankle, start_angle=90.0)
+
+    @property
+    def hip_servo(self) -> Servo:
+        return self._hip_servo
+    # ... (en getters for knee en ankle)
+
+# --- In main.py ---
+# (Uitgaande van package-structuur M2)
+from spiderpi_core.leg import Leg
+
+front_leg = Leg(id_hip=1, id_knee=2, id_ankle=3)
+
+# Toegang tot het 'sub-object' (via getter):
+print(front_leg.hip_servo.id) # Output: 1</code></pre>
+
+    </main>
+</div>
+
+<div id="footer-placeholder"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

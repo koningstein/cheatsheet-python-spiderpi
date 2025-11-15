@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M6.2: Compositie (VideoCapture)</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m6-1.html">« M6.1: Camera Klasse</a>
+            <a href="m6-3.html">M6.3: .get_frame() »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 6: Camera Vision</h1>
+            <p>De camera aansturen, beelden (frames) lezen en simpele detectie.</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m6-1.html">M6.1: De Camera Klasse</a></li>
+                <li><a href="m6-2.html" class="active">M6.2: VideoCapture</a></li>
+                <li><a href="m6-3.html">M6.3: .get_frame()</a></li>
+                <li><a href="m6-4.html">M6.4: Integratie Camera</a></li>
+                <li><a href="m6-5.html">M6.5: Videostream CLI</a></li>
+                <li><a href="m6-6.html">M6.6: HSV Theorie</a></li>
+                <li><a href="m6-7.html">M6.7: Detectie (Pixels)</a></li>
+                <li><a href="m6-8.html">M6.8: Debuggen (Vision)</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M6.2: Compositie (VideoCapture)</h2>
+
+        <h3>Theorie: De Camera 'Connectie'</h3>
+        <p>
+            <strong>Probleem:</strong> Onze <code>Camera</code> klasse (M6.1) is leeg. Het is een 'doos' zonder inhoud.
+        </p>
+        <p>
+            <strong>Oplossing:</strong> We moeten *in* de <code>__init__</code> de *echte* verbinding met de camera-hardware maken. In <code>OpenCV</code> is het object dat de *fysieke camera* vertegenwoordigt: <strong><code>cv2.VideoCapture(0)</code></strong>.
+        </p>
+        <p>
+            Het getal <code>0</code> betekent "pak de eerste camera die je kunt vinden" (meestal de ingebouwde webcam of de Pi-camera).
+        </p>
+        <p>
+            Onze <code>Camera</code> klasse (de 'doos') *bevat* (heeft een) dit <code>VideoCapture</code> object. Dit is <strong>Compositie</strong> (herhaling van M1.8). [cite: 247-248]
+        </p>
+
+        <hr>
+        <h3>Python Voorbeeld (`camera.py`)</h3>
+        <p>We vullen de <code>__init__</code> van onze <code>Camera</code> klasse.</p>
+
+        <pre><code class="language-python"># In spiderpi_core/camera.py
+import cv2
+import numpy as np
+
+class Camera:
+    """Vertegenwoordigt de hardware camera."""
+
+    # We slaan het OpenCV object op in een 'protected' property
+    _capture: cv2.VideoCapture
+
+    def __init__(self) -> None:
+        """Initialiseert de camera en 'grijpt' de hardware."""
+
+        # Maak het OpenCV object
+        self._capture = cv2.VideoCapture(0)
+
+        if not self._capture.isOpened():
+            # Een check of de camera wel echt gevonden is
+            raise IOError("Kan de camera niet openen op index 0.")
+
+        print("Camera succesvol geïnitialiseerd.")
+
+# --- In main.py (om te testen) ---
+# try:
+#     cam = Camera()
+#     print("Camera-object succesvol gemaakt.")
+# except IOError as e:
+#     print(f"FOUT: {e}")</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

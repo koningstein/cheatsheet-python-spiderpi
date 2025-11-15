@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M7.1: Interfaces (Protocol)</title>
+
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="../module6/m6-8.html">« M6.8: Debuggen (Vision)</a>
+            <a href="m7-2.html">M7.2: Implementatie (Kleur) »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 7: Abstracte Vision & Interfaces</h1>
+            <p>Een 'plug-and-play' vision-systeem bouwen met Interfaces (Protocols).</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m7-1.html" class="active">M7.1: Interfaces (Protocol)</a></li>
+                <li><a href="m7-2.html">M7.2: Implementatie (Kleur)</a></li>
+                <li><a href="m7-3.html">M7.3: Implementatie (Lijn)</a></li>
+                <li><a href="m7-4.html">M7.4: Implementatie (Gezicht)</a></li>
+                <li><a href="m7-5.html">M7.5: Implementatie (Gebaar)</a></li>
+                <li><a href="m7-6.html">M7.6: Poly-koppeling</a></li>
+                <li><a href="m7-7.html">M7.7: Sensor Integratie</a></li>
+                <li><a href="m7-8.html">M7.8: Testing (Detectors)</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M7.1: Interfaces (Protocol)</h2>
+
+        <h3>Theorie: Het 'Contract' voor Vision</h3>
+        <p>
+            <strong>Probleem:</strong> In Module 6 hebben we <code>SpiderPi.stream()</code> [cite: 251-252] aangepast om specifiek *kleur* te detecteren. Wat als we morgen *gezichten* willen detecteren? Of *lijnen*? Moeten we dan <code>SpiderPi.stream_faces()</code> en <code>SpiderPi.stream_lines()</code> maken? Dat is niet onderhoudbaar.
+        </p>
+        <p>
+            <strong>Oplossing:</strong> Een <strong>Interface</strong> (in modern Python een <strong><code>Protocol</code></strong>). We definiëren een **contract**. We zeggen: "Het maakt me niet uit *wat* voor vision-taak je bent (kleur, gezicht, lijn), je *moet* een methode hebben die <code>analyze_frame</code> heet."
+        </p>
+        <p>
+            Dit is de 'stopcontact'-analogie: We definiëren de *vorm* van het stopcontact (bv. twee pinnen, <code>analyze_frame</code>). Het maakt niet uit wat je inplugt (een lamp, een laptop), zolang het maar *past*.
+        </p>
+
+        <hr>
+        <h3>Python Voorbeeld (`vision.py`)</h3>
+        <p>We maken een nieuw bestand <code>spiderpi_core/vision.py</code> voor al onze vision-gerelateerde klassen.</p>
+
+        <pre><code class="language-python"># In spiderpi_core/vision.py
+from typing import Protocol
+import numpy as np
+
+class VisionProcessorProtocol(Protocol):
+    """
+    HET CONTRACT (de Interface):
+    Elke klasse die 'wil zijn' zoals dit protocol,
+    MOET een 'analyze_frame' methode hebben.
+    """
+
+    def analyze_frame(self, frame: np.ndarray) -> np.ndarray:
+        """
+        Analyseert een videoframe en geeft het (bewerkte) frame terug.
+        """
+        ... # '...' (Ellipsis) is de 'pass' voor protocollen
+
+# --- Testen ---
+# Je kunt geen object maken van een Protocol.
+# De "win" is het correct definiëren van het contract-bestand.
+# We *gebruiken* het in de volgende les.</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

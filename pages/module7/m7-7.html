@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M7.7: Abstracte Sensor Integratie</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m7-6.html">« M7.6: Poly-koppeling</a>
+            <a href="m7-8.html">M7.8: Testing (Detectors) »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 7: Abstracte Vision & Interfaces</h1>
+            <p>Een 'plug-and-play' vision-systeem bouwen met Interfaces (Protocols).</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m7-1.html">M7.1: Interfaces (Protocol)</a></li>
+                <li><a href="m7-2.html">M7.2: Implementatie (Kleur)</a></li>
+                <li><a href="m7-3.html">M7.3: Implementatie (Lijn)</a></li>
+                <li><a href="m7-4.html">M7.4: Implementatie (Gezicht)</a></li>
+                <li><a href="m7-5.html">M7.5: Implementatie (Gebaar)</a></li>
+                <li><a href="m7-6.html">M7.6: Poly-koppeling</a></li>
+                <li><a href="m7-7.html" class="active">M7.7: Sensor Integratie</a></li>
+                <li><a href="m7-8.html">M7.8: Testing (Detectors)</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M7.7: Abstracte Sensor Integratie</h2>
+
+        <h3>Theorie: De 'Slimme' Sensor</h3>
+        <p>
+            We hebben twee 'contracten':
+        </p>
+        <ol>
+            <li><code>AbstractSensor</code> (M5.5) [cite: 249-250]: *Eist* een <code>.read_value() -> float</code> methode (geeft een <strong>getal</strong>).</li>
+            <li><code>VisionProcessorProtocol</code> (M7.1) : *Eist* een <code>.analyze_frame() -> np.ndarray</code> methode (geeft een <strong>beeld</strong>).</li>
+        </ol>
+        <p>
+            <strong>Probleem:</strong> Deze lijken onverenigbaar.
+        </p>
+        <p>
+            <strong>Oplossing:</strong> We maken een *nieuwe* klasse: <code>VisionSensor</code>. Dit is een "Adapter" klasse.
+        </p>
+        <ul>
+            <li><code>VisionSensor</code> <em>IS EEN</em> <code>AbstractSensor</code> (erft ervan, vervult <code>read_value()</code>).</li>
+            <li><code>VisionSensor</code> <em>HEEFT EEN</em> <code>Camera</code> (om te kijken).</li>
+            <li><code>VisionSensor</code> <em>HEEFT EEN</em> <code>ColorDetector</code> (om te analyseren).</li>
+        </ul>
+        <p>De <code>.read_value()</code> methode van de <code>VisionSensor</code> doet dan *zelf* de detectie en *telt* de pixels (herhaling M6.7) [cite: 251-252].</p>
+
+        <hr>
+        <h3>Python Voorbeeld (`sensors.py`)</h3>
+        <p>We maken een 'slimme sensor' die *is een* Sensor, maar *vision* gebruikt.</p>
+
+        <pre><code class="language-python"># In spiderpi_core/sensors.py
+from .camera import Camera
+from .vision import ColorDetector
+import cv2
+import numpy as np
+
+# ... (AbstractSensor van M5.5) ...
+
+class ColorVisionSensor(AbstractSensor):
+    """
+    IS EEN Sensor. HEEFT EEN Camera en Kleur-grenzen.
+    Implementeert .read_value() door pixels te tellen.
+    """
+    _camera: Camera
+    _detector: ColorDetector
+
+    def __init__(self, camera: Camera, lower_bound: np.ndarray, upper_bound: np.ndarray):
+        self._camera = camera
+        # Maak de *specifieke* processor die deze sensor nodig heeft
+        self._detector = ColorDetector(lower_bound, upper_bound)
+
+    def read_value(self) -> float:
+        """Leest de sensor: telt de gekleurde pixels."""
+        frame = self._camera.get_frame()
+        if frame is None:
+            return 0.0
+
+        # Gebruik de detector om het masker te krijgen
+        mask = self._detector.analyze_frame(frame)
+
+        # Tel de pixels (logica uit M6.7)
+        count = cv2.countNonZero(mask)
+        return float(count)
+
+# --- In main.py ---
+# from spiderpi_core.camera import Camera
+# from spiderpi_core.sensors import ColorVisionSensor
+#
+# cam = Camera()
+# LOWER_RED = np.array([0, 120, 70])
+# UPPER_RED = np.array([10, 255, 255])
+# red_sensor = ColorVisionSensor(cam, LOWER_RED, UPPER_RED)
+#
+# print(f"Rode pixels gedetecteerd: {red_sensor.read_value()}")</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

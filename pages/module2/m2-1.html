@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M2.1: Virtual Environment (venv)</title>
+
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="../module1/m1-10.html">« M1.10: Hoofd-Klasse</a>
+            <a href="m2-2.html">M2.2: Requirements »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 2: Structuur & Modules</h1>
+            <p>Het project organiseren met mappen, environments en imports.</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m2-1.html" class="active">M2.1: venv</a></li>
+                <li><a href="m2-2.html">M2.2: Requirements</a></li>
+                <li><a href="m2-3.html">M2.3: Modules</a></li>
+                <li><a href="m2-4.html">M2.4: Packages</a></li>
+                <li><a href="m2-5.html">M2.5: Relative Imports</a></li>
+                <li><a href="m2-6.html">M2.6: Hoofdprogramma</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M2.1: Virtual Environment (venv)</h2>
+
+        <h3>Theorie: Je Eigen Gereedschapskist</h3>
+        <p>
+            <strong>Probleem:</strong> Je installeert software (libraries) om je robot te besturen (bv. <code>opencv-python</code>). Je installeert deze standaard 'globaal' op je computer. Maar wat als Project A versie 1.0 van een library nodig heeft, en Project B versie 2.0? Ze gaan ruzie maken.
+        </p>
+        <p>
+            <strong>Oplossing:</strong> Een <strong>Virtual Environment (<code>venv</code>)</strong> is een persoonlijke, geïsoleerde 'gereedschapskist' voor alleen jouw project.  Alles wat je installeert komt *alleen* in de <code>venv</code>-map van dit project, en stoort andere projecten niet.
+        </p>
+        <ul>
+            <li><strong>Vergelijking (Gereedschap):</strong> Zonder <code>venv</code> gooi je al je gereedschap (hamers, zagen) voor al je klussen (projecten) in één grote, rommelige schuur (je 'globale' Python-installatie). Een <code>venv</code> is een <strong>aparte, schone kist</strong> die je pakt voor één specifieke klus.</li>
+        </ul>
+
+        <hr>
+        <h3>Python Voorbeeld (Terminal)</h3>
+        <p><code>venv</code> is een command-line tool. Je gebruikt het in je terminal.</p>
+        <pre><code class="language-bash"># 1. Navigeer naar je projectmap
+cd C:\Projecten\spiderpi_oop
+
+# 2. Maak de venv (er verschijnt een 'venv' map)
+python -m venv venv
+
+# 3. Activeer de venv (Windows)
+.\venv\Scripts\activate
+
+# (Op Mac/Linux is het: source venv/bin/activate)
+
+# Je terminal-prompt verandert nu naar (venv)...
+(venv) C:\Projecten\spiderpi_oop&gt;
+
+# 4. Nu kun je veilig libraries installeren
+(venv) C:\Projecten\spiderpi_oop&gt; pip install lewansoul-servo-bus</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

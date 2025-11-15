@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M2.3: Modules (Bestanden)</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m2-2.html">« M2.2: Requirements</a>
+            <a href="m2-4.html">M2.4: Packages »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 2: Structuur & Modules</h1>
+            <p>Het project organiseren met mappen, environments en imports.</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m2-1.html">M2.1: venv</a></li>
+                <li><a href="m2-2.html">M2.2: Requirements</a></li>
+                <li><a href="m2-3.html" class="active">M2.3: Modules</a></li>
+                <li><a href="m2-4.html">M2.4: Packages</a></li>
+                <li><a href="m2-5.html">M2.5: Relative Imports</a></li>
+                <li><a href="m2-6.html">M2.6: Hoofdprogramma</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M2.3: Modules (Bestanden)</h2>
+
+        <h3>Theorie: Code Organiseren in Bestanden</h3>
+        <p>
+            <strong>Probleem:</strong> We kunnen <em>alle</em> code (<code>Servo</code>, <code>Leg</code>, <code>SpiderPi</code>) in één gigantisch <code>main.py</code> bestand schrijven. Het zou werken, maar het is een chaos. Niemand kan dat lezen of onderhouden.
+        </p>
+        <p>
+            <strong>Oplossing:</strong> Een <strong>Module</strong>. In Python is een Module simpelweg een <strong><code>.py</code> bestand</strong>. Het idee is dat elk bestand (elke module) **één duidelijke taak** (Single Responsibility) heeft.
+        </p>
+        <ul>
+            <li><code>servo.py</code> weet alles over *één motor*. </li>
+            <li><code>leg.py</code> weet alles over *één poot*. </li>
+            <li><code>main.py</code> *gebruikt* de robot.</li>
+        </ul>
+        <p>We 'importeren' de code van de ene module in de andere met <code>from ... import ...</code>.</p>
+
+        <hr>
+        <h3>Python Voorbeeld (Structuur)</h3>
+        <p>De structuur die we in Module 1 hebben opgebouwd, is een modulaire structuur.</p>
+        <pre><code class="language-text"># Projectstructuur (simpel):
+# ├── servo.py
+# ├── leg.py
+# ├── robot.py
+# └── main.py</code></pre>
+
+        <pre><code class="language-python"># In servo.py:
+class Servo:
+    pass
+
+# In leg.py:
+from servo import Servo # Importeert de Servo klasse
+class Leg:
+    pass
+
+# In main.py:
+from robot import SpiderPi # Importeert de SpiderPi klasse
+my_robot = SpiderPi()</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

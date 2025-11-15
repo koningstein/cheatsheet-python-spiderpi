@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M6.5: Videostream CLI</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m6-4.html">« M6.4: Integratie Camera</a>
+            <a href="m6-6.html">M6.6: HSV Theorie »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 6: Camera Vision</h1>
+            <p>De camera aansturen, beelden (frames) lezen en simpele detectie.</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m6-1.html">M6.1: De Camera Klasse</a></li>
+                <li><a href="m6-2.html">M6.2: VideoCapture</a></li>
+                <li><a href="m6-3.html">M6.3: .get_frame()</a></li>
+                <li><a href="m6-4.html">M6.4: Integratie Camera</a></li>
+                <li><a href="m6-5.html" class="active">M6.5: Videostream CLI</a></li>
+                <li><a href="m6-6.html">M6.6: HSV Theorie</a></li>
+                <li><a href="m6-7.html">M6.7: Detectie (Pixels)</a></li>
+                <li><a href="m6-8.html">M6.8: Debuggen (Vision)</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M6.5: Videostream CLI</h2>
+
+        <h3>Theorie: De Monitor (`cv2.imshow`)</h3>
+        <p>
+            <strong>Probleem:</strong> <code>.get_frame()</code> (Les 6.3) haalt *één* foto. Een video is *veel* foto's achter elkaar (bv. 30 per seconde).
+        </p>
+        <p>
+            <strong>Oplossing:</strong> We hebben een <code>while True:</code> loop nodig die continu frames ophaalt en toont.
+        </p>
+        <p>Om een video te tonen, heb je 3 <code>cv2</code> commando's nodig *binnen* een loop:</p>
+        <ol>
+            <li><strong><code>frame = ...get_frame()</code></strong>: Haal de foto.</li>
+            <li><strong><code>cv2.imshow("Titel", frame)</code></strong>: Toon de foto in een venster. </li>
+            <li><strong><code>cv2.waitKey(1)</code></strong>: Wacht 1 milliseconde op een toetsaanslag. *Dit is cruciaal!* Zonder <code>waitKey</code> ververst het venster niet.</li>
+        </ol>
+        <p>We stoppen deze loop in een nieuwe methode <code>stream()</code> in <code>SpiderPi</code> en koppelen die aan een CLI-commando (herhaling M3.7) [cite: 245-246].</p>
+
+        <hr>
+        <h3>Python Voorbeeld</h3>
+
+        <h4>1. De methode (in <code>robot.py</code>)</h4>
+        <pre><code class="language-python"># In spiderpi_core/robot.py
+import cv2 # Nu ook hier nodig!
+
+class SpiderPi(RobotComponent):
+    # ... (init, wave, getters ...)
+
+    def stream(self) -> None:
+        """Start een live videostream naar het scherm."""
+        if not self._camera:
+            print("Kan niet streamen, geen camera gevonden.")
+            return
+
+        print("Stream gestart. Druk op 'q' om te stoppen.")
+        while True:
+            # 1. Haal frame (via delegatie)
+            frame = self._camera.get_frame()
+            if frame is None:
+                break # Stop als frame mislukt
+
+            # 2. Toon frame op scherm
+            cv2.imshow("SpiderPi Stream", frame)
+
+            # 3. Wacht 1ms. Stop als 'q' wordt ingedrukt.
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+
+        # Opruimen
+        cv2.destroyAllWindows()</code></pre>
+
+        <h4>2. De koppeling (in <code>main.py</code>)</h4>
+        <pre><code class="language-python"># In main.py
+# ... (argparse setup uit M3.6) ...
+
+# In de 'Router'
+elif args.action == "stream":
+    my_robot.stream()
+</code></pre>
+
+        <h4>3. Testen (in Terminal)</h4>
+        <pre><code class="language-bash">(venv) C:\...&gt; python main.py --action stream
+# Resultaat: Een venster opent met live video.</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

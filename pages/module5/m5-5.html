@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M5.5: Abstractie voor Sensoren</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m5-4.html">« M5.4: Implementatie (Complex)</a>
+            <a href="m5-6.html">M5.6: Unit Testing »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 5: Abstractie & Utilities</h1>
+            <p>Contracten afdwingen (ABC) en gedeelde (static) logica bouwen.</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m5-1.html">M5.1: Abstract Base Class (ABC)</a></li>
+                <li><a href="m5-2.html">M5.2: Abstracte Methoden</a></li>
+                <li><a href="m5-3.html">M5.3: Implementatie (Simpel)</a></li>
+                <li><a href="m5-4.html">M5.4: Implementatie (Complex)</a></li>
+                <li><a href="m5-5.html" class="active">M5.5: Abstractie voor Sensoren</a></li>
+                <li><a href="m5-6.html">M5.6: Unit Testing (Pytest)</a></li>
+                <li><a href="m5-7.html">M5.7: Static Methoden</a></li>
+                <li><a href="m5-8.html">M5.8: Class Variables</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M5.5: Abstractie voor Sensoren</h2>
+
+        <h3>Theorie: Een Contract voor Data</h3>
+        <p>
+            Dit is een <em>herhaling</em> van het abstractie-concept (M5.1 & M5.2), maar nu toegepast op een nieuw domein: <strong>Sensoren</strong>.
+        </p>
+        <p>
+            <strong>Probleem:</strong> Een Ultrasoon-sensor geeft *afstand in cm*. Een Temperatuur-sensor geeft *graden Celsius*. Ze lijken verschillend, maar ze doen conceptueel hetzelfde: ze <strong>lezen een waarde</strong>.
+        </p>
+        <p>
+            <strong>Oplossing:</strong> We maken een <code>AbstractSensor</code> contract (ABC) dat *eist* dat elke sensor die we op de robot aansluiten, een <code>.read_value()</code> methode heeft.
+        </p>
+
+        <hr>
+        <h3>Python Voorbeeld (`sensors.py`)</h3>
+        <p>We maken een nieuw bestand <code>spiderpi_core/sensors.py</code>.</p>
+
+        <pre><code class="language-python"># In spiderpi_core/sensors.py
+from abc import ABC, abstractmethod
+
+class AbstractSensor(ABC):
+    """
+    Contract voor alle sensoren.
+    Elke sensor MOET een waarde kunnen lezen.
+    """
+
+    @abstractmethod
+    def read_value(self) -> float:
+        """
+        Leest de waarde van de sensor.
+
+        Returns:
+            float: De gemeten waarde (bv. cm, graden, etc.)
+        """
+        pass
+
+# --- Concrete implementatie (om te testen) ---
+class MockUltrasonicSensor(AbstractSensor):
+    """Een neppe sensor voor test-doeleinden."""
+
+    def read_value(self) -> float:
+        """Implementeert het contract. Geeft een neppe waarde terug."""
+        print("Ultrasoon sensor leest...")
+        return 10.5 # Gesimuleerde afstand
+
+# --- In main.py ---
+# from spiderpi_core.sensors import MockUltrasonicSensor
+# us_sensor = MockUltrasonicSensor()
+# afstand = us_sensor.read_value()
+# print(f"Afstand is: {afstand}") # Output: 10.5</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

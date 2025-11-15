@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M7.6: Polymorfische Koppeling</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m7-5.html">« M7.5: Implementatie (Gebaar)</a>
+            <a href="m7-7.html">M7.7: Sensor Integratie »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 7: Abstracte Vision & Interfaces</h1>
+            <p>Een 'plug-and-play' vision-systeem bouwen met Interfaces (Protocols).</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m7-1.html">M7.1: Interfaces (Protocol)</a></li>
+                <li><a href="m7-2.html">M7.2: Implementatie (Kleur)</a></li>
+                <li><a href="m7-3.html">M7.3: Implementatie (Lijn)</a></li>
+                <li><a href="m7-4.html">M7.4: Implementatie (Gezicht)</a></li>
+                <li><a href="m7-5.html">M7.5: Implementatie (Gebaar)</a></li>
+                <li><a href="m7-6.html" class="active">M7.6: Poly-koppeling</a></li>
+                <li><a href="m7-7.html">M7.7: Sensor Integratie</a></li>
+                <li><a href="m7-8.html">M7.8: Testing (Detectors)</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M7.6: Polymorfische Koppeling</h2>
+
+        <h3>Theorie: De 'Slimme' Robot</h3>
+        <p>
+            <strong>Probleem:</strong> <code>main.py</code> is nu onze 'router' en testbank. De *robot* (<code>SpiderPi</code>) weet niet eens dat er 'processors' bestaan.
+        </p>
+        <p>
+            <strong>Oplossing (De 'Payoff'):</strong> We maken de robot *slimmer*.
+        </p>
+        <ol>
+            <li>De <code>SpiderPi</code> krijgt een *nieuwe* property: <code>self._processor</code>, die het <strong>Protocol</strong> (het 'stopcontact') als type hint heeft.</li>
+            <li>De <code>SpiderPi</code> krijgt een *nieuwe* methode: <code>set_vision_processor(processor)</code>.</li>
+            <li>De <code>SpiderPi.stream()</code> methode stopt met zelf-detecteren. Het *delegeert* al het analyse-werk aan <code>self._processor.analyze_frame()</code>.</li>
+        </ol>
+        <p><code>main.py</code> wordt nu heel simpel: het kiest (via CLI) welke 'stekker' (<code>FaceDetector</code>, <code>ColorDetector</code>) het in het 'stopcontact' van de robot stopt.</p>
+
+        <hr>
+        <h3>Python Voorbeeld</h3>
+
+        <h4>1. De 'slimme' Robot (in <code>robot.py</code>)</h4>
+        <pre><code class="language-python"># In spiderpi_core/robot.py
+# Importeer het CONTRACT (Interface)
+from .vision import VisionProcessorProtocol
+
+class SpiderPi(RobotComponent):
+    _processor: VisionProcessorProtocol | None = None # Het 'stopcontact'
+    # ...
+
+    def set_vision_processor(self, processor: VisionProcessorProtocol) -> None:
+        """Stelt de actieve 'vision brain' (de 'stekker') in."""
+        self._processor = processor
+
+    def stream(self) -> None:
+        """De 'slimme' stream loop."""
+        # ... (camera check)
+        while True:
+            frame = self._camera.get_frame()
+            if frame is None: break
+
+            # --- POLYMORFISME ---
+            if self._processor:
+                # We weten niet welke het is, en het boeit niet!
+                processed_frame = self._processor.analyze_frame(frame)
+            else:
+                processed_frame = frame # Geen processor? Toon origineel.
+
+            cv2.imshow("SpiderPi Stream", processed_frame)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+        cv2.destroyAllWindows()
+</code></pre>
+
+        <h4>2. De 'Router' (in <code>main.py</code>)</h4>
+        <pre><code class="language-python"># In main.py
+from spiderpi_core.robot import SpiderPi
+from spiderpi_core.vision import (
+    FaceDetector, ColorDetector, LineFollowProcessor
+)
+
+# ... (argparse setup voor --detector) ...
+args = parser.parse_args()
+my_robot = SpiderPi()
+processor = None # Default
+
+# --- De 'Processor Factory' ---
+if args.detector == "face":
+    processor = FaceDetector("haarcascade_frontalface_default.xml")
+elif args.detector == "color":
+    processor = ColorDetector(LOWER_RED, UPPER_RED)
+elif args.detector == "line":
+    processor = LineFollowProcessor(LOWER_LINE, UPPER_LINE)
+
+# --- De Koppeling ---
+if processor:
+    my_robot.set_vision_processor(processor)  # Stop de 'stekker' erin
+
+# --- De Actie ---
+if args.action == "stream":
+    my_robot.stream() # De robot regelt de rest!
+</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M5.2: Abstracte Methoden</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m5-1.html">« M5.1: ABC</a>
+            <a href="m5-3.html">M5.3: Implementatie »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 5: Abstractie & Utilities</h1>
+            <p>Contracten afdwingen (ABC) en gedeelde (static) logica bouwen.</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m5-1.html">M5.1: Abstract Base Class (ABC)</a></li>
+                <li><a href="m5-2.html" class="active">M5.2: Abstracte Methoden</a></li>
+                <li><a href="m5-3.html">M5.3: Implementatie (Simpel)</a></li>
+                <li><a href="m5-4.html">M5.4: Implementatie (Complex)</a></li>
+                <li><a href="m5-5.html">M5.5: Abstractie voor Sensoren</a></li>
+                <li><a href="m5-6.html">M5.6: Unit Testing (Pytest)</a></li>
+                <li><a href="m5-7.html">M5.7: Static Methoden</a></li>
+                <li><a href="m5-8.html">M5.8: Class Variables</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M5.2: Abstracte Methoden</h2>
+
+        <h3>Theorie: Het 'Contract' (Deel 2: De Eis)</h3>
+        <p>
+            Een <code>ABC</code> (Les 5.1) wordt pas krachtig als we het combineren met <code>@abstractmethod</code>.
+        </p>
+        <p>
+            Dit is een 'decorator' die je boven een methode zet. Het betekent: "Ik (de Ouder) heb geen code voor deze methode, maar ik <em>eis</em> dat elk 'kind' (subklasse) dat deze klasse erft, deze methode <em>zelf implementeert</em>."
+        </p>
+        <p>
+            Een klasse met één of meer abstracte methoden kan zelf <strong>niet</strong> meer geïnstantieerd (aangemaakt) worden.
+        </p>
+
+        <hr>
+        <h3>Python Voorbeeld (`actions.py`)</h3>
+        <p>We passen <code>AbstractRobotAction</code> aan en voegen de 'eis' toe.</p>
+
+        <pre><code class="language-python">from abc import ABC, abstractmethod
+from spiderpi_core.robot import SpiderPi
+
+class AbstractRobotAction(ABC):
+    # ... (init van Les 5.1) ...
+
+    # DIT IS HET CONTRACT:
+    @abstractmethod
+    def execute(self) -> None:
+        """
+        Voert de specifieke robot-actie uit.
+        Kind-klassen MOETEN dit implementeren.
+        """
+        pass # Geen code hier
+
+# --- In main.py ---
+# from spiderpi_core.actions import AbstractRobotAction
+#
+# actie = AbstractRobotAction(my_robot)
+#
+# ^^^ DIT CRASHT NU (TypeError)
+# Fout: Can't instantiate abstract class AbstractRobotAction
+#       with abstract method execute
+# Dit is de "win" van de les! Het contract werkt.</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

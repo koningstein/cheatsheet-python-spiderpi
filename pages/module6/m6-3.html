@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M6.3: De .get_frame() Methode</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m6-2.html">« M6.2: VideoCapture</a>
+            <a href="m6-4.html">M6.4: Integratie Camera »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 6: Camera Vision</h1>
+            <p>De camera aansturen, beelden (frames) lezen en simpele detectie.</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m6-1.html">M6.1: De Camera Klasse</a></li>
+                <li><a href="m6-2.html">M6.2: VideoCapture</a></li>
+                <li><a href="m6-3.html" class="active">M6.3: .get_frame()</a></li>
+                <li><a href="m6-4.html">M6.4: Integratie Camera</a></li>
+                <li><a href="m6-5.html">M6.5: Videostream CLI</a></li>
+                <li><a href="m6-6.html">M6.6: HSV Theorie</a></li>
+                <li><a href="m6-7.html">M6.7: Detectie (Pixels)</a></li>
+                <li><a href="m6-8.html">M6.8: Debuggen (Vision)</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M6.3: De .get_frame() Methode</h2>
+
+        <h3>Theorie: Een Foto Nemen (Een Frame Lezen)</h3>
+        <p>
+            <strong>Probleem:</strong> De camera is *aan* (dankzij <code>__init__</code>), maar we 'kijken' nog niet.
+        </p>
+        <p>
+            <strong>Oplossing:</strong> We hebben een methode nodig om één 'foto' op te vragen. In video heet een foto een <strong>Frame</strong>. Het <code>VideoCapture</code> object (dat in <code>self._capture</code> zit) heeft hiervoor een methode: <strong><code>.read()</code></strong>.
+        </p>
+        <p><code>succes, frame = self._capture.read()</code>  geeft <strong>twee</strong> dingen terug:</p>
+        <ol>
+            <li><code>succes</code>: Een <strong>boolean</strong> (<code>True</code> / <code>False</code>). <code>True</code> als het gelukt is om een frame te lezen.</li>
+            <li><code>frame</code>: Het <strong>beeld</strong> zelf. Dit is een groot 'rooster' met getallen (een NumPy array) dat alle pixelkleuren bevat.</li>
+        </ol>
+        <p>Onze eigen <code>.get_frame()</code> methode moet deze aanroep 'wrappen' (inpakken), controleren of het gelukt is, en alleen het <code>frame</code> teruggeven.</p>
+
+        <hr>
+        <h3>Python Voorbeeld (`camera.py`)</h3>
+        <p>We voegen <code>numpy</code> toe voor de type hints en bouwen de methode.</p>
+
+        <h4>1. Installeren (Terminal)</h4>
+        <pre><code class="language-bash">(venv) C:\...&gt; pip install numpy
+(venv) C:\...&gt; pip freeze > requirements.txt</code></pre>
+
+        <h4>2. Methode toevoegen (in <code>camera.py</code>)</h4>
+        <pre><code class="language-python"># ... (imports bovenaan)
+import numpy as np
+
+class Camera:
+    # ... (__init__ van Les 6.2) ...
+
+    def get_frame(self) -> np.ndarray | None:
+        """
+        Leest één frame van de camera.
+
+        Returns:
+            np.ndarray: Het frame (beeld) als een NumPy array.
+            None: Als het lezen van het frame mislukt is.
+        """
+        # Vraag het frame op bij het OpenCV object
+        success, frame = self._capture.read()
+
+        if not success:
+            print("FOUT: Kon geen frame lezen van camera.")
+            return None
+
+        return frame
+
+# --- In main.py (om te testen) ---
+# cam = Camera()
+# test_frame = cam.get_frame()
+# if test_frame is not None:
+#     print("Frame succesvol gelezen!")
+#     print(f"Dimensies van het frame: {test_frame.shape}")
+# Output: Dimensies van het frame: (480, 640, 3)</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

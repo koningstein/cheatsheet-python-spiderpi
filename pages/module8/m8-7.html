@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M8.7: Code Kwaliteit (Refactoring)</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m8-6.html">« M8.6: AI Logica (Gebaar)</a>
+            <a href="m8-8.html">M8.8: Eindopdracht »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 8: Integratie & Eindopdracht</h1>
+            <p>Alles samenbrengen in een 'Sense-Think-Act' loop.</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m8-1.html">M8.1: Integratie (Stop op Rood)</a></li>
+                <li><a href="m8-2.html">M8.2: Sturing (Lijnvolgen)</a></li>
+                <li><a href="m8-3.html">M8.3: Integratie (Gezicht Volgen)</a></li>
+                <li><a href="m8-4.html">M8.4: Integratie (Gebaar Actie)</a></li>
+                <li><a href="m8-5.html">M8.5: AI Logica (Gezicht)</a></li>
+                <li><a href="m8-6.html">M8.6: AI Logica (Gebaar)</a></li>
+                <li><a href="m8-7.html" class="active">M8.7: Code Kwaliteit</a></li>
+                <li><a href="m8-8.html">M8.8: Eindopdracht</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M8.7: Code Kwaliteit (Refactoring)</h2>
+
+        <h3>Theorie: De Grote Schoonmaak</h3>
+        <p>
+            Dit is een *herhaling* van <strong>Linting</strong> (M3.8) [cite: 245-246] en de introductie van een <strong>Formatter</strong> (<code>black</code>).
+        </p>
+        <p>
+            We hebben M6 en M7 [cite: 251-254] er snel 'bijgebouwd'. Er zitten nu waarschijnlijk 'unused imports', 'lines too long', en inconsistent witgebruik in.
+        </p>
+        <ul>
+            <li><strong>Formatter (<code>black</code>):</strong> <em>Repareert</em> automatisch alle *stijl*-fouten (witregels, komma's, regel-afbreking).</li>
+            <li><strong>Linter (<code>pylint</code>):</strong> <em>Klaagt</em> over *logische* fouten (bv. <code>W0611: Unused import cv2</code>) en conventies.</li>
+        </ul>
+
+        <hr>
+        <h3>Python Voorbeeld (Terminal)</h3>
+        <p>De opdracht is om de code-score van het project te verhogen.</p>
+
+        <pre><code class="language-bash"># 1. Installeer de Formatter (in je venv)
+(venv) C:\...&gt; pip install black
+
+# 2. Update je 'recept'
+(venv) C:\...&gt; pip freeze > requirements.txt
+
+# 3. Draai 'black' (de Formatter)
+#    De '.' betekent 'formatteer alles in deze map'
+(venv) C:\...&gt; black .
+# Output:
+# reformatted spiderpi_core\vision.py
+# reformatted spiderpi_core\robot.py
+# All done!
+
+# 4. Draai 'pylint' (de Linter) (herhaling M3.8)
+(venv) C:\...&gt; pylint spiderpi_core
+
+# 5. Bekijk de output en los handmatig de 'Warnings' op.
+#    BV: "W0611: Unused import time" in robot.py
+#    Oplossing: Open robot.py en verwijder de 'import time' regel.
+
+# 6. Draai 'pylint' opnieuw
+(venv) C:\...&gt; pylint spiderpi_core
+# ...
+# Your code has been rated at 9.50/10 (hogere score!)</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

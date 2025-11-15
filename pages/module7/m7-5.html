@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M7.5: Implementatie (Gebarenherkenning)</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m7-4.html">« M7.4: Implementatie (Gezicht)</a>
+            <a href="m7-6.html">M7.6: Poly-koppeling »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 7: Abstracte Vision & Interfaces</h1>
+            <p>Een 'plug-and-play' vision-systeem bouwen met Interfaces (Protocols).</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m7-1.html">M7.1: Interfaces (Protocol)</a></li>
+                <li><a href="m7-2.html">M7.2: Implementatie (Kleur)</a></li>
+                <li><a href="m7-3.html">M7.3: Implementatie (Lijn)</a></li>
+                <li><a href="m7-4.html">M7.4: Implementatie (Gezicht)</a></li>
+                <li><a href="m7-5.html" class="active">M7.5: Implementatie (Gebaar)</a></li>
+                <li><a href="m7-6.html">M7.6: Poly-koppeling</a></li>
+                <li><a href="m7-7.html">M7.7: Sensor Integratie</a></li>
+                <li><a href="m7-8.html">M7.8: Testing (Detectors)</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M7.5: Implementatie (Gebarenherkenning)</h2>
+
+        <h3>Theorie: Vormen Vinden (Contours)</h3>
+        <p>
+            <strong>Probleem:</strong> Hoe detecteer je een "open hand"? Het heeft geen vaste kleur (zoals de lijn) of vaste vorm (zoals een gezicht).
+        </p>
+        <p>
+            <strong>Oplossing:</strong> We zoeken naar *vormen* (contouren). We implementeren een *vierde* processor die het <code>analyze_frame</code> contract volgt.
+        </p>
+        <p><strong>Logica (Simpel):</strong></p>
+        <ol>
+            <li>Maak het beeld *extreem* contrastrijk (binair: alleen zwart of wit). Dit heet <strong>Thresholding</strong>.</li>
+            <li>Vraag <code>OpenCV</code> om *alle* vormen (omtrekken) te vinden: <code>cv2.findContours()</code>.</li>
+            <li>Vind de *grootste* vorm (contour) in de lijst.</li>
+            <li>Kijk naar de *oppervlakte* (<code>cv2.contourArea()</code>). Als de oppervlakte > 5000 (een 'magic number'), gaan we ervan uit dat het een gebaar is.</li>
+            <li>Teken die grootste vorm op het *originele* beeld.</li>
+            <li>Geef het *originele* beeld terug.</li>
+        </ol>
+
+        <hr>
+        <h3>Python Voorbeeld (`vision.py`)</h3>
+        <p>We voegen een *vierde* implementatie toe aan <code>vision.py</code>.</p>
+
+        <pre><code class="language-python"># In spiderpi_core/vision.py
+# ... (FaceDetector) ...
+
+class GestureDetector:
+    """Een vierde 'stekker'. Detecteert grote vormen/gebaren."""
+
+    _min_area: int
+
+    def __init__(self, min_area: int = 5000):
+        self._min_area = min_area
+
+    def analyze_frame(self, frame: np.ndarray) -> np.ndarray:
+        """
+        Implementeert het protocol.
+        Vindt grote 'contouren' (bv. een hand).
+        """
+        # 1. Converteer en filter (Threshold)
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        blur = cv2.GaussianBlur(gray, (5, 5), 0)
+        # 'Threshold' zet alles < 70 op Zwart (0), alles > 70 op Wit (255)
+        _, thresh = cv2.threshold(blur, 70, 255, cv2.THRESH_BINARY_INV)
+
+        # 2. Vind vormen
+        contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+        if contours: # Als er vormen zijn gevonden
+            # 3. Vind de grootste
+            biggest_contour = max(contours, key=cv2.contourArea)
+
+            # 4. Check oppervlakte
+            if cv2.contourArea(biggest_contour) > self._min_area:
+                # 5. Teken de vorm
+                cv2.drawContours(frame, [biggest_contour], -1, (0, 255, 0), 3) # Groen
+
+        # 6. Geef frame terug
+        return frame
+</code></pre>
+        <p><strong>Testen in <code>main.py</code>:</strong></p>
+        <pre><code class="language-python"># processor = GestureDetector(min_area=10000)
+# my_robot.set_vision_processor(processor)
+# my_robot.stream()</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

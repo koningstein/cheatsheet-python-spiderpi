@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M3.8: Linting (Pylint)</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m3-7.html">« M3.7: CLI Acties</a>
+            <a href="../module4/m4-1.html">Module 4: Overerving »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 3: Encapsulatie & Kwaliteit</h1>
+            <p>Code afschermen (encapsulatie) en de kwaliteit controleren (lint, debug).</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m3-1.html">M3.1: Type Hints</a></li>
+                <li><a href="m3-2.html">M3.2: Docstrings</a></li>
+                <li><a href="m3-3.html">M3.3: Protected ('_')</a></li>
+                <li><a href="m3-4.html">M3.4: Private ('__')</a></li>
+                <li><a href="m3-5.html">M3.5: Debuggen (Basis)</a></li>
+                <li><a href="m3-6.html">M3.6: Simple CLI</a></li>
+                <li><a href="m3-7.html">M3.7: CLI Acties</a></li>
+                <li><a href="m3-8.html" class="active">M3.8: Linting (Pylint)</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M3.8: Linting (Kwaliteit)</h2>
+
+        <h3>Theorie: De Spellingscontrole voor Code</h3>
+        <p>
+            <strong>Probleem:</strong> Onze code <em>werkt</em>, maar is het <em>goede</em> code? Hebben we ongebruikte imports? Te lange regels? Verkeerde naamgeving (<code>mijnKlasse</code> i.p.v. <code>MijnKlasse</code>)?
+        </p>
+        <p>
+            <strong>Oplossing:</strong> Een <strong>Linter</strong> (zoals <code>pylint</code>). Dit is een tool die je code <em>leest</em> (zonder het uit te voeren) en functioneert als een strenge, automatische docent die je code een *cijfer* geeft (op 10).
+        </p>
+        <p>Het controleert op Fouten (Errors), Waarschuwingen (Warnings), en Stijl-Conventies (Conventions).</p>
+
+        <hr>
+        <h3>Python Voorbeeld (Terminal)</h3>
+        <p><code>pylint</code> is een tool die je installeert en draait vanuit de terminal.</p>
+
+        <pre><code class="language-bash"># 1. Installeren (in je venv)
+(venv) C:\...&gt; pip install pylint
+
+# 2. Toevoegen aan je 'recept'
+(venv) C:\...&gt; pip freeze > requirements.txt
+
+# 3. Analyseren (draai in de hoofdmap, wijs naar je package)
+(venv) C:\...&gt; pylint spiderpi_core
+
+# 4. Voorbeeld Output (je krijgt een 'muur van tekst'):
+# ************* Module spiderpi_core.servo
+# spiderpi_core\servo.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+# spiderpi_core\servo.py:10:4: C0103: Attribute name "_id" doesn't conform to snake_case naming style (invalid-name)
+# ...
+# -------------------------------------
+# Your code has been rated at 3.45/10
+
+# 5. De Opdracht:
+# Probeer de makkelijke fouten (C0114, W0611 Unused import)
+# op te lossen en kijk of je score stijgt.</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M5.8: Class Variables</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m5-7.html">« M5.7: Static Methoden</a>
+            <a href="../module6/m6-1.html">Module 6: Camera Vision »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 5: Abstractie & Utilities</h1>
+            <p>Contracten afdwingen (ABC) en gedeelde (static) logica bouwen.</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m5-1.html">M5.1: Abstract Base Class (ABC)</a></li>
+                <li><a href="m5-2.html">M5.2: Abstracte Methoden</a></li>
+                <li><a href="m5-3.html">M5.3: Implementatie (Simpel)</a></li>
+                <li><a href="m5-4.html">M5.4: Implementatie (Complex)</a></li>
+                <li><a href="m5-5.html">M5.5: Abstractie voor Sensoren</a></li>
+                <li><a href="m5-6.html">M5.6: Unit Testing (Pytest)</a></li>
+                <li><a href="m5-7.html">M5.7: Static Methoden</a></li>
+                <li><a href="m5-8.html" class="active">M5.8: Class Variables</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M5.8: Class Variables</h2>
+
+        <h3>Theorie: 'van het Object' vs. 'van de Klasse'</h3>
+        <p>
+            Er zijn twee soorten variabelen:
+        </p>
+        <p>
+            <strong>1. Instance Variable (Wat we al kennen):</strong>
+        </p>
+        <ul>
+            <li>Gedefinieerd in <code>__init__</code> met <code>self.</code></li>
+            <li><code>self._current_angle = 90.0</code></li>
+            <li><strong>Uniek</strong> voor elk object. <code>motor1.current_angle</code> kan anders zijn dan <code>motor2.current_angle</code>.</li>
+        </ul>
+
+        <p>
+            <strong>2. Class Variable:</strong>
+        </p>
+        <ul>
+            <li>Gedefinieerd *direct* onder de <code>class</code> regel (buiten <code>__init__</code>).</li>
+            <li>Wordt <strong>gedeeld</strong> door *alle* objecten van die klasse.</li>
+            <li><strong>Vergelijking (Auto):</strong> <code>mijn_auto.kleur</code> (instance) vs <code>Auto.AANTAL_WIELEN = 4</code> (class).</li>
+        </ul>
+
+        <hr>
+        <h3>Python Voorbeeld (`robot.py`)</h3>
+        <p>We voegen gedeelde constanten toe aan onze klassen.</p>
+
+        <h4>In <code>spiderpi_core/robot.py</code>:</h4>
+        <pre><code class="language-python">from .leg import Leg
+from .component import RobotComponent
+
+class SpiderPi(RobotComponent):
+    # --- CLASS VARIABLES ---
+    # Gedeeld door alle SpiderPi objecten
+    DEFAULT_IP: str = "192.168.1.100"
+    LEG_COUNT: int = 6
+
+    _leg_front_r: Leg # Instance variable
+    # ...
+
+    def __init__(self) -> None:
+        super().__init__(name="SpiderPi_Robot")
+        # --- INSTANCE VARIABLES ---
+        self._leg_front_r = Leg(...)
+        # ...</code></pre>
+
+        <h4>In <code>spiderpi_core/servo.py</code>:</h4>
+        <p>We verplaatsen <code>MIN_ANGLE</code> en <code>MAX_ANGLE</code> *in* de klasse, zodat ze logisch bij de <code>Servo</code> horen.</p>
+        <pre><code class="language-python">class Servo(RobotComponent):
+    # --- CLASS VARIABLES ---
+    MIN_ANGLE: float = 0.0
+    MAX_ANGLE: float = 180.0
+
+    _id: int # Instance variable
+    _current_angle: float # Instance variable
+
+    def set_angle(self, new_angle: float) -> None:
+        # Gebruik 'self.' of 'Servo.' om de class variable te lezen
+        if not (self.MIN_ANGLE <= new_angle <= self.MAX_ANGLE):
+            raise ValueError("Hoek buiten bereik")
+        # ...</code></pre>
+
+        <h4>In <code>main.py</code>:</h4>
+        <pre><code class="language-python">from spiderpi_core.robot import SpiderPi
+from spiderpi_core.servo import Servo
+
+# Je kunt ze aanroepen ZONDER een object te maken:
+print(f"Een SpiderPi heeft {SpiderPi.LEG_COUNT} poten.")
+print(f"De max hoek van een Servo is {Servo.MAX_ANGLE} graden.")</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

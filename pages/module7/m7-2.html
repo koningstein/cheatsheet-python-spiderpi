@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M7.2: Implementatie (Kleurdetector)</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m7-1.html">« M7.1: Protocol</a>
+            <a href="m7-3.html">M7.3: Implementatie (Lijn) »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 7: Abstracte Vision & Interfaces</h1>
+            <p>Een 'plug-and-play' vision-systeem bouwen met Interfaces (Protocols).</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m7-1.html">M7.1: Interfaces (Protocol)</a></li>
+                <li><a href="m7-2.html" class="active">M7.2: Implementatie (Kleur)</a></li>
+                <li><a href="m7-3.html">M7.3: Implementatie (Lijn)</a></li>
+                <li><a href="m7-4.html">M7.4: Implementatie (Gezicht)</a></li>
+                <li><a href="m7-5.html">M7.5: Implementatie (Gebaar)</a></li>
+                <li><a href="m7-6.html">M7.6: Poly-koppeling</a></li>
+                <li><a href="m7-7.html">M7.7: Sensor Integratie</a></li>
+                <li><a href="m7-8.html">M7.8: Testing (Detectors)</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M7.2: Implementatie (Kleurdetector)</h2>
+
+        <h3>Theorie: Het Contract Vervullen (Deel 1)</h3>
+        <p>
+            In Les 7.1 hebben we het *contract* (het 'stopcontact') gemaakt. Nu maken we de *implementatie* (de 'stekker').
+        </p>
+        <p>
+            We maken een klasse <code>ColorDetector</code>. In Python hoef je niet expliciet <code>implements</code> te schrijven. Als jouw klasse een methode heeft die *exact* <code>analyze_frame(self, frame)</code> heet, "implementeert" het automatisch het protocol. Dit heet <strong>Duck Typing</strong>.
+        </p>
+        <p>
+            We verplaatsen de logica uit Module 6 (HSV, <code>inRange</code>) [cite: 251-252] *uit* de <code>Camera</code> / <code>Robot</code> klassen en *in* deze nieuwe, gespecialiseerde klasse.
+        </p>
+
+        <hr>
+        <h3>Python Voorbeeld (`vision.py`)</h3>
+        <p>We voegen de <code>ColorDetector</code> klasse toe aan <code>spiderpi_core/vision.py</code>.</p>
+
+        <pre><code class="language-python"># In spiderpi_core/vision.py
+from typing import Protocol
+import numpy as np
+import cv2
+
+# ... (VisionProcessorProtocol van Les 7.1) ...
+
+class ColorDetector: # Erft *niet* (voor nu)
+    """
+    Een concrete implementatie van een vision processor.
+    Vindt een specifieke kleur.
+    Deze klasse 'past' op het VisionProcessorProtocol.
+    """
+    _lower_bound: np.ndarray
+    _upper_bound: np.ndarray
+
+    def __init__(self, lower_bound: np.ndarray, upper_bound: np.ndarray) -> None:
+        """Slaat de te zoeken kleurgrenzen op."""
+        self._lower_bound = lower_bound
+        self._upper_bound = upper_bound
+
+    def analyze_frame(self, frame: np.ndarray) -> np.ndarray:
+        """
+        Implementeert het protocol.
+        Vindt de kleur en geeft een 'mask' (zwart-wit) beeld terug.
+        """
+        # 1. Converteer naar HSV (Logica uit M6.6)
+        hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+        # 2. Maak de 'mask'
+        mask = cv2.inRange(hsv_frame, self._lower_bound, self._upper_bound)
+
+        return mask # Geeft het zwart-wit masker terug
+</code></pre>
+        <p><strong>Testen:</strong> Je kunt <code>main.py</code> tijdelijk aanpassen om deze processor te gebruiken en <code>cv2.imshow("Mask", mask)</code> te tonen.</p>
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

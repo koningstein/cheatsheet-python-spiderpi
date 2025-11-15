@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M8.1: Integratie (Stop op Rood)</title>
+
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="../module7/m7-8.html">« M7.8: Testing (Detectors)</a>
+            <a href="m8-2.html">M8.2: Sturing (Lijnvolgen) »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 8: Integratie & Eindopdracht</h1>
+            <p>Alles samenbrengen in een 'Sense-Think-Act' loop.</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m8-1.html" class="active">M8.1: Integratie (Stop op Rood)</a></li>
+                <li><a href="m8-2.html">M8.2: Sturing (Lijnvolgen)</a></li>
+                <li><a href="m8-3.html">M8.3: Integratie (Gezicht Volgen)</a></li>
+                <li><a href="m8-4.html">M8.4: Integratie (Gebaar Actie)</a></li>
+                <li><a href="m8-5.html">M8.5: AI Logica (Gezicht)</a></li>
+                <li><a href="m8-6.html">M8.6: AI Logica (Gebaar)</a></li>
+                <li><a href="m8-7.html">M8.7: Code Kwaliteit</a></li>
+                <li><a href="m8-8.html">M8.8: Eindopdracht</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M8.1: Integratie (Stop op Rood)</h2>
+
+        <h3>Theorie: De 'Sense-Think-Act' Loop</h3>
+        <p>
+            Dit is de meest fundamentele loop in robotica. We combineren concepten uit eerdere modules tot één werkend geheel.
+        </p>
+        <ol>
+            <li><strong>Sense (Zien):</strong> We gebruiken de <code>ColorVisionSensor</code> (M7.7) [cite: 253-254] om een *getal* (aantal pixels) te lezen.</li>
+            <li><strong>Think (Denken):</strong> We gebruiken een simpele <code>if</code>-statement om dat getal te vergelijken met een drempel (threshold).</li>
+            <li><strong>Act (Doen):</strong> We roepen een <code>AbstractRobotAction</code> (M5.3) [cite: 249-250] aan om de robot te laten reageren.</li>
+        </ol>
+        <p>
+            We bouwen een <code>while</code>-loop in <code>main.py</code> die de robot een actie laat uitvoeren (bv. zwaaien) *totdat* hij 'rood' ziet, en dan stopt.
+        </p>
+
+        <hr>
+        <h3>Python Voorbeeld (`main.py`)</h3>
+        <p>We bouwen een script dat stopt zodra het 'rood' ziet.</p>
+
+        <pre><code class="language-python"># In main.py
+import numpy as np
+import time
+from spiderpi_core.robot import SpiderPi
+from spiderpi_core.camera import Camera
+from spiderpi_core.sensors import ColorVisionSensor
+from spiderpi_core.actions import WaveAction # (Uit M5.4)
+
+# --- 1. Sense (Setup) ---
+# Definieer de grenzen voor rood (herhaling van M7)
+LOWER_RED = np.array([0, 120, 70])
+UPPER_RED = np.array([10, 255, 255])
+# De 'drempel': hoeveel rode pixels telt als 'stop'
+RED_THRESHOLD = 5000
+
+# --- 3. Act (Setup) ---
+my_robot = SpiderPi()
+wave_action = WaveAction(my_robot)
+# We hebben de camera nodig voor de sensor
+cam = Camera()
+red_sensor = ColorVisionSensor(cam, LOWER_RED, UPPER_RED)
+
+print("Starten... Hou iets roods voor de camera om te stoppen.")
+
+# --- De Sense-Think-Act Loop ---
+while True:
+    # 1. Sense
+    pixel_count = red_sensor.read_value()
+    print(f"Rode pixels: {pixel_count}")
+
+    # 2. Think
+    if pixel_count > RED_THRESHOLD:
+        print("ROOD GEDETECTEERD! Stoppen.")
+        break # Stopt de while-loop
+
+    # 3. Act (als 'Think' niet stopt)
+    print("Actie: Zwaaien... (geen rood gezien)")
+    wave_action.execute()
+
+    time.sleep(1) # Wacht 1 seconde
+
+print("Programma gestopt.")</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

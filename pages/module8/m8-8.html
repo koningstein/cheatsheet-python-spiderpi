@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M8.8: Eindopdracht (Polymorfisme Totaal)</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m8-7.html">« M8.7: Code Kwaliteit</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 8: Integratie & Eindopdracht</h1>
+            <p>Alles samenbrengen in een 'Sense-Think-Act' loop.</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m8-1.html">M8.1: Integratie (Stop op Rood)</a></li>
+                <li><a href="m8-2.html">M8.2: Sturing (Lijnvolgen)</a></li>
+                <li><a href="m8-3.html">M8.3: Integratie (Gezicht Volgen)</a></li>
+                <li><a href="m8-4.html">M8.4: Integratie (Gebaar Actie)</a></li>
+                <li><a href="m8-5.html">M8.5: AI Logica (Gezicht)</a></li>
+                <li><a href="m8-6.html">M8.6: AI Logica (Gebaar)</a></li>
+                <li><a href="m8-7.html">M8.7: Code Kwaliteit</a></li>
+                <li><a href="m8-8.html" class="active">M8.8: Eindopdracht</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M8.8: Eindopdracht (Polymorfisme Totaal)</h2>
+
+        <h3>Theorie: De Eindmontage</h3>
+        <p>
+            Dit is de eindopdracht . We bouwen de *definitieve* <code>main.py</code> die alle concepten (CLI, Polymorfisme, Acties, Detectors) combineert tot één flexibel besturingsscript.
+        </p>
+        <p><strong>De Architectuur:</strong></p>
+        <ol>
+            <li><strong>CLI (<code>argparse</code>):</strong> Leest <code>--detector</code> (wat te zien?) en <code>--on-detect</code> (wat te doen?).</li>
+            <li><strong><code>main.py</code> (Router):</strong>
+                <ul>
+                    <li>Maakt de juiste <code>VisionProcessor</code> (M7) [cite: 253-254] (de 'stekker').</li>
+                    <li>Maakt de juiste <code>AbstractRobotAction</code> (M5) [cite: 249-250] (de 'actie').</li>
+                </ul>
+            </li>
+            <li><strong><code>Robot</code> (Koppeling):</strong> <code>main.py</code> *geeft* de processor en de actie aan de robot.</li>
+            <li><strong><code>Robot.run_loop()</code>:</strong> De robot handelt de 'Sense-Think-Act' loop (M8.1)  <em>intern</em> en <em>polymorfisch</em> af.</li>
+        </ol>
+
+        <hr>
+        <h3>Python Voorbeeld</h3>
+
+        <h4>1. Refactor (in <code>robot.py</code>)</h4>
+        <p>Maak een 'hoofd-loop' in de robot die de actie uitvoert.</p>
+        <pre><code class="language-python"># In spiderpi_core/robot.py
+# ... (imports)
+from .actions import AbstractRobotAction
+from .vision import VisionProcessorProtocol
+
+class SpiderPi(RobotComponent):
+    # ... (init, set_vision_processor, etc.) ...
+
+    def run_vision_loop(self, action_on_detect: AbstractRobotAction) -> None:
+        """
+        De definitieve 'Sense-Think-Act' loop.
+        Voert de gegeven 'action' uit als de 'processor' iets vindt.
+        """
+        if not self._camera or not self._processor:
+            print("Fout: Camera of Processor niet ingesteld.")
+            return
+
+        print("Vision loop gestart. Druk 'q' om te stoppen.")
+        while True:
+            frame = self._camera.get_frame()
+            if frame is None: break
+
+            # 1. Sense (Polymorfisch)
+            processed_frame, data = self._processor.analyze_frame(frame)
+
+            # 2. Think
+            if data:
+                # 3. Act (Polymorfisch)
+                # We geven de data (bv. (cX, cY)) mee aan de actie
+                action_on_detect.execute(data)
+
+            cv2.imshow("SpiderPi Vision", processed_frame)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+        cv2.destroyAllWindows()</code></pre>
+
+        <h4>2. Refactor (in <code>actions.py</code>)</h4>
+        <p>Pas het <code>execute</code> contract (M5.2) aan zodat het <code>data</code> kán accepteren.</p>
+        <pre><code class="language-python"># In spiderpi_core/actions.py
+class AbstractRobotAction(ABC):
+    @abstractmethod
+    def execute(self, data=None) -> None: # 'data=None' toegevoegd
+        pass
+
+class WaveAction(AbstractRobotAction):
+    def execute(self, data=None) -> None: # 'data=None' toegevoegd
+        self._robot.wave()</code></pre>
+
+        <h4>3. De Eindbaas (in <code>main.py</code>)</h4>
+        <pre><code class="language-python"># In main.py
+# ... (alle imports: argparse, robot, camera, vision, actions, numpy)
+
+def main():
+    # 1. CLI (argparse)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--detector", default="face", help="face, color, line, gesture")
+    parser.add_argument("--on-detect", default="wave", help="wave, aim, ...")
+    args = parser.parse_args()
+
+    # Setup
+    my_robot = SpiderPi()
+    processor = None
+    action = None
+
+    # 2. Processor Factory (Stekker kiezen)
+    if args.detector == "face":
+        processor = FaceDetector("haarcascade_frontalface_default.xml")
+    elif args.detector == "color":
+        LOWER_RED = np.array([0, 120, 70])
+        UPPER_RED = np.array([10, 255, 255])
+        processor = ColorDetector(LOWER_RED, UPPER_RED)
+    # ... (elif voor line en gesture) ...
+
+    # 3. Action Factory (Actie kiezen)
+    if args.on_detect == "wave":
+        action = WaveAction(my_robot)
+    # elif args.on_detect == "aim":
+    #    action = AimAction(my_robot) # (Nog te bouwen)
+
+    # 4. Koppelen & 5. Uitvoeren
+    if processor and action:
+        my_robot.set_vision_processor(processor)
+        my_robot.run_vision_loop(action)
+    else:
+        print("Fout: Kon detector of actie niet vinden.")
+
+if __name__ == "__main__":
+    main()</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

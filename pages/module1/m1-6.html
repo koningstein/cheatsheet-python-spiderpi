@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M1.6: Constructor (__init__)</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="m1-5.html">« M1.5: Getters</a>
+            <a href="m1-7.html">M1.7: Named Arguments »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 1: Fundamenten van OOP</h1>
+            <p>De basisbouwstenen: Classes, Objecten, Methoden, en Compositie.</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m1-1.html">M1.1: Class & Object</a></li>
+                <li><a href="m1-2.html">M1.2: Properties</a></li>
+                <li><a href="m1-3.html">M1.3: Methoden</a></li>
+                <li><a href="m1-4.html">M1.4: Setters</a></li>
+                <li><a href="m1-5.html">M1.5: Getters</a></li>
+                <li><a href="m1-6.html" class="active">M1.6: Constructor</a></li>
+                <li><a href="m1-7.html">M1.7: Named Arguments</a></li>
+                <li><a href="m1-8.html">M1.8: Compositie</a></li>
+                <li><a href="m1-9.html">M1.9: Delegatie</a></li>
+                <li><a href="m1-10.html">M1.10: Hoofd-Klasse</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <main>
+        <h2>M1.6: Constructor (__init__)</h2>
+
+        <h3>Theorie: De 'Geboorte' van een Object</h3>
+        <p>
+            Een <strong>Constructor</strong> is een speciale methode die <em>automatisch</em> wordt aangeroepen op het moment dat een object wordt gemaakt (geïnstantieerd).
+        </p>
+        <p>
+            In Python heet deze methode <code>def __init__(self, ...):</code> (met dubbele underscores).
+        </p>
+        <p>
+            Dit is de perfecte plek om de begin-properties (de 'toestand') van een object in te stellen. Het *dwingt* de programmeur om de benodigde data (zoals een <code>id</code> en <code>start_angle</code>) direct mee te geven bij het maken van het object.
+        </p>
+
+        <hr>
+        <h3>Python Voorbeeld</h3>
+        <p>We passen <code>servo.py</code> aan. De properties <code>_id</code> en <code>_current_angle</code> worden nu in de constructor ingesteld in plaats van in <code>main.py</code>.</p>
+        <pre><code class="language-python"># In servo.py
+MIN_ANGLE = 0.0
+MAX_ANGLE = 180.0
+
+class Servo:
+    _id: int
+    _current_angle: float
+
+    # De Constructor
+    def __init__(self, start_id, start_angle):
+        """Wordt automatisch aangeroepen bij Servo(...)"""
+        print(f"Nieuw Servo object (ID: {start_id}) wordt gemaakt...")
+        self._id = start_id
+
+        # We kunnen de setter *binnen* de constructor gebruiken
+        # voor validatie bij de 'geboorte'!
+        self.set_angle(start_angle)
+        # Let op: We stellen _current_angle niet meer dubbel in.
+
+    def set_angle(self, new_angle):
+        """SETTER: Stelt de hoek in, mét validatie."""
+        if new_angle >= MIN_ANGLE and new_angle <= MAX_ANGLE:
+            self._current_angle = new_angle
+        else:
+            # We gooien nu een 'Error' (Exception)
+            raise ValueError(f"Hoek {new_angle} is ongeldig.")
+
+    @property
+    def current_angle(self):
+        return self._current_angle
+
+# In main.py
+# Oude manier (werkt niet meer):
+# motor = Servo() # Crasht: Mist 2 argumenten
+# motor.id = 1
+# motor.set_angle(90.0)
+
+# Nieuwe manier:
+motor1 = Servo(1, 90.0)
+motor2 = Servo(2, 110.0)
+print(f"Motor 1 staat op {motor1.current_angle} graden.")
+
+# Crasht direct bij aanmaak (dankzij de constructor):
+# motor3 = Servo(3, 9000.0) # ValueError!</code></pre>
+
+    </main>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>
