@@ -61,31 +61,45 @@
     <main>
         <h2>M1.5: Getters (Read-Only)</h2>
 
-        <h3>Theorie: Data Veilig Lezen</h3>
+        <h3>Theorie: Data Veilig Lezen (Encapsulatie)</h3>
         <p>
-            Een Getter is een methode die bedoeld is om een property veilig uit te lezen.
+            <strong>Probleem:</strong> Onze <code>set_angle</code> (Setter) is nu veilig, maar een gebruiker kan de validatie nog steeds omzeilen! In <code>main.py</code> kan iemand nog steeds dit doen:
+            <br><code>motor.current_angle = 9000</code>
+            <br>Dit stelt de property *direct* in, zonder onze <code>if/else</code> te gebruiken.
         </p>
         <p>
-            <strong>Probleem:</strong> Onze <code>set_angle</code> (Setter) is nu veilig, maar een gebruiker kan de validatie nog steeds omzeilen door <code>motor.current_angle = 9000</code> direct in te stellen.
-        </p>
-        <p>
-            <strong>Oplossing:</strong> We 'verstoppen' de echte data-property (dit heet **Encapsulatie**) en geven de gebruiker een 'read-only' getter om de waarde te lezen.
+            <strong>Oplossing: Encapsulatie (Afschermen).</strong> We 'verstoppen' de echte data-property en geven de gebruiker alleen toegang via onze veilige methoden.
         </p>
         <ol>
             <li>We hernoemen de 'echte' data naar <code>self._current_angle</code> (met een <strong>underscore</strong> <code>_</code>). Dit is de Python-conventie voor "protected": "blijf hier af, dit is intern".</li>
-            <li>We maken een <strong>Getter</strong> met <code>@property</code>.  Dit is een speciale methode die eruitziet als een property (je roept hem aan zonder haakjes).</li>
+            <li>We maken een <strong>Getter</strong> met <code>@property</code>. Dit is een speciale methode die eruitziet als een property (je roept hem aan zonder haakjes) maar alleen kan *lezen*.</li>
         </ol>
 
         <hr>
-        <h3>Python Voorbeeld</h3>
+        <h3>Stap-voor-stap Voorbeeld (in `servo.py`)</h3>
+
+        <h4>Stap 1: Vóór (Code uit M1.4)</h4>
+        <pre><code class="language-python"># In servo.py
+class Servo:
+    # Onveilig! Iedereen kan dit direct aanpassen.
+    current_angle = 90.0
+    id = 0
+
+    def set_angle(self, new_angle):
+        if ...:
+            self.current_angle = new_angle # Past de publieke var aan
+        # ...</code></pre>
+
+        <h4>Stap 2: Na (Refactor naar Protected + Getter)</h4>
+        <p>We hernoemen <code>current_angle</code> naar <code>_current_angle</code> in de *hele* klasse. Daarna voegen we de <code>@property</code> getter toe.</p>
         <pre><code class="language-python"># In servo.py
 MIN_ANGLE = 0.0
 MAX_ANGLE = 180.0
 
 class Servo:
     # De 'echte' data is nu 'protected' (verstopt)
-    _current_angle = 0.0 # We geven een default waarde
-    id = 0 # 'id' is nog wel public
+    _current_angle = 90.0 # We geven een default waarde
+    id = 0 # 'id' is nog wel public (fixen we later)
 
     def set_angle(self, new_angle):
         """SETTER: Past de *protected* property aan."""
@@ -100,19 +114,35 @@ class Servo:
     def current_angle(self):
         """GETTER: Leest de *protected* property 'read-only' uit."""
         return self._current_angle
+</code></pre>
 
-# In main.py
+        <h4>Stap 3: Testen (in `main.py`)</h4>
+        <p>Probeer nu de waarde te lezen en direct te schrijven.</p>
+        <pre><code class="language-python"># In main.py
 motor = Servo()
 motor.id = 1
-motor.set_angle(90.0)
+motor.set_angle(120.0)
 
-# 1. Lezen (gebruikt de getter, zonder haakjes)
-print(f"Hoek is: {motor.current_angle}") # Output: 90.0
+# 1. Lezen (dit werkt, het gebruikt de getter)
+print(f"Hoek is: {motor.current_angle}")
 
-# 2. Schrijven (CRASHT!)
-# motor.current_angle = 200.0 # AttributeError: can't set attribute
-# Dit is GOED! Onze data is nu veilig.</code></pre>
+# 2. Schrijven (dit crasht nu!)
+print("Probeer de hoek direct op 200.0 te zetten...")
+try:
+    motor.current_angle = 200.0
+except AttributeError as e:
+    print(f"GELUKT: De code crashte met: {e}")
 
+# 3. De 'verstopte' property (niet doen, maar het kan)
+print(f"De 'echte' interne waarde is: {motor._current_angle}")</code></pre>
+
+        <h4>Stap 4: Resultaat</h4>
+        <p>Onze data is nu veilig! De enige manier om de hoek aan te passen is via de <code>set_angle</code> methode, die onze validatie uitvoert.</p>
+        <pre><code class="language-text">Motor 1 beweegt naar 120.0 gr.
+Hoek is: 120.0
+Probeer de hoek direct op 200.0 te zetten...
+GELUKT: De code crashte met: can't set attribute 'current_angle'
+De 'echte' interne waarde is: 120.0</code></pre>
     </main>
 </div>
 

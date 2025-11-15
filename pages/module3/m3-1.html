@@ -58,20 +58,61 @@
     </div>
 
     <main>
-        <h2>M3.1: Type Hints</h2>
+        <h2>M3.1: Type Hints (De Spelregels)</h2>
 
         <h3>Theorie: Zeggen Wat Je Verwacht</h3>
         <p>
-            <strong>Probleem:</strong> Python is 'dynamically typed'. Dat betekent dat je dit kan doen: <code>mijn_motor.set_angle("honderd")</code>. De code crasht pas *tijdens het uitvoeren* (run-time), diep in je <code>if</code>-statement.
+            <strong>Probleem:</strong> Python is 'dynamisch'. Dat betekent dat je dit kan doen: <code>mijn_motor.set_angle("honderd")</code>. Je code crasht pas *tijdens het uitvoeren* (run-time), diep in je <code>if</code>-statement.
         </p>
         <p>
-            <strong>Oplossing:</strong> Met <strong>Type Hints</strong> vertel je *vooraf* wat je verwacht. Het is een contract. Een moderne IDE (zoals VS Code) zal de student nu **direct waarschuwen** met een rood lijntje onder <code>"honderd"</code>, nog *voordat* de code draait.
+            <strong>Oplossing:</strong> Met <strong>Type Hints</strong> vertel je *vooraf* (als 'spelregel') wat voor type data je verwacht. Een moderne IDE (zoals VS Code) zal de student nu **direct waarschuwen** met een rood lijntje onder <code>"honderd"</code>, nog *voordat* de code draait.
         </p>
-        <p>We geven het type aan met <code>:</code> en de return-waarde met <code>-></code>.</p>
+        <p>We gaan onze <code>servo.py</code> stap-voor-stap 'refactoren' (verbeteren).</p>
 
         <hr>
-        <h3>Python Voorbeeld</h3>
-        <p>We passen <code>servo.py</code> aan om overal type hints toe te voegen.</p>
+        <h4>Stap 1: Properties 'Hinten'</h4>
+        <p>We vertellen de klasse welke properties een object zal hebben en welk type ze zijn. We voegen dit bovenaan de klasse-definitie toe.</p>
+        <pre><code class="language-python"># VOOR:
+class Servo(RobotComponent):
+    MIN_ANGLE = 0.0
+    # ...
+
+# NA:
+class Servo(RobotComponent):
+    _id: int
+    _current_angle: float
+    MIN_ANGLE: float = 0.0
+    # ...</code></pre>
+
+        <h4>Stap 2: Constructor (`__init__`) 'Hinten'</h4>
+        <p>We 'hinten' de parameters die binnenkomen (<code>: int</code>) en wat de methode teruggeeft (<code>-> None</code>, want een constructor geeft nooit iets terug).</p>
+        <pre><code class="language-python"># VOOR:
+def __init__(self, start_id, start_angle):
+
+# NA:
+def __init__(self, start_id: int, start_angle: float) -> None:</code></pre>
+
+        <h4>Stap 3: Methoden 'Hinten'</h4>
+        <p>Hetzelfde doen we voor alle methoden. <code>set_angle</code> verwacht een <code>float</code> en geeft niets (<code>None</code>) terug.</p>
+        <pre><code class="language-python"># VOOR:
+def set_angle(self, new_angle):
+
+# NA:
+def set_angle(self, new_angle: float) -> None:</code></pre>
+
+        <h4>Stap 4: Getters 'Hinten'</h4>
+        <p>Een <code>@property</code> getter geeft wél iets terug. We specificeren het return type (<code>-> float</code>).</p>
+        <pre><code class="language-python"># VOOR:
+@property
+def current_angle(self):
+
+# NA:
+@property
+def current_angle(self) -> float:</code></pre>
+
+        <hr>
+        <h3>Python Voorbeeld (Eindresultaat in `servo.py`)</h3>
+        <p>Nadat je alle stappen hebt doorlopen, ziet je <code>servo.py</code> er zo uit:</p>
 
         <pre><code class="language-python"># In spiderpi_core/servo.py
 

@@ -61,27 +61,33 @@
     <main>
         <h2>M1.10: Hoofd-Klasse (Integratie)</h2>
 
-        <h3>Theorie: Het Totaalplaatje</h3>
+        <h3>Theorie: Het Totaalplaatje (De Top van de Piramide)</h3>
         <p>
-            We passen het Compositie-principe (M1.8) nog een laatste keer toe om de structuur compleet te maken. We bouwen de 'top' van de piramide: de <code>SpiderPi</code>-klasse.
+            We passen het Compositie-principe (M1.8) nog een laatste keer toe om de basisstructuur van onze robot compleet te maken. [cite_start]We bouwen de 'top' van de piramide: de <code>SpiderPi</code>-klasse[cite: 2189].
         </p>
+        <p>De hiërarchie (structuur) is nu:</p>
         <ul>
-            <li>De <code>SpiderPi</code>-robot <em>heeft</em> 6 <code>Leg</code>-objecten. </li>
-            <li>Elke <code>Leg</code> <em>heeft</em> 3 <code>Servo</code>-objecten. </li>
+            <li>De <code>SpiderPi</code>-robot <em>heeft</em> 6 <code>Leg</code>-objecten.</li>
+            <li>Elke <code>Leg</code> <em>heeft</em> 3 <code>Servo</code>-objecten.</li>
         </ul>
         <p>
-            De <code>__init__</code> van de <code>SpiderPi</code> maakt 6 <code>Leg</code>-objecten aan, die op hun beurt 18 <code>Servo</code>-objecten aanmaken. Dit is een "cascade" van constructors.
+            De <code>__init__</code> van de <code>SpiderPi</code> maakt 6 <code>Leg</code>-objecten aan. De <code>__init__</code> van *elke* <code>Leg</code> maakt vervolgens 3 <code>Servo</code>-objecten aan.
         </p>
+        <p>Als we één <code>SpiderPi</code> object maken, worden er dus <strong>automatisch 1 + 6 + (6 * 3) = 25 objecten</strong> in totaal geïnitialiseerd! Dit is de kracht van Compositie.</p>
 
         <hr>
-        <h3>Python Voorbeeld</h3>
-        <p>We maken een nieuw bestand, <code>robot.py</code> (in M2 verplaatsen we dit naar <code>spiderpi_core/robot.py</code>).</p>
+        <h3>Stap-voor-stap Voorbeeld</h3>
 
+        <h4>Stap 1: Maak `robot.py` (De Hoofd-Klasse)</h4>
+        <p>We maken een nieuw bestand, <code>robot.py</code> (in M2 verplaatsen we dit naar <code>spiderpi_core/robot.py</code>).</p>
         <pre><code class="language-python"># In robot.py
 from .leg import Leg # (Uitgaande van package-structuur M2)
 
 class SpiderPi:
-    """Modelleert de complete robot."""
+    """
+    Modelleert de complete robot.
+    Dit is de 'Hoofd-Klasse' die alles 'bezit'.
+    """
     _leg_front_r: Leg
     _leg_mid_r: Leg
     _leg_rear_r: Leg
@@ -96,11 +102,11 @@ class SpiderPi:
         # Compositie van Leg-objecten
         # (De ID's 1-18 zijn specifiek voor de hardware)
         self._leg_front_r = Leg(id_hip=1, id_knee=2, id_ankle=3)
-        self._leg_mid_r = Leg(id_hip=4, id_knee=5, id_ankle=6)
-        self._leg_rear_r = Leg(id_hip=7, id_knee=8, id_ankle=9)
+        self._leg_mid_r   = Leg(id_hip=4, id_knee=5, id_ankle=6)
+        self._leg_rear_r  = Leg(id_hip=7, id_knee=8, id_ankle=9)
         self._leg_front_l = Leg(id_hip=10, id_knee=11, id_ankle=12)
-        self._leg_mid_l = Leg(id_hip=13, id_knee=14, id_ankle=15)
-        self._leg_rear_l = Leg(id_hip=16, id_knee=17, id_ankle=18)
+        self._leg_mid_l   = Leg(id_hip=13, id_knee=14, id_ankle=15)
+        self._leg_rear_l  = Leg(id_hip=16, id_knee=17, id_ankle=18)
 
         print("Robot is klaar voor gebruik!")
 
@@ -109,15 +115,41 @@ class SpiderPi:
     def leg_front_r(self) -> Leg:
         return self._leg_front_r
 
-# --- In main.py ---
+    # ... (en 5 meer getters voor de andere poten) ...
+</code></pre>
+
+        <h4>Stap 2: De 'Definitieve' `main.py` (voor nu)</h4>
+        <p><code>main.py</code> wordt nu extreem simpel. We hoeven alleen nog maar de <code>SpiderPi</code>-klasse te importeren en één object te maken.</p>
+        <pre><code class="language-python"># In main.py
+# Importeer alleen de 'top' van de piramide
 from spiderpi_core.robot import SpiderPi
 
 # Dit ene commando start een kettingreactie van __init__ aanroepen!
+print("--- Robot wordt gebouwd ---")
 my_robot = SpiderPi()
+print("--- Robot is gebouwd ---")
 
-# We kunnen nu de *hele* keten aanroepen (via getters):
-my_robot.leg_front_r.move_to_angles(100, 100, 100)</code></pre>
+# We kunnen nu de *hele* keten van delegatie aanroepen:
+# "Robot -> Poot -> Servo's"
+print("\n--- Commando wordt gegeven ---")
+my_robot.leg_front_r.move_to_angles(100.0, 100.0, 100.0)</code></pre>
 
+        <h4>Stap 3: Resultaat</h4>
+        <p>De output van <code>main.py</code> toont de volledige 'cascade' van object-creatie.</p>
+        <pre><code class="language-text">--- Robot wordt gebouwd ---
+SpiderPi robot wordt geassembleerd...
+Nieuw Servo object (ID: 1) wordt gemaakt...
+Nieuw Servo object (ID: 2) wordt gemaakt...
+Nieuw Servo object (ID: 3) wordt gemaakt...
+Leg aangemaakt met servo's: 1, 2, 3
+(Dit herhaalt zich nog 5x voor de andere poten...)
+Robot is klaar voor gebruik!
+--- Robot is gebouwd ---
+
+--- Commando wordt gegeven ---
+Poot (start-ID 1) beweegt...
+(Hier zou de output van 3x servo.set_angle() komen)</code></pre>
+        <p><strong>Gefeliciteerd!</strong> Je hebt de volledige 'body' van de robot in OOP gemodelleerd. In Module 2 gaan we deze bestandsstructuur formaliseren.</p>
     </main>
 </div>
 

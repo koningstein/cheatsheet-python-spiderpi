@@ -64,22 +64,29 @@
 
         <h3>Theorie: Gedrag Toevoegen</h3>
         <p>
-            We hebben data (Properties). Nu hebben we <strong>gedrag</strong> nodig. <strong>Methoden</strong> zijn functies die <em>in</em> een klasse leven en het gedrag van objecten van die klasse definiëren.
+            We hebben data (Properties). Nu hebben we <strong>gedrag</strong> nodig. [cite_start]<strong>Methoden</strong> zijn functies die *in* een klasse leven en het gedrag van objecten van die klasse definiëren[cite: 2189].
         </p>
         <ul>
-            <li><strong>Vergelijking (Auto):</strong> Een <code>Auto</code>-object heeft data (<code>kleur</code>). Het heeft ook gedrag: <code>.start_motor()</code> of <code>.toeteren()</code>.</li>
-            <li><strong>SpiderPi:</strong> Ons <code>Servo</code>-object heeft data (<code>current_angle</code>). Het heeft gedrag nodig, zoals <code>.set_angle(hoek)</code>.</li>
+            <li><strong>Analogie:</strong> Een <code>Auto</code>-object heeft data (<code>kleur</code>). Het heeft ook gedrag: <code>.start_motor()</code> of <code>.toeteren()</code>.</li>
+            <li><strong>SpiderPi:</strong> Ons <code>Servo</code>-object heeft data (<code>current_angle</code>). [cite_start]Het heeft gedrag nodig, zoals <code>.set_angle(hoek)</code>[cite: 2189].</li>
         </ul>
 
         <h4>Het <code>self</code> Keyword</h4>
         <p>
-            Methoden binnen een klasse hebben <em>altijd</em> <code>self</code> als hun eerste parameter. Het <code>self</code> keyword verwijst naar het *specifieke object zelf* dat de methode aanroept. Hiermee kan de methode de <em>eigen</em> properties van dat object lezen of aanpassen.
+            Methoden binnen een klasse hebben <em>altijd</em> <code>self</code> als hun eerste parameter. Het <code>self</code> keyword verwijst naar het *specifieke object zelf* (bv. <code>motor_voor_rechts</code>) dat de methode aanroept. Hiermee kan de methode de <em>eigen</em> properties van dat object lezen of aanpassen.
         </p>
 
         <hr>
-        <h3>Python Voorbeeld</h3>
-        <p>We passen <code>servo.py</code> aan om gedrag toe te voegen.</p>
+        <h3>Stap-voor-stap Voorbeeld</h3>
 
+        <h4>Stap 1: Vóór (in `servo.py`)</h4>
+        <p>Onze klasse was leeg en deed niets.</p>
+        <pre><code class="language-python"># In servo.py
+class Servo:
+    pass</code></pre>
+
+        <h4>Stap 2: Na (Methode toevoegen in `servo.py`)</h4>
+        <p>We voegen de methode <code>set_angle</code> toe. Deze methode ontvangt <code>self</code> (het object zelf) en <code>new_angle</code> (de input).</p>
         <pre><code class="language-python"># In servo.py
 class Servo:
     """Modelleert een enkele motor (servo)."""
@@ -96,8 +103,11 @@ class Servo:
 
         # We gebruiken 'self.id' (aangemaakt in main.py)
         print(f"Motor {self.id} beweegt nu naar {self.current_angle} graden.")
+</code></pre>
 
-# In main.py
+        <h4>Stap 3: De Methode Aanroepen (in `main.py`)</h4>
+        <p>We passen <code>main.py</code> aan om de nieuwe methode aan te roepen (te "callen").</p>
+        <pre><code class="language-python"># In main.py
 from servo import Servo
 
 motor = Servo()
@@ -111,6 +121,13 @@ motor.set_angle(110.0)
 # De property is nu aangepast
 print(f"Nieuwe hoek: {motor.current_angle}")</code></pre>
 
+        <h4>Stap 4: Testen</h4>
+        <pre><code class="language-bash">python main.py</code></pre>
+        <p>De output laat zien dat de methode *binnen* het object de data van *datzelfde* object heeft aangepast:</p>
+        <pre><code class="language-text">Beginhoek: 90.0
+Motor 1 beweegt nu naar 110.0 graden.
+Nieuwe hoek: 110.0</code></pre>
+
     </main>
 </div>
 
@@ -122,5 +139,6 @@ print(f"Nieuwe hoek: {motor.current_angle}")</code></pre>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
 </body>
 </html>

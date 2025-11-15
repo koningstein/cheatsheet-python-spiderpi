@@ -63,21 +63,27 @@
 
         <h3>Theorie: Werk Delegeren</h3>
         <p>
-            Het is onhandig om <code>poot.hip_servo.set_angle(90)</code> te moeten schrijven (we gaan er even vanuit dat <code>hip_servo</code> een getter is die het object teruggeeft). De 'buitenwereld' wil niet weten dat een poot servo's *heeft*. De buitenwereld wil gewoon zeggen: "Poot, ga naar positie X".
+            <strong>Probleem:</strong> In <code>main.py</code> moeten we nu dit schrijven om een poot te bewegen:
+            <br><code>front_leg.hip_servo.set_angle(100.0)</code>
+            <br><code>front_leg.knee_servo.set_angle(110.0)</code>
+            <br><code>front_leg.ankle_servo.set_angle(120.0)</code>
+            <br>Dit is "micromanagement". De 'buitenwereld' (<code>main.py</code>) moet te veel weten over de *interne* onderdelen van een <code>Leg</code>.
         </p>
         <p>
-            We maken een *nieuwe methode* in de 'container'-klasse (<code>Leg</code>). Deze methode roept *zelf* de methoden van zijn eigen <code>Servo</code>-objecten aan. Dit heet <strong>Delegatie</strong>: de <code>Leg</code>-klasse delegeert het 'zet hoek'-werk aan de <code>Servo</code>-klassen die hij bezit.
+            <strong>Oplossing: Delegatie.</strong> We maken een *nieuwe, slimmere methode* in de 'container'-klasse (<code>Leg</code>), bijvoorbeeld <code>move_to_angles()</code>. Deze methode roept *zelf* de methoden van zijn eigen <code>Servo</code>-objecten aan.
         </p>
+        [cite_start]<p>De <code>Leg</code>-klasse <strong>delegeert</strong> het 'zet hoek'-werk aan de <code>Servo</code>-klassen die hij bezit[cite: 2189].</p>
 
         <hr>
-        <h3>Python Voorbeeld</h3>
+        <h3>Stap-voor-stap Voorbeeld</h3>
 
+        <h4>Stap 1: De Methode toevoegen (in `leg.py`)</h4>
+        <p>We voegen <code>move_to_angles</code> toe aan onze <code>Leg</code> klasse.</p>
         <pre><code class="language-python"># In leg.py
 from .servo import Servo
 
 class Leg:
-    # ... (init met _hip_servo, etc.) ...
-    # ... (getters voor de servo's) ...
+    # ... (init en de 3 getters) ...
 
     # Een nieuwe, slimmere methode
     def move_to_angles(self, hip: float, knee: float, ankle: float) -> None:
@@ -85,25 +91,50 @@ class Leg:
         Beweegt de hele poot in één keer.
         DELEGEERT het werk aan de individuele servo-objecten.
         """
-        print(f"Poot (ID {self._hip_servo.id}) beweegt...")
+        print(f"Poot (start-ID {self._hip_servo.id}) beweegt...")
 
-        # Delegatie aan de methoden van de sub-objecten
-        self._hip_servo.set_angle(hip)
-        self._knee_servo.set_angle(knee)
-        self._ankle_servo.set_angle(ankle)
+        try:
+            # Delegatie aan de methoden van de sub-objecten
+            self._hip_servo.set_angle(hip)
+            self._knee_servo.set_angle(knee)
+            self._ankle_servo.set_angle(ankle)
+        except ValueError as e:
+            print(f"FOUT: Ongeldige hoek voor poot: {e}")
+</code></pre>
 
-# --- In main.py ---
+        <h4>Stap 2: Testen (in `main.py`)</h4>
+        <p>Ons <code>main.py</code> script wordt nu veel schoner en makkelijker te lezen.</p>
+        <pre><code class="language-python"># In main.py
 from spiderpi_core.leg import Leg
 
 front_leg = Leg(id_hip=1, id_knee=2, id_ankle=3)
 
+# Oude manier (micromanagement, niet meer doen):
+# print("Oude manier:")
+# front_leg.hip_servo.set_angle(100.0)
+# front_leg.knee_servo.set_angle(110.0)
+# front_leg.ankle_servo.set_angle(120.0)
+
 # De nieuwe, schone aanroep:
+print("\nNieuwe manier (Delegatie):")
 front_leg.move_to_angles(hip=100.0, knee=110.0, ankle=120.0)
 
-# Oude manier (willen we niet meer gebruiken):
-# (via getters, als je die hebt gemaakt)
-# front_leg.hip_servo.set_angle(100.0)</code></pre>
+# Test ook de validatie
+print("\nValidatie Test:")
+front_leg.move_to_angles(hip=90.0, knee=9000.0, ankle=90.0)
+</code></pre>
 
+        <h4>Stap 3: Resultaat</h4>
+        <p>De output laat zien dat de <code>Leg</code> klasse nu het werk voor ons doet.</p>
+        <pre><code class="language-text">... (Servo init output) ...
+Leg aangemaakt met servo's: 1, 2, 3
+
+Nieuwe manier (Delegatie):
+Poot (start-ID 1) beweegt...
+
+Validatie Test:
+Poot (start-ID 1) beweegt...
+FOUT: Ongeldige hoek voor poot: Hoek 9000.0 is ongeldig.</code></pre>
     </main>
 </div>
 

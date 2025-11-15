@@ -64,49 +64,73 @@
 
         <h3>Theorie: De Blauwdruk vs. het Gebouw</h3>
         <p>
-            In OOP proberen we de echte wereld na te bootsen. We maken 'dingen' (objecten) die data (eigenschappen) en gedrag (methoden) hebben.
+            Welkom bij OOP! We gaan de echte wereld nabootsen in code. We beginnen met het belangrijkste concept: het verschil tussen een <strong>Klasse</strong> en een <strong>Object</strong>.
         </p>
 
         <h4>Wat is een Klasse (Class)?</h4>
         <p>
-            Een <strong>Klasse</strong> is een <em>blauwdruk</em>, een <em>sjabloon</em> of een <em>bouwplan</em>. Het beschrijft <em>hoe</em> iets gemaakt moet worden, maar het <em>is</em> nog niet het ding zelf.
+            [cite_start]Een <strong>Klasse</strong> is een <em>blauwdruk</em>, een <em>sjabloon</em> of een <em>bouwplan</em>[cite: 2215]. Het beschrijft *hoe* iets gemaakt moet worden, maar het *is* nog niet het ding zelf.
         </p>
         <ul>
-            <li><strong>Vergelijking:</strong> Een architect tekent een <strong>bouwplan</strong> voor een huis. Dat bouwplan is de <strong>Klasse</strong>. Je kunt niet in het bouwplan wonen.</li>
-            <li><strong>SpiderPi:</strong> We maken een bouwplan voor één motor. [cite_start]Dat bouwplan noemen we <code>Servo</code>. [cite: 58-59]</li>
+            <li><strong>Analogie:</strong> Het bouwplan van een huis. Je kunt niet in het bouwplan wonen.</li>
+            <li><strong>SpiderPi:</strong> We maken een bouwplan voor één motor. [cite_start]Dat bouwplan noemen we <code>Servo</code>[cite: 2189, 2213].</li>
         </ul>
 
         <h4>Wat is een Object (Instance)?</h4>
         <p>
-            Een <strong>Object</strong> is het <em>echte ding</em> dat je hebt gemaakt met de blauwdruk.
+            Een <strong>Object</strong> is het <em>echte ding</em> dat je hebt gemaakt met de blauwdruk. [cite_start]Dit wordt ook wel een 'instantie' genoemd[cite: 2226].
         </p>
         <ul>
-            <li><strong>Vergelijking:</strong> Het <strong>echte huis</strong> dat je hebt gebouwd op basis van het bouwplan, is het <strong>Object</strong>.</li>
-            [cite_start]<li><strong>SpiderPi:</strong> De 18 <em>echte, fysieke motortjes</em> op de robot zijn de Objecten. [cite: 58-59]</li>
+            [cite_start]<li><strong>Analogie:</strong> Het <strong>echte huis</strong> dat je hebt gebouwd op basis van het bouwplan[cite: 2228]. Je kunt *meerdere* huizen (objecten) bouwen met *één* bouwplan (klasse).</li>
+            [cite_start]<li><strong>SpiderPi:</strong> De 18 <em>echte, fysieke motortjes</em> op de robot zijn de Objecten[cite: 2189, 2228].</li>
         </ul>
 
         <hr>
-        <h3>Python Voorbeeld</h3>
-        <pre><code class="language-python"># servo.py (De Blauwdruk)
-# We definiëren de klasse met PascalCase
-class Servo:
-    """Modelleert een enkele motor (servo)."""
-    pass
+        <h3>Stap-voor-stap Voorbeeld</h3>
+        <p>We hebben twee bestanden nodig: de blauwdruk (`servo.py`) en het script dat de objecten maakt (`main.py`).</p>
 
-# main.py (Objecten Maken)
-# We importeren de blauwdruk
+        <h4>Stap 1: De Blauwdruk (`servo.py`)</h4>
+        <p>Maak een nieuw bestand <code>servo.py</code>. Hier definiëren we de <code>Servo</code> klasse. Omdat we nog geen details hebben, gebruiken we <code>pass</code>.</p>
+        <pre><code class="language-python"># In servo.py
+
+class Servo:
+    """
+    De 'blauwdruk' voor een enkele motor (servo).
+    (Opmerking: 'PascalCase' (hoofdletters) is de standaard voor klassen.)
+    """
+    pass # 'pass' betekent 'hier komt later code'.</code></pre>
+
+        <h4>Stap 2: De Objecten (`main.py`)</h4>
+        <p>Maak een tweede bestand <code>main.py</code>. Dit is ons hoofdscript.</p>
+        <ol>
+            <li>We <strong>importeren</strong> de blauwdruk.</li>
+            <li>We <strong>bouwen</strong> twee 'echte' objecten (twee motoren) op basis van die blauwdruk.</li>
+        </ol>
+        <pre><code class="language-python"># In main.py
+
+# 1. Importeer de 'Servo' blauwdruk uit het 'servo.py' bestand.
 from servo import Servo
 
-# We maken 'echte' objecten van de blauwdruk
-motor1 = Servo()
-motor2 = Servo()
+# 2. Maak 'echte' objecten (instanties) van de blauwdruk
+motor_voor_rechts = Servo()
+motor_achter_links = Servo()
 
-# Dit zijn twee unieke, aparte objecten
-print(motor1)
-print(motor2)
-# Output:
-# <__main__.Servo object at 0x10f2a4f10>
-# <__main__.Servo object at 0x10f2a4e50></code></pre>
+# 3. Verifieer: dit zijn twee unieke, aparte objecten
+print("Object 1 (motor_voor_rechts):")
+print(motor_voor_rechts)
+
+print("\nObject 2 (motor_achter_links):")
+print(motor_achter_links)</code></pre>
+
+        <h4>Stap 3: Testen</h4>
+        <p>Voer <code>main.py</code> uit in je terminal:</p>
+        <pre><code class="language-bash">python main.py</code></pre>
+        <p>De output laat zien dat het twee verschillende objecten zijn op twee unieke geheugenlocaties:</p>
+        <pre><code class="language-text">Object 1 (motor_voor_rechts):
+&lt;servo.Servo object at 0x10f2a4f10&gt;
+
+Object 2 (motor_achter_links):
+&lt;servo.Servo object at 0x10f2a4e50&gt;</code></pre>
 
     </main>
 </div>
@@ -119,5 +143,6 @@ print(motor2)
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
 </body>
 </html>

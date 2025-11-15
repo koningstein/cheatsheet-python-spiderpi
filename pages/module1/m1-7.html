@@ -63,32 +63,49 @@
 
         <h3>Theorie: Leesbare Code Schrijven</h3>
         <p>
-            <strong>Probleem:</strong> Wat betekent <code>Servo(1, 90.0)</code>? Is 1 de hoek of het ID? Je moet de volgorde onthouden.
+            Dit is een korte les over code-stijl die je veel tijd zal besparen.
         </p>
         <p>
-            <strong>Oplossing:</strong> Met <strong>Named Arguments</strong> (Benoemde Argumenten) geef je expliciet aan welke <em>waarde</em> bij welke <em>parameter</em> hoort. Dit maakt de code veel leesbaarder en de volgorde maakt niet meer uit.
+            <strong>Probleem:</strong> Wat betekent <code>Servo(1, 90.0)</code>? Is <code>1</code> de hoek of het <code>id</code>? Je moet de volgorde in <code>servo.py</code> onthouden om <code>main.py</code> te kunnen schrijven.
+        </p>
+        <p>
+            [cite_start]<strong>Oplossing:</strong> Met <strong>Named Arguments</strong> (Benoemde Argumenten) geef je expliciet aan welke <em>waarde</em> bij welke <em>parameter</em> hoort[cite: 2189]. Dit maakt de code veel leesbaarder en de volgorde maakt niet meer uit.
         </p>
 
         <hr>
-        <h3>Python Voorbeeld</h3>
+        <h3>Stap-voor-stap Voorbeeld</h3>
+
+        <h4>Stap 1: De Constructor (in `servo.py`)</h4>
+        <p>Onze constructor (uit M1.6) verwacht twee argumenten: <code>start_id</code> en <code>start_angle</code>.</p>
         <pre><code class="language-python"># In servo.py
 class Servo:
     # De __init__ verwacht 'start_id' en 'start_angle'
-    def __init__(self, start_id, start_angle):
+    def __init__(self, start_id: int, start_angle: float):
         self._id = start_id
-        self._current_angle = start_angle
-        # ... (validatie weggelaten voor eenvoud)
+        self.set_angle(start_angle)
+        # ... (rest van de code)</code></pre>
 
-# In main.py
-# Normale aanroep (positional)
+        <h4>Stap 2: Gebruik in `main.py`</h4>
+        <p>We kunnen de constructor op drie manieren aanroepen. Vergelijk het verschil in leesbaarheid.</p>
+        <pre><code class="language-python"># In main.py
+from .servo import Servo # (uitgaande van M2 package)
+
+# 1. Normale aanroep (positional)
+#    Werkt, maar is onduidelijk. Wat is 1? Wat is 90.0?
 motor1 = Servo(1, 90.0)
 
-# Aanroep met Named Arguments (veel leesbaarder)
+# 2. Aanroep met Named Arguments (BENOEMDE ARGUMENTEN)
+#    Veel leesbaarder!
 motor2 = Servo(start_id=2, start_angle=100.0)
 
-# Volgorde maakt niet meer uit!
-motor3 = Servo(start_angle=110.0, start_id=3)</code></pre>
+# 3. Volgorde maakt niet meer uit!
+#    Dit werkt ook, omdat we de namen gebruiken.
+motor3 = Servo(start_angle=110.0, start_id=3)
 
+print(f"Motor 1 ID: {motor1.id}")
+print(f"Motor 2 ID: {motor2.id}")
+print(f"Motor 3 ID: {motor3.id}")</code></pre>
+        <p><strong>Conclusie:</strong> Gebruik altijd Named Arguments als je een object aanmaakt. Het maakt je code leesbaar en voorkomt fouten.</p>
     </main>
 </div>
 

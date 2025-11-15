@@ -63,53 +63,88 @@
 
         <h3>Theorie: 'Heeft een...' Relatie</h3>
         <p>
-            Objecten in de echte wereld zijn vaak <em>opgebouwd</em> uit andere objecten. Dit heet <strong>Compositie</strong> (samenstelling), de "Heeft een..." relatie.
+            Objecten in de echte wereld zijn vaak <em>opgebouwd</em> uit andere objecten. [cite_start]Dit heet <strong>Compositie</strong> (samenstelling), de "Heeft een..." (HAS-A) relatie[cite: 2189].
         </p>
         <ul>
-            <li><strong>Vergelijking (Auto):</strong> Een <code>Auto</code>-object <em>heeft een</em> <code>Motor</code>-object en vier <code>Wiel</code>-objecten.</li>
-            <li><strong>SpiderPi:</strong> Een <code>Leg</code>-object <em>heeft drie</em> <code>Servo</code>-objecten. </li>
+            <li><strong>Analogie:</strong> Een <code>Auto</code>-object <em>heeft een</em> <code>Motor</code>-object en vier <code>Wiel</code>-objecten.</li>
+            [cite_start]<li><strong>SpiderPi:</strong> Een <code>Leg</code>-object (poot) <em>heeft drie</em> <code>Servo</code>-objecten (heup, knie, enkel)[cite: 2189].</li>
         </ul>
         <p>
             We implementeren dit door in de <code>__init__</code> van de 'container'-klasse (<code>Leg</code>) objecten aan te maken van de 'inhoud'-klasse (<code>Servo</code>) en die op te slaan als properties.
         </p>
 
         <hr>
-        <h3>Python Voorbeeld</h3>
-        <p>We maken een nieuw bestand, <code>leg.py</code>, dat <code>servo.py</code> importeert.</p>
+        <h3>Stap-voor-stap Voorbeeld</h3>
 
+        <h4>Stap 1: Maak een nieuw bestand `leg.py`</h4>
+        <p>Dit bestand bevat de blauwdruk voor een <em>complete poot</em>.</p>
         <pre><code class="language-python"># In leg.py
-# (We gaan ervan uit dat we in een package 'spiderpi_core' zitten)
+# (We gaan ervan uit dat we in een package 'spiderpi_core' zitten, zie M2)
 from .servo import Servo
 
 class Leg:
     """Modelleert een poot, opgebouwd uit 3 servo's."""
+
+    # We definiëren de 'protected' properties die de servo-objecten
+    # gaan vasthouden.
     _hip_servo: Servo
     _knee_servo: Servo
     _ankle_servo: Servo
 
     def __init__(self, id_hip: int, id_knee: int, id_ankle: int):
-        """Maakt de 3 servo-objecten aan die deze poot bevat."""
-
-        # COMPOSITIE:
-        # Deze properties zijn zelf objecten
+        """
+        Maakt de 3 servo-objecten aan die deze poot *bevat*.
+        Dit is COMPOSITIE.
+        """
         self._hip_servo = Servo(start_id=id_hip, start_angle=90.0)
         self._knee_servo = Servo(start_id=id_knee, start_angle=90.0)
         self._ankle_servo = Servo(start_id=id_ankle, start_angle=90.0)
 
+        print(f"Leg aangemaakt met servo's: {id_hip}, {id_knee}, {id_ankle}")
+
+    # We voegen getters toe (M1.5) zodat we de servo's
+    # van buitenaf kunnen lezen.
     @property
     def hip_servo(self) -> Servo:
         return self._hip_servo
-    # ... (en getters for knee en ankle)
 
-# --- In main.py ---
-# (Uitgaande van package-structuur M2)
+    @property
+    def knee_servo(self) -> Servo:
+        return self._knee_servo
+
+    @property
+    def ankle_servo(self) -> Servo:
+        return self._ankle_servo
+</code></pre>
+
+        <h4>Stap 2: Testen (in `main.py`)</h4>
+        <p>We maken nu geen losse <code>Servo</code>s meer aan, maar één <code>Leg</code>.</p>
+        <pre><code class="language-python"># In main.py
+# Importeer de NIEUWE Leg klasse
 from spiderpi_core.leg import Leg
 
+print("--- Start Compositie Test ---")
+
+# Maak één 'Leg' object.
+# De __init__ van Leg zal AUTOMATISCH 3 Servo-objecten aanmaken.
 front_leg = Leg(id_hip=1, id_knee=2, id_ankle=3)
 
-# Toegang tot het 'sub-object' (via getter):
-print(front_leg.hip_servo.id) # Output: 1</code></pre>
+print("--- Testen voltooid ---")
 
+# We kunnen nu bij de 'sub-objecten' via de getters:
+print(f"De ID van de heup-servo is: {front_leg.hip_servo.id}")
+print(f"De hoek van de knie-servo is: {front_leg.knee_servo.current_angle}")</code></pre>
+
+        <h4>Stap 3: Resultaat</h4>
+        <p>De output van <code>main.py</code> toont de "cascade" van constructors:</p>
+        <pre><code class="language-text">--- Start Compositie Test ---
+Nieuw Servo object (ID: 1) wordt gemaakt...
+Nieuw Servo object (ID: 2) wordt gemaakt...
+Nieuw Servo object (ID: 3) wordt gemaakt...
+Leg aangemaakt met servo's: 1, 2, 3
+--- Testen voltooid ---
+De ID van de heup-servo is: 1
+De hoek van de knie-servo is: 90.0</code></pre>
     </main>
 </div>
 

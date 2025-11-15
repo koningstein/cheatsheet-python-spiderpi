@@ -64,43 +64,56 @@
 
         <h3>Theorie: De Toestand van een Object</h3>
         <p>
-            Een object (zoals het <code>Servo</code>-object dat we in les 1.1 hebben gemaakt) is pas nuttig als het *data* kan opslaan. Deze data, die de unieke toestand van een object beschrijft, noemen we <strong>Properties</strong> (eigenschappen).
+            Een object (ons 'huis') is pas nuttig als het *data* kan opslaan. [cite_start]Deze data, die de unieke toestand van een object beschrijft, noemen we <strong>Properties</strong> (eigenschappen)[cite: 2277].
         </p>
         <ul>
-            <li><strong>Vergelijking (Auto):</strong> Een <code>Auto</code>-object kan een <code>kleur</code>-property hebben. <code>mijn_auto.kleur = "blauw"</code> en <code>buurman_auto.kleur = "rood"</code>.</li>
-            <li><strong>SpiderPi:</strong> Onze <code>Servo</code>-objecten hebben een <code>id</code> en een <code>current_angle</code> nodig. [cite: 58-59]</li>
+            <li><strong>Analogie:</strong> Een <code>Auto</code>-object kan een <code>kleur</code>-property hebben. <code>mijn_auto.kleur = "blauw"</code> en <code>buurman_auto.kleur = "rood"</code>.</li>
+            [cite_start]<li><strong>SpiderPi:</strong> Onze <code>Servo</code>-objecten hebben een <code>id</code> en een <code>current_angle</code> (huidige hoek) nodig[cite: 2189, 2283, 2284, 2285].</li>
         </ul>
         <p>
             In Python gebruiken we de <strong>punt-notatie</strong> (<code>.</code>) om een property in te stellen of uit te lezen.
         </p>
-
+        <p>
+            <em>(Opmerking: We leren dit nu 'dynamisch' toe te voegen in <code>main.py</code>. In Les M1.6 leren we de professionele manier om dit *in* de klasse te doen met een <code>__init__</code> constructor.)</em>
+        </p>
         <hr>
-        <h3>Python Voorbeeld</h3>
+        <h3>Stap-voor-stap Voorbeeld</h3>
+        <p>We passen <code>main.py</code> aan. <code>servo.py</code> blijft leeg (<code>pass</code>).</p>
 
-        <p>We passen <code>main.py</code> aan om properties *toe te voegen* aan de objecten nadat we ze hebben gemaakt. <code>servo.py</code> blijft leeg.</p>
+        <h4>Stap 1: Vóór (Code uit M1.1)</h4>
+        <p>Dit is wat we hadden. De objecten zijn leeg.</p>
+        <pre><code class="language-python"># In main.py
+from servo import Servo
 
+motor_voor_rechts = Servo()
+motor_achter_links = Servo()</code></pre>
+
+        <h4>Stap 2: Na (Properties Toevoegen)</h4>
+        <p>We voegen data (toestand) toe aan de objecten *nadat* ze zijn gemaakt.</p>
         <pre><code class="language-python"># In main.py
 from servo import Servo
 
 # Maak de objecten
-right_hip_motor = Servo()
-left_knee_motor = Servo()
+motor_voor_rechts = Servo()
+motor_achter_links = Servo()
 
 # Stel de unieke properties (toestand) in
-right_hip_motor.id = 3
-right_hip_motor.current_angle = 90.0
+motor_voor_rechts.id = 3
+motor_voor_rechts.current_angle = 90.0
 
-left_knee_motor.id = 11
-left_knee_motor.current_angle = 100.5
+motor_achter_links.id = 16
+motor_achter_links.current_angle = 100.5
 
 # Lees de properties uit
-print(f"Motor {right_hip_motor.id} heeft hoek: {right_hip_motor.current_angle}")
-print(f"Motor {left_knee_motor.id} heeft hoek: {left_knee_motor.current_angle}")
+print(f"Motor {motor_voor_rechts.id} heeft hoek: {motor_voor_rechts.current_angle}")
+print(f"Motor {motor_achter_links.id} heeft hoek: {motor_achter_links.current_angle}")</code></pre>
 
-# Output:
-# Motor 3 heeft hoek: 90.0
-# Motor 11 heeft hoek: 100.5</code></pre>
-
+        <h4>Stap 3: Testen</h4>
+        <p>Voer <code>main.py</code> opnieuw uit.</p>
+        <pre><code class="language-bash">python main.py</code></pre>
+        <p>De output laat zien dat elk object zijn eigen, unieke data heeft opgeslagen:</p>
+        <pre><code class="language-text">Motor 3 heeft hoek: 90.0
+Motor 16 heeft hoek: 100.5</code></pre>
     </main>
 </div>
 
@@ -112,5 +125,6 @@ print(f"Motor {left_knee_motor.id} heeft hoek: {left_knee_motor.current_angle}")
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
 </body>
 </html>

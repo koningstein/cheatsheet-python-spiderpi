@@ -61,37 +61,48 @@
 
         <h3>Theorie: De Spellingscontrole voor Code</h3>
         <p>
-            <strong>Probleem:</strong> Onze code <em>werkt</em>, maar is het <em>goede</em> code? Hebben we ongebruikte imports? Te lange regels? Verkeerde naamgeving (<code>mijnKlasse</code> i.p.v. <code>MijnKlasse</code>)?
+            <strong>Probleem:</strong> Onze code <em>werkt</em>, maar is het <em>goede</em> code? Volgen we de professionele standaarden? Hebben we ongebruikte imports? Te lange regels? Verkeerde naamgeving (<code>mijnKlasse</code> i.p.v. <code>MijnKlasse</code>)?
         </p>
         <p>
-            <strong>Oplossing:</strong> Een <strong>Linter</strong> (zoals <code>pylint</code>). Dit is een tool die je code <em>leest</em> (zonder het uit te voeren) en functioneert als een strenge, automatische docent die je code een *cijfer* geeft (op 10).
+            <strong>Oplossing:</strong> Een <strong>Linter</strong> (zoals <code>pylint</code>). Dit is een tool die je code *leest* (zonder het uit te voeren) en functioneert als een strenge, automatische docent die je code een *cijfer* geeft (op 10).
         </p>
-        <p>Het controleert op Fouten (Errors), Waarschuwingen (Warnings), en Stijl-Conventies (Conventions).</p>
+        <p>Het controleert op Fouten (Errors), Waarschuwingen (Warnings, bv. ongebruikte variabele), en Stijl-Conventies (Conventions, bv. te veel witregels).</p>
+        <p>Dit is de laatste stap in Module 3 om onze code 'af' te maken: <strong>Kwaliteit</strong>.</p>
 
         <hr>
-        <h3>Python Voorbeeld (Terminal)</h3>
-        <p><code>pylint</code> is een tool die je installeert en draait vanuit de terminal.</p>
+        <h3>Python Stappen (Terminal)</h3>
+        <p><code>pylint</code> is een tool die je installeert en draait vanuit de terminal (met je <code>venv</code> actief).</p>
 
         <pre><code class="language-bash"># 1. Installeren (in je venv)
 (venv) C:\...&gt; pip install pylint
 
-# 2. Toevoegen aan je 'recept'
+# 2. Toevoegen aan je 'recept' (M2.2)
 (venv) C:\...&gt; pip freeze > requirements.txt
 
-# 3. Analyseren (draai in de hoofdmap, wijs naar je package)
+# 3. Analyseren
+#    Draai dit commando in de hoofdmap van je project.
+#    We wijzen het naar onze 'source' map: de spiderpi_core package.
 (venv) C:\...&gt; pylint spiderpi_core
 
 # 4. Voorbeeld Output (je krijgt een 'muur van tekst'):
 # ************* Module spiderpi_core.servo
 # spiderpi_core\servo.py:1:0: C0114: Missing module docstring (missing-module-docstring)
-# spiderpi_core\servo.py:10:4: C0103: Attribute name "_id" doesn't conform to snake_case naming style (invalid-name)
-# ...
+#    (Oeps! Dit hebben we in M3.2 opgelost, maar misschien was je het
+#     vergeten in leg.py?)
+#
+# spiderpi_core\robot.py:3:0: W0611: Unused import time (unused-import)
+#    (In M3.7 hebben we 'import time' toegevoegd, maar daarna
+#     hebben we de 'time.sleep()' regels uitgecommentarieerd.
+#     De import is nu dus overbodig!)
+#
 # -------------------------------------
 # Your code has been rated at 3.45/10
 
 # 5. De Opdracht:
-# Probeer de makkelijke fouten (C0114, W0611 Unused import)
-# op te lossen en kijk of je score stijgt.</code></pre>
+#    Probeer de makkelijke fouten (C0114, W0611) op te lossen.
+#    - Voeg de module docstring toe aan robot.py en leg.py.
+#    - Verwijder de 'import time' regel uit robot.py.
+#    Draai 'pylint spiderpi_core' opnieuw en kijk hoe je score stijgt!</code></pre>
 
     </main>
 </div>

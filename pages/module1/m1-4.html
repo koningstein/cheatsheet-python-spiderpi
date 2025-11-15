@@ -64,46 +64,78 @@
 
         <h3>Theorie: Data Beschermen</h3>
         <p>
-            Een Setter is een methode die bedoeld is om een property *veilig* in te stellen. Het grote voordeel hiervan is dat we <strong>validatie</strong> (controles) kunnen inbouwen.
+            Een <strong>Setter</strong> is een methode die bedoeld is om een property *veilig* in te stellen. [cite_start]Het grote voordeel hiervan is dat we <strong>validatie</strong> (controles) kunnen inbouwen[cite: 2189].
         </p>
         <p>
-            We willen niet dat iemand <code>motor.set_angle(9000)</code> kan instellen. Een setter-methode kan dit controleren met een <code>if/else</code>-statement en de ongeldige waarde weigeren.
+            <strong>Probleem:</strong> Wat als een gebruiker <code>motor.set_angle(9000)</code> aanroept? De echte servo kan maar tot 180 graden en zal kapot gaan.
         </p>
-        <ul>
-            <li><strong>Vergelijking (Bankrekening):</strong> Een <code>.opnemen(bedrag)</code> methode (een setter voor je saldo) moet controleren: <code>if bedrag > self.saldo: print("Dat kan niet!")</code>.</li>
-            <li><strong>SpiderPi:</strong> We controleren of de hoek binnen een veilige grens ligt (bv. 0-180 graden). </li>
-        </ul>
+        <p>
+            <strong>Oplossing:</strong> We voegen een <code>if/else</code>-statement toe in de setter. Deze controleert de waarde *voordat* deze wordt ingesteld.
+        </p>
 
         <hr>
-        <h3>Python Voorbeeld</h3>
+        <h3>Stap-voor-stap Voorbeeld</h3>
+
+        <h4>Stap 1: Vóór (in `servo.py`)</h4>
+        <p>Onze methode uit M1.3 was 'dom'. Het accepteerde elke waarde.</p>
+        <pre><code class="language-python"># In servo.py
+class Servo:
+    def set_angle(self, new_angle):
+        self.current_angle = new_angle # Onveilig!
+        print(f"Motor {self.id} beweegt nu naar {self.current_angle} gr.")</code></pre>
+
+        <h4>Stap 2: Na (Validatie toevoegen in `servo.py`)</h4>
+        <p>We voegen <strong>Constanten</strong> (<code>MIN_ANGLE</code>, <code>MAX_ANGLE</code>) toe bovenaan ons bestand. Dit zijn variabelen die nooit veranderen. Daarna voegen we de <code>if/else</code> check toe in de setter.</p>
         <pre><code class="language-python"># In servo.py
 
-# Constanten (bovenaan het bestand)
+# Constanten (bovenaan het bestand, in HOOFDLETTERS)
 MIN_ANGLE = 0.0
 MAX_ANGLE = 180.0
 
 class Servo:
-    # ...
     def set_angle(self, new_angle):
         """Stelt de hoek in, MAAR alleen als deze geldig is."""
 
         # De VALIDATIE-check
         if new_angle >= MIN_ANGLE and new_angle <= MAX_ANGLE:
+            # Alleen als het veilig is, stellen we de property in
             self.current_angle = new_angle
             print(f"Motor {self.id} beweegt naar {self.current_angle} gr.")
         else:
             # Weiger de ongeldige waarde
-            print(f"FOUT: Hoek {new_angle} is ongeldig.")
+            print(f"FOUT: Hoek {new_angle} is ongeldig en wordt genegeerd.")
+</code></pre>
 
-# In main.py
+        <h4>Stap 3: Testen (in `main.py`)</h4>
+        <p>Nu testen we onze beveiliging in <code>main.py</code>.</p>
+        <pre><code class="language-python"># In main.py
 from servo import Servo
 
 motor = Servo()
 motor.id = 1
-motor.current_angle = 90.0
+motor.current_angle = 90.0 # Stel de beginwaarde in
+print(f"Beginhoek: {motor.current_angle}")
 
-motor.set_angle(200.0)  # Output: FOUT: Hoek 200.0 is ongeldig.
-motor.set_angle(120.0)  # Output: Motor 1 beweegt naar 120.0 gr.</code></pre>
+# Test 1: Ongeldige waarde (te hoog)
+print("Test 1: Zet hoek naar 200.0")
+motor.set_angle(200.0)
+print(f"Huidige hoek is nog steeds: {motor.current_angle}")
+
+# Test 2: Geldige waarde
+print("\nTest 2: Zet hoek naar 120.0")
+motor.set_angle(120.0)
+print(f"Huidige hoek is nu: {motor.current_angle}")</code></pre>
+
+        <h4>Stap 4: Resultaat</h4>
+        <p>De output van <code>main.py</code> laat zien dat onze validatie werkt. De ongeldige waarde wordt geweigerd en de property wordt niet aangepast.</p>
+        <pre><code class="language-text">Beginhoek: 90.0
+Test 1: Zet hoek naar 200.0
+FOUT: Hoek 200.0 is ongeldig en wordt genegeerd.
+Huidige hoek is nog steeds: 90.0
+
+Test 2: Zet hoek naar 120.0
+Motor 1 beweegt naar 120.0 gr.
+Huidige hoek is nu: 120.0</code></pre>
 
     </main>
 </div>

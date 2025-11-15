@@ -64,15 +64,50 @@
             Dit is het strengste niveau van afschermen. In Python gebruiken we een <strong>dubbele underscore (<code>__</code>)</strong>.
         </p>
         <p>
-            Dit is geen <em>conventie</em> (afspraak) zoals de enkele <code>_</code>, maar een <em>technische ingreep</em>. Python doet aan <strong>"Name Mangling"</strong> (Naam Verhaspeling). Het hernoemt de property achter de schermen naar <code>_Klasse__property</code>.
+            Dit is geen <em>conventie</em> (afspraak) zoals de enkele <code>_</code>, maar een <em>technische ingreep</em>. Python doet aan <strong>"Name Mangling"</strong> (Naam Verhaspeling).
         </p>
         <p>
-            Hierdoor is de property <em>echt</em> onzichtbaar voor de buitenwereld én voor 'kind'-klassen (subklassen). Je gebruikt dit zelden, alleen voor interne details die je absoluut wilt verbergen.
+            Python hernoemt de property <code>self.__max_temp</code> achter de schermen naar <code>self._Servo__max_temp</code>. Hierdoor is de property *echt* onzichtbaar voor de buitenwereld én voor 'kind'-klassen (subklassen, zien we in M4).
         </p>
+        <p><strong>Wanneer gebruik je dit?</strong> Bijna nooit. Alleen voor interne details die je *absoluut* wilt verbergen en waarvan je zeker weet dat niemand (zelfs een kind-klasse) ze mag aanpassen.</p>
 
         <hr>
-        <h3>Python Voorbeeld</h3>
-        <p>We voegen een <code>__private</code> property toe aan <code>Servo</code>.</p>
+        <h4>Stap 1: Toevoegen aan `servo.py`</h4>
+        <p>We voegen een *nieuwe* interne property <code>__max_temp</code> toe aan de <code>__init__</code> van <code>Servo</code>.</p>
+        <pre><code class="language-python"># In spiderpi_core/servo.py
+class Servo(RobotComponent):
+    _id: int
+    _current_angle: float
+    __max_temp: int # Private property
+
+    def __init__(self, start_id: int, start_angle: float) -> None:
+        super().__init__(name=f"Servo_{start_id}")
+        self._id = start_id
+        self._current_angle = start_angle
+        self.__max_temp = 80 # Private property (bv. max veilige temp)
+
+    def get_max_temp(self) -> int:
+        # Een getter kan er wel bij
+        return self.__max_temp
+
+    # ... rest van de klasse</code></pre>
+
+        <h4>Stap 2: Testen in `main.py`</h4>
+        <p>We proberen de waarde te lezen. De getter *werkt*, maar directe toegang *crasht*.</p>
+        <pre><code class="language-python"># In main.py
+motor = Servo(1, 90)
+
+# Dit werkt (via de publieke getter):
+print(motor.get_max_temp())
+# Output: 80
+
+# Dit crasht (de "win" van de les):
+print(motor.__max_temp)
+# Fout: 'Servo' object has no attribute '__max_temp'</code></pre>
+
+        <hr>
+        <h3>Python Voorbeeld (Volledig)</h3>
+        <p>Hier is de code die je kunt gebruiken om te testen.</p>
         <pre><code class="language-python"># In spiderpi_core/servo.py
 class Servo(RobotComponent):
     _id: int

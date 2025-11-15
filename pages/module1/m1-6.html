@@ -63,50 +63,88 @@
 
         <h3>Theorie: De 'Geboorte' van een Object</h3>
         <p>
-            Een <strong>Constructor</strong> is een speciale methode die <em>automatisch</em> wordt aangeroepen op het moment dat een object wordt gemaakt (geïnstantieerd).
+            <strong>Probleem:</strong> In <code>main.py</code> moeten we nu 3 regels code schrijven om één motor te maken:
+            <br><code>motor = Servo()</code>
+            <br><code>motor.id = 1</code>
+            <br><code>motor.set_angle(90.0)</code>
+            <br>Dit is onhandig en je kunt vergeten de <code>id</code> in te stellen.
         </p>
         <p>
-            In Python heet deze methode <code>def __init__(self, ...):</code> (met dubbele underscores).
+            <strong>Oplossing:</strong> Een <strong>Constructor</strong>. [cite_start]Dit is een speciale methode die *automatisch* wordt aangeroepen op het moment dat een object wordt gemaakt (geïnstantieerd)[cite: 2189, 2288].
         </p>
         <p>
-            Dit is de perfecte plek om de begin-properties (de 'toestand') van een object in te stellen. Het *dwingt* de programmeur om de benodigde data (zoals een <code>id</code> en <code>start_angle</code>) direct mee te geven bij het maken van het object.
+            In Python heet deze methode <code>def __init__(self, ...):</code> (met dubbele underscores, "dunder init" genoemd).
+        </p>
+        <p>
+            Dit is de perfecte plek om de begin-properties (de 'toestand') van een object in te stellen. [cite_start]Het *dwingt* de programmeur om de benodigde data (zoals een <code>id</code> en <code>start_angle</code>) direct mee te geven bij het maken van het object [cite: 2288-2292].
         </p>
 
         <hr>
-        <h3>Python Voorbeeld</h3>
-        <p>We passen <code>servo.py</code> aan. De properties <code>_id</code> en <code>_current_angle</code> worden nu in de constructor ingesteld in plaats van in <code>main.py</code>.</p>
+        <h3>Stap-voor-stap Voorbeeld</h3>
+
+        <h4>Stap 1: Vóór (Code uit M1.5)</h4>
+        <p><code>servo.py</code> heeft nog geen <code>__init__</code>. <code>main.py</code> stelt properties handmatig in.</p>
+        <pre><code class="language-python"># In servo.py
+class Servo:
+    _current_angle = 90.0
+    id = 0
+
+    def set_angle(self, new_angle):
+        # ...
+
+    @property
+    def current_angle(self):
+        # ...
+
+# In main.py
+motor = Servo()
+motor.id = 1
+motor.set_angle(90.0)</code></pre>
+
+        <h4>Stap 2: Na (Refactor met `__init__`)</h4>
+        <p>We voegen <code>__init__</code> toe aan <code>servo.py</code>. We verplaatsen het instellen van <code>id</code> en <code>_current_angle</code> naar de constructor. We hernoemen ook <code>id</code> naar <code>_id</code> om het 'protected' te maken.</p>
         <pre><code class="language-python"># In servo.py
 MIN_ANGLE = 0.0
 MAX_ANGLE = 180.0
 
 class Servo:
+    # We definiëren de properties nu hier (zie M3.1)
     _id: int
     _current_angle: float
 
     # De Constructor
-    def __init__(self, start_id, start_angle):
+    def __init__(self, start_id: int, start_angle: float):
         """Wordt automatisch aangeroepen bij Servo(...)"""
         print(f"Nieuw Servo object (ID: {start_id}) wordt gemaakt...")
+
+        # We stellen de 'protected' properties in
         self._id = start_id
 
         # We kunnen de setter *binnen* de constructor gebruiken
         # voor validatie bij de 'geboorte'!
         self.set_angle(start_angle)
-        # Let op: We stellen _current_angle niet meer dubbel in.
 
-    def set_angle(self, new_angle):
+    def set_angle(self, new_angle: float):
         """SETTER: Stelt de hoek in, mét validatie."""
         if new_angle >= MIN_ANGLE and new_angle <= MAX_ANGLE:
             self._current_angle = new_angle
         else:
-            # We gooien nu een 'Error' (Exception)
+            # Gooi een 'Error' (Exception)
             raise ValueError(f"Hoek {new_angle} is ongeldig.")
 
     @property
-    def current_angle(self):
+    def current_angle(self) -> float:
         return self._current_angle
 
-# In main.py
+    @property
+    def id(self) -> int:
+        return self._id
+</code></pre>
+
+        <h4>Stap 3: Testen (in `main.py`)</h4>
+        <p>Onze oude <code>main.py</code> code *crasht* nu, omdat <code>Servo()</code> parameters vereist. Dat is goed! We passen het aan.</p>
+        <pre><code class="language-python"># In main.py
+
 # Oude manier (werkt niet meer):
 # motor = Servo() # Crasht: Mist 2 argumenten
 # motor.id = 1
@@ -115,10 +153,23 @@ class Servo:
 # Nieuwe manier:
 motor1 = Servo(1, 90.0)
 motor2 = Servo(2, 110.0)
-print(f"Motor 1 staat op {motor1.current_angle} graden.")
+
+print(f"Motor 1 (ID: {motor1.id}) staat op {motor1.current_angle} graden.")
+print(f"Motor 2 (ID: {motor2.id}) staat op {motor2.current_angle} graden.")
 
 # Crasht direct bij aanmaak (dankzij de constructor):
-# motor3 = Servo(3, 9000.0) # ValueError!</code></pre>
+try:
+    motor3 = Servo(3, 9000.0) # ValueError!
+except ValueError as e:
+    print(f"Fout bij aanmaken motor 3: {e}")
+</code></pre>
+        <p><strong>Output:</strong></p>
+        <pre><code class="language-text">Nieuw Servo object (ID: 1) wordt gemaakt...
+Nieuw Servo object (ID: 2) wordt gemaakt...
+Motor 1 (ID: 1) staat op 90.0 graden.
+Motor 2 (ID: 2) staat op 110.0 graden.
+Nieuw Servo object (ID: 3) wordt gemaakt...
+Fout bij aanmaken motor 3: Hoek 9000.0 is ongeldig</code></pre>
 
     </main>
 </div>

@@ -64,35 +64,50 @@
             <strong>Probleem:</strong> Fouten zoeken met <code>print("DEBUG: waarde is", x)</code> is traag, rommelig en je vergeet ze weg te halen.
         </p>
         <p>
-            <strong>Oplossing:</strong> Een <strong>Visuele Debugger</strong>. Dit is een tool in je IDE (zoals VS Code of PyCharm) waarmee je:
+            <strong>Oplossing:</strong> Een <strong>Visuele Debugger</strong>. Dit is een tool in je IDE (zoals VS Code of PyCharm) die veel krachtiger is.
         </p>
-        <ul>
-            <li><strong>Breakpoints</strong> kunt zetten: Rode stippen naast de code die zeggen "Pauzeer hier!".</li>
-            <li><strong>Stap-voor-stap</strong> door je code kunt lopen (Step Over, Step Into).</li>
-            <li>Live alle <strong>Variabelen</strong> (zoals <code>self</code> of <code>new_angle</code>) kunt bekijken.</li>
-        </ul>
+        <p>De drie belangrijkste functies zijn:</p>
+        <ol>
+            <li><strong>Breakpoints (Rode Stip):</strong> Een "Stop!"-bord voor je code. Je klikt links naast de regelnummers om er een te plaatsen. Je code *pauzeert* daar.</li>
+            <li><strong>Stap-voor-stap Navigatie:</strong>
+                <ul>
+                    <li><strong>Step Over (F10):</strong> Voer de huidige regel uit en ga naar de *volgende* regel.</li>
+                    <li><strong>Step Into (F11):</strong> Als de regel een functie of methode aanroept (bv. <code>Leg(...)</code>), *spring* dan *in* die methode.</li>
+                </ul>
+            </li>
+            <li><strong>Variabelen Inspecteren:</strong> Terwijl de code gepauzeerd is, kun je in het "Variables" of "Debug" venster *live* de inhoud van alle variabelen zien (wat zit er in <code>self</code>? Wat is <code>start_id</code>?).</li>
+        </ol>
 
         <hr>
-        <h3>Python Voorbeeld (Debugger Stappen)</h3>
-        <p>Dit is een opdracht *zonder* nieuwe code. De opdracht is om de debugger te *gebruiken*.</p>
+        <h3>Python Opdracht (Debugger Stappen)</h3>
+        <p>Dit is een opdracht *zonder* nieuwe code. De opdracht is om de debugger te *gebruiken* om de "cascade" van constructors (M1.10) te volgen.</p>
+        <p>Open je <code>main.py</code> en volg deze stappen:</p>
 
         <pre><code class="language-python"># In main.py
 from spiderpi_core.robot import SpiderPi
 
 # 1. Zet een Breakpoint op de volgende regel:
+#    (Klik links van het regelnummer 5)
 my_robot = SpiderPi()
 
 # 2. Start de Debugger (F5 in VS Code)
-# 3. Code pauzeert. Druk Step Into (F11).
+#    De code pauzeert en markeert regel 5 geel.
+
+# 3. Druk op Step Into (F11).
 # 4. Je springt nu IN de __init__ van SpiderPi (in robot.py).
+
 # 5. Druk op Step Over (F10) om regel voor regel te gaan.
 # 6. Ga naar het 'VARIABLES' / 'VARIABLES' venster om 'self' te inspecteren.
-# 7. Druk nogmaals Step Into als je op self._leg_front_r = Leg(...) staat.
+#    Je zult zien dat 'self' langzaam wordt opgebouwd.
+
+# 7. Druk nogmaals Step Into (F11) als je op self._leg_front_r = Leg(...) staat.
 # 8. Je springt nu IN de __init__ van Leg (in leg.py).
-# 9. Druk nogmaals Step Into als je op self._hip_servo = Servo(...) staat.
+
+# 9. Druk nogmaals Step Into (F11) als je op self._hip_servo = Servo(...) staat.
 # 10. Je springt nu IN de __init__ van Servo (in servo.py).
 
 print("Debuggen voltooid.")</code></pre>
+        <p>Door dit te doen *zie* je precies hoe de objecten (<code>SpiderPi</code>, <code>Leg</code>, <code>Servo</code>) in elkaar zitten.</p>
 
     </main>
 </div>
