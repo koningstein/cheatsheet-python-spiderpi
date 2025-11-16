@@ -14,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m2-2.html">« M2.2: Requirements</a>
-            <a href="m2-4.html">M2.4: Packages »</a>
+            <a href="../module1/m1-1.html">« M1: Fundamenten</a>
+            <a href="../module3/m3-1.html">M3: Kwaliteit »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -57,42 +57,57 @@
     <main>
         <h2>M2.3: Modules (Bestanden)</h2>
 
-        <h3>Theorie: Code Organiseren in Bestanden</h3>
+        <h3>Uitleg: Het Probleem (Chaos)</h3>
         <p>
-            <strong>Probleem:</strong> We kunnen <em>alle</em> code (<code>Servo</code>, <code>Leg</code>, <code>SpiderPi</code>) in één gigantisch <code>main.py</code> bestand schrijven. Het zou werken, maar het is een chaos. Niemand kan dat lezen of onderhouden.
+            We kunnen <em>alle</em> code (de <code>Servo</code> klasse, de <code>Leg</code> klasse, de <code>SpiderPi</code> klasse) in één gigantisch <code>main.py</code> bestand schrijven. Het zou werken, maar het is een chaos. Niemand kan dat lezen of onderhouden.
         </p>
+
+        <h3>Uitleg: De Oplossing (Modules)</h3>
         <p>
-            <strong>Oplossing:</strong> Een <strong>Module</strong>. In Python is een Module simpelweg een <strong><code>.py</code> bestand</strong>. Het idee is dat elk bestand (elke module) **één duidelijke taak** (Single Responsibility) heeft.
+            Een <strong>Module</strong> in Python is simpelweg een <strong><code>.py</code> bestand</strong>. Het idee is dat elk bestand (elke module) **één duidelijke taak** heeft.
         </p>
         <ul>
-            <li><code>servo.py</code> weet alles over *één motor*. </li>
-            <li><code>leg.py</code> weet alles over *één poot*. </li>
-            <li><code>main.py</code> *gebruikt* de robot.</li>
+            <li><code>servo.py</code>: Weet alles over één motor.</li>
+            <li><code>leg.py</code>: Weet alles over één poot.</li>
+            <li><code>robot.py</code>: Weet alles over de hele robot.</li>
+            <li><code>main.py</code>: *Gebruikt* de robot (start het programma).</li>
         </ul>
-        <p>We 'importeren' de code van de ene module in de andere met <code>from ... import ...</code>.</p>
+        <p>
+            Dit is de projectstructuur die we in Module 1 hebben opgebouwd.
+        </p>
 
-        <hr>
-        <h3>Python Voorbeeld (Structuur)</h3>
-        <p>De structuur die we in Module 1 hebben opgebouwd, is een modulaire structuur.</p>
         <pre><code class="language-text"># Projectstructuur (simpel):
 # ├── servo.py
 # ├── leg.py
 # ├── robot.py
 # └── main.py</code></pre>
 
-        <pre><code class="language-python"># In servo.py:
-class Servo:
-    pass
+        <h3>Uitleg: Modules Gebruiken (Importeren)</h3>
+        <p>
+            Om de <code>Servo</code> klasse (uit <code>servo.py</code>) te kunnen gebruiken in <code>leg.py</code>, moeten we Python vertellen waar hij die blauwdruk kan vinden. Dit doen we met <code>from ... import ...</code>.
+        </p>
 
-# In leg.py:
-from servo import Servo # Importeert de Servo klasse
+        <pre><code class="language-python"># Inhoud van leg.py:
+
+# Vertel Python: "Uit het bestand 'servo', haal de klasse 'Servo'"
+from servo import Servo
+
 class Leg:
-    pass
+    # Nu kent Python 'Servo' en kunnen we het hier gebruiken
+    hip_servo: Servo
+    # ...</code></pre>
 
-# In main.py:
-from robot import SpiderPi # Importeert de SpiderPi klasse
-my_robot = SpiderPi()</code></pre>
+        <p>
+            Hetzelfde geldt voor <code>main.py</code>, die de <code>SpiderPi</code> klasse uit <code>robot.py</code> moet importeren.
+        </p>
 
+        <pre><code class="language-python"># Inhoud van main.py:
+
+# "Uit het bestand 'robot', haal de klasse 'SpiderPi'"
+from robot import SpiderPi
+
+my_robot = SpiderPi()
+my_robot.wake_up()</code></pre>
     </main>
 </div>
 

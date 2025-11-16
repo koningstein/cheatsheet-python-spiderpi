@@ -14,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m2-1.html">« M2.1: venv</a>
-            <a href="m2-3.html">M2.3: Modules »</a>
+            <a href="../module1/m1-1.html">« M1: Fundamenten</a>
+            <a href="../module3/m3-1.html">M3: Kwaliteit »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -57,39 +57,52 @@
     <main>
         <h2>M2.2: Dependency Management (requirements.txt)</h2>
 
-        <h3>Theorie: De Inventarislijst</h3>
+        <h3>Uitleg: Het Probleem (Deel 2)</h3>
         <p>
-            <strong>Probleem:</strong> Je <code>venv</code> (gereedschapskist) is klaar en je project werkt. Nu wil je collega aan hetzelfde project werken. Hoe weet hij <em>precies</em> welke libraries (en welke versies!) hij moet installeren in <em>zijn</em> <code>venv</code>?
+            Oké, jouw <code>venv</code> (gereedschapskist) werkt perfect. Nu wil je collega aan hetzelfde project werken. Hoe weet hij <em>precies</em> welke libraries (en welke versies!) hij moet installeren in <em>zijn</em> <code>venv</code>?
+        </p>
+
+        <h3>Uitleg: De Oplossing (De Boodschappenlijst)</h3>
+        <p>
+            De <strong><code>requirements.txt</code></strong> is een simpele "boodschappenlijst" (of inventaris) van je project. Je maakt deze lijst automatisch met een commando.
         </p>
         <p>
-            <strong>Oplossing:</strong> Het <code>requirements.txt</code> bestand. Dit is een simpele <strong>inventarislijst</strong> (of 'boodschappenlijst') van je project. Je collega kan deze lijst pakken en met één commando (<code>pip install -r requirements.txt</code>) exact dezelfde 'gereedschapskist' krijgen.
+            <strong>Vergelijking (Koken):</strong> <code>requirements.txt</code> is het <strong>recept</strong>. Het vertelt je precies welke ingrediënten (<code>lewansoul-servo-bus==1.0.0</code>) je nodig hebt.
         </p>
-        <ul>
-            <li><strong>Vergelijking (Koken):</strong> <code>requirements.txt</code> is het <strong>recept</strong>. Het vertelt je precies welke ingrediënten (<code>lewansoul-servo-bus==1.0.0</code>) je nodig hebt.</li>
-        </ul>
 
-        <hr>
-        <h3>Python Voorbeeld (Terminal)</h3>
-        <p>Je maakt de lijst met <code>pip freeze</code> en installeert het met <code>pip install -r</code>.</p>
+        <pre><code class="language-bash"># Zorg dat je venv actief is (je ziet (venv) vooraan)
+(venv) C:\...&gt;
 
-        <h4>De lijst genereren:</h4>
-        <pre><code class="language-bash"># Zorg dat je venv actief is
-(venv) C:\...&gt; pip install lewansoul-servo-bus
+# 1. Genereer de "boodschappenlijst"
+(venv) C:\...&gt; pip freeze &gt; requirements.txt</code></pre>
 
-# Genereer de lijst
-(venv) C:\...&gt; pip freeze > requirements.txt</code></pre>
-        <p>Inhoud van <code>requirements.txt</code> is nu:</p>
-        <pre><code class="language-text">lewansoul-servo-bus==1.0.0
-# ... (en andere dependencies)</code></pre>
+        <h3>Uitleg: Wat is er gebeurd?</h3>
+        <p>
+            Er is nu een nieuw bestand <code>requirements.txt</code> in je projectmap. Als je dit opent, ziet het er ongeveer zo uit:
+        </p>
 
-        <h4>De lijst installeren (op een nieuwe computer):</h4>
-        <pre><code class="language-bash"># 1. Maak en activeer een lege venv
+        <pre><code class="language-text"># Inhoud van requirements.txt
+lewansoul-servo-bus==1.0.0
+numpy==1.26.0
+opencv-python==4.8.0
+# ... (en misschien nog een paar andere)</code></pre>
+
+        <h3>Uitleg: De Boodschappenlijst Gebruiken</h3>
+        <p>
+            Jouw collega (of jijzelf, op een nieuwe computer) kan nu deze lijst gebruiken om met één commando exact dezelfde gereedschapskist te krijgen.
+        </p>
+
+        <pre><code class="language-bash"># Op een nieuwe computer:
+# 1. Maak en activeer een lege venv (zie M2.1)
 (venv) C:\NieuweMap&gt;
 
 # 2. Installeer alles van de lijst
 (venv) C:\NieuweMap&gt; pip install -r requirements.txt
-# ... installeert lewansoul-servo-bus ...</code></pre>
 
+# Output:
+# Collecting lewansoul-servo-bus==1.0.0
+# ...
+# Successfully installed lewansoul-servo-bus-1.0.0 numpy-1.26.0 ...</code></pre>
     </main>
 </div>
 

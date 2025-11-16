@@ -14,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m3-5.html">« M3.5: Debuggen</a>
-            <a href="m3-7.html">M3.7: CLI Acties »</a>
+            <a href="../module2/m2-1.html">« M2: Structuur</a>
+            <a href="../module4/m4-1.html">M4: Overerving »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -59,62 +59,59 @@
     <main>
         <h2>M3.6: Simple CLI (argparse)</h2>
 
-        <h3>Theorie: De Terminal als Interface</h3>
+        <h3>Uitleg: De Terminal als Interface</h3>
         <p>
-            <strong>Probleem:</strong> Onze <code>main.py</code> is *statisch*. Het doet altijd *exact* hetzelfde (de robot initialiseren). Als we de robot willen laten zwaaien, moeten we de code in <code>main.py</code> *aanpassen* (bv. <code>my_robot.wave()</code> toevoegen).
+            <strong>Probleem:</strong> Onze <code>main.py</code> is *statisch*. Het doet altijd *exact* hetzelfde. Als we de robot willen laten zwaaien, moeten we de code in <code>main.py</code> *aanpassen*.
         </p>
         <p>
-            <strong>Oplossing:</strong> Een <strong>Command-Line Interface (CLI)</strong>. We willen de robot *commando's* geven als we het script starten vanaf de terminal:
+            <strong>Oplossing:</strong> Een <strong>Command-Line Interface (CLI)</strong>. We willen de robot *commando's* geven als we het script starten vanaf de terminal, zoals:
             <br><code>python main.py --action wave</code>
-            <br><code>python main.py --action stand --speed 100</code>
         </p>
         <p>
             De <strong><code>argparse</code></strong> module (standaard in Python) is de professionele manier om deze "argumenten" (de <code>--</code> vlaggen) te lezen.
         </p>
 
         <hr>
-        <h3>Python Stappen (in `main.py`)</h3>
-        <p>We bouwen een 'parser' in <code>main.py</code> die luistert naar commando's.</p>
-
+        <h3>Stap 1: Importeren en de Parser Maken</h3>
+        <p>We beginnen in <code>main.py</code>. We importeren de <code>argparse</code> library en maken een "parser". Dit is het object dat de commando's gaat lezen.</p>
         <pre><code class="language-python"># In main.py
 import argparse
-# We importeren de robot nog niet, we printen alleen de args
 
-# 1. Importeer de library
-import argparse
+# (We importeren de robot nog niet, we printen alleen de commando's)
 
-# 2. Maak een 'parser' object
-parser = argparse.ArgumentParser(description="SpiderPi Robot Controller")
+# 1. Maak een 'parser' object
+parser = argparse.ArgumentParser(description="SpiderPi Robot Controller")</code></pre>
 
-# 3. Vertel de parser welke argumenten je verwacht
+        <h3>Stap 2: Argumenten Definiëren</h3>
+        <p>Nu vertellen we de parser welke "vlaggen" (commando's) we verwachten. We voegen twee argumenten toe: <code>--action</code> en <code>--speed</code>.</p>
+        <pre><code class="language-python"># 2. Vertel de parser welke argumenten je verwacht
 parser.add_argument(
     "--action",                     # De naam van de 'vlag'
-    type=str,                       # Welk type data verwachten we?
+    type=str,                       # Welk type data verwachten we? (tekst)
     default="stand",                # Wat is de waarde als men niks invult?
     help="De actie (bv: 'wave', 'stand')" # Help-tekst
 )
 parser.add_argument(
     "--speed",
-    type=int,
+    type=int,                       # Welk type data verwachten we? (getal)
     default=50,
     help="Snelheid (0-100)"
-)
+)</code></pre>
 
-# 4. Laat de parser de terminal 'lezen'
+        <h3>Stap 3: Lezen en Printen</h3>
+        <p>Nu geven we de parser de opdracht om de terminal te "lezen" en slaan we het resultaat op in een variabele genaamd <code>args</code>. Daarna printen we wat we hebben ontvangen.</p>
+        <pre><code class="language-python"># 3. Laat de parser de terminal 'lezen'
 args = parser.parse_args()
 
-# 5. Gebruik de resultaten (opgeslagen in 'args')
+# 4. Gebruik de resultaten (opgeslagen in 'args')
 print(f"--- CLI Input Ontvangen ---")
 print(f"De gekozen actie is: {args.action}")
 print(f"De snelheid is: {args.speed}")
 
 # In de volgende les (M3.7) gaan we deze 'args'
-# koppelen aan de echte robot-methoden.
-# my_robot = SpiderPi()
-# if args.action == "wave":
-#     my_robot.wave()</code></pre>
+# koppelen aan de echte robot-methoden.</code></pre>
 
-        <h4>Testen in de terminal:</h4>
+        <h3>Stap 4: Testen in de Terminal</h3>
         <p>Sla <code>main.py</code> op en voer deze commando's uit in je terminal (zorg dat je <code>venv</code> actief is).</p>
 
         <pre><code class="language-bash"># Test 1: Zonder argumenten (gebruikt de defaults)
@@ -129,24 +126,11 @@ De snelheid is: 50
 De gekozen actie is: wave
 De snelheid is: 90
 
-# Test 3: De volgorde maakt niet uit
-(venv) C:\...&gt; python main.py --speed 75 --action walk
---- CLI Input Ontvangen ---
-De gekozen actie is: walk
-De snelheid is: 75
-
-# Test 4: De ingebouwde help-functie
+# Test 3: De ingebouwde help-functie
 (venv) C:\...&gt; python main.py --help
 # Output:
 # usage: main.py [-h] [--action ACTION] [--speed SPEED]
-#
-# SpiderPi Robot Controller
-#
-# options:
-#   -h, --help       show this help message and exit
-#   --action ACTION  De actie (bv: 'wave', 'stand')
-#   --speed SPEED    Snelheid (0-100)</code></pre>
-
+# ... (toont een automatisch help-menu)</code></pre>
     </main>
 </div>
 

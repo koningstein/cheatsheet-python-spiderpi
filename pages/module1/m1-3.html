@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M1.3: Methoden</title>
-
+    <title>M1.3: Methoden (Gedrag)</title>
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="../../script.js" defer></script>
@@ -15,8 +14,7 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m1-2.html">« M1.2: Properties</a>
-            <a href="m1-4.html">M1.4: Setters »</a>
+            <a href="../module2/m2-1.html">Module 2: Structuur »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -51,7 +49,7 @@
                 <li><a href="m1-4.html">M1.4: Setters</a></li>
                 <li><a href="m1-5.html">M1.5: Getters</a></li>
                 <li><a href="m1-6.html">M1.6: Constructor</a></li>
-                <li><a href="m1-7.html">M1.7: Named Arguments</a></li>
+                <li><a href="m1-7.html">M1.7: Class Variables</a></li>
                 <li><a href="m1-8.html">M1.8: Compositie</a></li>
                 <li><a href="m1-9.html">M1.9: Delegatie</a></li>
                 <li><a href="m1-10.html">M1.10: Hoofd-Klasse</a></li>
@@ -62,31 +60,25 @@
     <main>
         <h2>M1.3: Methoden (Gedrag)</h2>
 
-        <h3>Theorie: Gedrag Toevoegen</h3>
-        <p>
-            We hebben data (Properties). Nu hebben we <strong>gedrag</strong> nodig. [cite_start]<strong>Methoden</strong> zijn functies die *in* een klasse leven en het gedrag van objecten van die klasse definiëren[cite: 2189].
-        </p>
+        <h3>Leeruitkomsten</h3>
         <ul>
-            <li><strong>Analogie:</strong> Een <code>Auto</code>-object heeft data (<code>kleur</code>). Het heeft ook gedrag: <code>.start_motor()</code> of <code>.toeteren()</code>.</li>
-            <li><strong>SpiderPi:</strong> Ons <code>Servo</code>-object heeft data (<code>current_angle</code>). [cite_start]Het heeft gedrag nodig, zoals <code>.set_angle(hoek)</code>[cite: 2189].</li>
+            <li>Ik begrijp het concept van een <strong>Methode</strong> als een functie die "leeft" binnen een klasse.</li>
+            <li>Ik kan een methode definiëren met het <code>def</code> keyword en het verplichte <code>self</code> argument.</li>
+            <li>Ik kan een methode aanroepen op een object-instantie.</li>
         </ul>
 
-        <h4>Het <code>self</code> Keyword</h4>
+        <h3>Uitleg: Gedrag Toevoegen (Methoden)</h3>
         <p>
-            Methoden binnen een klasse hebben <em>altijd</em> <code>self</code> als hun eerste parameter. Het <code>self</code> keyword verwijst naar het *specifieke object zelf* (bv. <code>motor_voor_rechts</code>) dat de methode aanroept. Hiermee kan de methode de <em>eigen</em> properties van dat object lezen of aanpassen.
+            Properties (M1.2) definiëren <strong>wat een object is</strong> (zijn toestand).
+            Methoden definiëren <strong>wat een object kan doen</strong> (zijn gedrag).
+        </p>
+        <p>
+            <strong>Vergelijking:</strong> Een Auto <strong>heeft</strong> een <code>snelheid</code> (property), maar <strong>doet</strong> <code>versnellen()</code> (methode).
+        </p>
+        <p>
+            Een methode is een functie die je <strong>binnen</strong> een klasse definieert. Het <strong>moet</strong> altijd <code>self</code> als eerste parameter hebben. <code>self</code> verwijst naar <strong>het object zelf</strong>, zodat de methode zijn eigen properties kan aanpassen.
         </p>
 
-        <hr>
-        <h3>Stap-voor-stap Voorbeeld</h3>
-
-        <h4>Stap 1: Vóór (in `servo.py`)</h4>
-        <p>Onze klasse was leeg en deed niets.</p>
-        <pre><code class="language-python"># In servo.py
-class Servo:
-    pass</code></pre>
-
-        <h4>Stap 2: Na (Methode toevoegen in `servo.py`)</h4>
-        <p>We voegen de methode <code>set_angle</code> toe. Deze methode ontvangt <code>self</code> (het object zelf) en <code>new_angle</code> (de input).</p>
         <pre><code class="language-python"># In servo.py
 class Servo:
     """Modelleert een enkele motor (servo)."""
@@ -102,11 +94,13 @@ class Servo:
         self.current_angle = new_angle
 
         # We gebruiken 'self.id' (aangemaakt in main.py)
-        print(f"Motor {self.id} beweegt nu naar {self.current_angle} graden.")
-</code></pre>
+        print(f"Motor {self.id} beweegt nu naar {self.current_angle} graden.")</code></pre>
 
-        <h4>Stap 3: De Methode Aanroepen (in `main.py`)</h4>
-        <p>We passen <code>main.py</code> aan om de nieuwe methode aan te roepen (te "callen").</p>
+        <h3>Uitleg: De Methode Aanroepen</h3>
+        <p>
+            We roepen de methode aan op het <em>object</em> met de punt-notatie. De methode past vervolgens de <em>toestand</em> (de property) van dat specifieke object aan.
+        </p>
+
         <pre><code class="language-python"># In main.py
 from servo import Servo
 
@@ -119,15 +113,17 @@ print(f"Beginhoek: {motor.current_angle}")
 motor.set_angle(110.0)
 
 # De property is nu aangepast
-print(f"Nieuwe hoek: {motor.current_angle}")</code></pre>
+print(f"Nieuwe hoek: {motor.current_angle}")
 
-        <h4>Stap 4: Testen</h4>
-        <pre><code class="language-bash">python main.py</code></pre>
-        <p>De output laat zien dat de methode *binnen* het object de data van *datzelfde* object heeft aangepast:</p>
-        <pre><code class="language-text">Beginhoek: 90.0
-Motor 1 beweegt nu naar 110.0 graden.
-Nieuwe hoek: 110.0</code></pre>
+# Output:
+# Beginhoek: 90.0
+# Motor 1 beweegt nu naar 110.0 graden.
+# Nieuwe hoek: 110.0</code></pre>
 
+        <h3>Het Probleem...</h3>
+        <p>
+            Wat gebeurt er als je <code>motor.set_angle(9000.0)</code> aanroept? De code accepteert dit, en de toestand van ons object is nu corrupt (9000.0 is geen echte hoek). Dit lossen we in de volgende les op.
+        </p>
     </main>
 </div>
 

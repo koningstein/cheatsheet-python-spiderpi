@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>M3.1: Type Hints</title>
-
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="../../script.js" defer></script>
@@ -15,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="../module2/m2-6.html">« M2.6: Hoofdprogramma</a>
-            <a href="m3-2.html">M3.2: Docstrings »</a>
+            <a href="../module2/m2-1.html">« M2: Structuur</a>
+            <a href="../module4/m4-1.html">M4: Overerving »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -60,63 +59,19 @@
     <main>
         <h2>M3.1: Type Hints (De Spelregels)</h2>
 
-        <h3>Theorie: Zeggen Wat Je Verwacht</h3>
+        <h3>Uitleg: Zeggen Wat Je Verwacht</h3>
         <p>
             <strong>Probleem:</strong> Python is 'dynamisch'. Dat betekent dat je dit kan doen: <code>mijn_motor.set_angle("honderd")</code>. Je code crasht pas *tijdens het uitvoeren* (run-time), diep in je <code>if</code>-statement.
         </p>
         <p>
-            <strong>Oplossing:</strong> Met <strong>Type Hints</strong> vertel je *vooraf* (als 'spelregel') wat voor type data je verwacht. Een moderne IDE (zoals VS Code) zal de student nu **direct waarschuwen** met een rood lijntje onder <code>"honderd"</code>, nog *voordat* de code draait.
+            <strong>Oplossing:</strong> Met <strong>Type Hints</strong> vertel je *vooraf* (als 'spelregel') wat voor type data je verwacht. Een moderne editor (zoals VS Code) zal je nu **direct waarschuwen** met een rood lijntje onder <code>"honderd"</code>, nog *voordat* de code draait.
         </p>
         <p>We gaan onze <code>servo.py</code> stap-voor-stap 'refactoren' (verbeteren).</p>
 
         <hr>
         <h4>Stap 1: Properties 'Hinten'</h4>
         <p>We vertellen de klasse welke properties een object zal hebben en welk type ze zijn. We voegen dit bovenaan de klasse-definitie toe.</p>
-        <pre><code class="language-python"># VOOR:
-class Servo(RobotComponent):
-    MIN_ANGLE = 0.0
-    # ...
-
-# NA:
-class Servo(RobotComponent):
-    _id: int
-    _current_angle: float
-    MIN_ANGLE: float = 0.0
-    # ...</code></pre>
-
-        <h4>Stap 2: Constructor (`__init__`) 'Hinten'</h4>
-        <p>We 'hinten' de parameters die binnenkomen (<code>: int</code>) en wat de methode teruggeeft (<code>-> None</code>, want een constructor geeft nooit iets terug).</p>
-        <pre><code class="language-python"># VOOR:
-def __init__(self, start_id, start_angle):
-
-# NA:
-def __init__(self, start_id: int, start_angle: float) -> None:</code></pre>
-
-        <h4>Stap 3: Methoden 'Hinten'</h4>
-        <p>Hetzelfde doen we voor alle methoden. <code>set_angle</code> verwacht een <code>float</code> en geeft niets (<code>None</code>) terug.</p>
-        <pre><code class="language-python"># VOOR:
-def set_angle(self, new_angle):
-
-# NA:
-def set_angle(self, new_angle: float) -> None:</code></pre>
-
-        <h4>Stap 4: Getters 'Hinten'</h4>
-        <p>Een <code>@property</code> getter geeft wél iets terug. We specificeren het return type (<code>-> float</code>).</p>
-        <pre><code class="language-python"># VOOR:
-@property
-def current_angle(self):
-
-# NA:
-@property
-def current_angle(self) -> float:</code></pre>
-
-        <hr>
-        <h3>Python Voorbeeld (Eindresultaat in `servo.py`)</h3>
-        <p>Nadat je alle stappen hebt doorlopen, ziet je <code>servo.py</code> er zo uit:</p>
-
         <pre><code class="language-python"># In spiderpi_core/servo.py
-
-# Importeer de Ouder-klasse voor type hinting
 from .component import RobotComponent
 
 class Servo(RobotComponent):
@@ -125,32 +80,41 @@ class Servo(RobotComponent):
     _current_angle: float
     MIN_ANGLE: float = 0.0
     MAX_ANGLE: float = 180.0
+    # ...</code></pre>
 
-    # Method-level type hints
+        <h4>Stap 2: Constructor (`__init__`) 'Hinten'</h4>
+        <p>We 'hinten' de parameters die binnenkomen (<code>: int</code>) en wat de methode teruggeeft (<code>-> None</code>, want een constructor geeft nooit iets terug).</p>
+        <pre><code class="language-python">    # Method-level type hints
     def __init__(self, start_id: int, start_angle: float) -> None:
         super().__init__(name=f"Servo_{start_id}")
         self._id = start_id
         # We negeren de return value van set_angle hier
-        self.set_angle(start_angle)
+        self.set_angle(start_angle)</code></pre>
 
-    def set_angle(self, new_angle: float) -> None:
+        <h4>Stap 3: Methoden 'Hinten'</h4>
+        <p>Hetzelfde doen we voor alle methoden. <code>set_angle</code> verwacht een <code>float</code> en geeft niets (<code>None</code>) terug.</p>
+        <pre><code class="language-python">    def set_angle(self, new_angle: float) -> None:
         """Stelt de hoek in."""
         if not (self.MIN_ANGLE <= new_angle <= self.MAX_ANGLE):
             raise ValueError("Ongeldige hoek")
-        self._current_angle = new_angle
+        self._current_angle = new_angle</code></pre>
 
-    @property
+        <h4>Stap 4: Getters 'Hinten'</h4>
+        <p>Een <code>@property</code> getter geeft wél iets terug. We specificeren het return type (<code>-> float</code>).</p>
+        <pre><code class="language-python">    @property
     def current_angle(self) -> float:
         return self._current_angle
 
     @property
     def id(self) -> int:
-        return self._id
+        return self._id</code></pre>
 
-# In main.py
+        <hr>
+        <h3>Uitleg: Het Resultaat</h3>
+        <p>Als je nu in <code>main.py</code> dit probeert, krijg je een waarschuwing van je editor:</p>
+        <pre><code class="language-python"># In main.py
 # motor.set_angle("tachtig")
 # ^^^ Je IDE zal hier nu een waarschuwing geven.</code></pre>
-
     </main>
 </div>
 

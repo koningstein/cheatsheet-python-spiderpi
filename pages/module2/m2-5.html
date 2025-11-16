@@ -14,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m2-4.html">« M2.4: Packages</a>
-            <a href="m2-6.html">M2.6: Hoofdprogramma »</a>
+            <a href="../module1/m1-1.html">« M1: Fundamenten</a>
+            <a href="../module3/m3-1.html">M3: Kwaliteit »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -55,22 +55,27 @@
     </div>
 
     <main>
-        <h2>M2.5: Relative Imports</h2>
+        <h2>M2.5: Relative Imports (Import binnen het package)</h2>
 
-        <h3>Theorie: De 'Binnenhuis' Adresboek</h3>
+        <h3>Uitleg: Het Probleem (Pakket-intern)</h3>
         <p>
-            <strong>Probleem:</strong> Nadat we onze modules in de <code>spiderpi_core</code> map (Package) hebben gezet, werkt de code niet meer. <code>leg.py</code> (in de package) kan <code>servo.py</code> (in dezelfde package) niet vinden.
+            We hebben een <code>spiderpi_core</code> package (map) gemaakt. Daarin zitten nu <code>leg.py</code> en <code>servo.py</code>.
         </p>
         <p>
-            <strong>Oplossing:</strong> We moeten de imports *binnen* het package "relatief" maken. We gebruiken een <strong>punt (<code>.</code>)</strong> om te zeggen: "kijk in de map (package) waar ik *zelf* al in sta".
+            Het bestand <code>leg.py</code> probeert <code>servo.py</code> te importeren met: <code>from servo import Servo</code>. Maar dit crasht.
         </p>
 
-        <hr>
-        <h3>Python Voorbeeld</h3>
-        <p>We passen de <code>import</code>-regels aan in onze package-bestanden.</p>
+        <h3>Uitleg: De Oplossing (Relatief Adres)</h3>
+        <p>
+            Omdat ze <em>samen in een package</em> zitten, moeten we een "relatief adres" gebruiken. We moeten <code>leg.py</code> vertellen: "zoek naar <code>servo.py</code> in de map waar je <em>zelf</em> al in staat."
+        </p>
+        <p>
+            Dit doen we met een <strong>punt (<code>.</code>)</strong> voor de bestandsnaam. Dit heet een <strong>Relative Import</strong>.
+        </p>
 
-        <h4>In <code>spiderpi_core/leg.py</code>:</h4>
-        <pre><code class="language-python"># OUD (crasht):
+        <pre><code class="language-python"># In spiderpi_core/leg.py
+
+# OUD (crasht):
 # from servo import Servo
 
 # NIEUW (werkt):
@@ -78,20 +83,35 @@
 from .servo import Servo
 
 class Leg:
-    _hip_servo: Servo
+    # ...
+    hip_servo: Servo
     # ...</code></pre>
 
-        <h4>In <code>spiderpi_core/robot.py</code>:</h4>
-        <pre><code class="language-python"># OUD (crasht):
+        <h3>Uitleg: Nog een keer...</h3>
+        <p>
+            Hetzelfde probleem geldt voor <code>robot.py</code>, die <code>leg.py</code> wil importeren. We moeten ook dáár het adres aanpassen.
+        </p>
+
+        <pre><code class="language-python"># In spiderpi_core/robot.py
+
+# OUD (crasht):
 # from leg import Leg
 
 # NIEUW (werkt):
 from .leg import Leg
 
 class SpiderPi:
-    _leg_front_r: Leg
+    # ...
+    leg_front_right: Leg
     # ...</code></pre>
-        <p><strong>Let op:</strong> <code>main.py</code> zal *nog steeds* crashen. Die repareren we in de volgende les.</p>
+
+        <h3>Uitleg: Status</h3>
+        <p>
+            Super! Nu werkt alle code <em>binnen</em> het <code>spiderpi_core</code> package weer.
+        </p>
+        <p>
+            <strong>MAAR:</strong> <code>main.py</code> (die *buiten* de map staat) is nog steeds kapot. Die kan de <code>robot</code> module nog steeds niet vinden. Dat lossen we in de laatste les op.
+        </p>
     </main>
 </div>
 

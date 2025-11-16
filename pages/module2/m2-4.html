@@ -14,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m2-3.html">« M2.3: Modules</a>
-            <a href="m2-5.html">M2.5: Relative Imports »</a>
+            <a href="../module1/m1-1.html">« M1: Fundamenten</a>
+            <a href="../module3/m3-1.html">M3: Kwaliteit »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -57,36 +57,56 @@
     <main>
         <h2>M2.4: Packages (__init__.py)</h2>
 
-        <h3>Theorie: Van Losse Bladen naar een Boek</h3>
+        <h3>Uitleg: Het Probleem (Weer rommelig)</h3>
         <p>
-            <strong>Probleem:</strong> Onze projectmap is rommelig. <code>main.py</code> is het script dat we *uitvoeren*, maar <code>servo.py</code>, <code>leg.py</code> en <code>robot.py</code> zijn onze *bibliotheek* (onze <code>src</code> code).
+            Oké, we hebben onze code netjes in aparte bestanden (Modules) gezet. Maar nu staat alles nog steeds los in de hoofdmap.
         </p>
         <p>
-            <strong>Oplossing:</strong> Een <strong>Package</strong>. Een Package is simpelweg een <strong>map</strong> die modules bevat. Cruciaal: om Python te vertellen dat een map een Package is, moet er een (meestal leeg) bestand in staan genaamd <code>__init__.py</code>.
+            <code>main.py</code> is het script dat we *uitvoeren*, maar <code>servo.py</code>, <code>leg.py</code> en <code>robot.py</code> zijn onze *bibliotheek* (onze 'gereedschapskist'). Het is netter om al ons gereedschap in één map te stoppen.
         </p>
-        <p>We maken een map (bv. <code>spiderpi_core</code>) en stoppen onze bibliotheek-bestanden daarin.</p>
 
-        <hr>
-        <h3>Python Voorbeeld (Structuur)</h3>
-        <p>We verplaatsen onze 'module' bestanden naar de 'package' map.</p>
+        <h3>Uitleg: De Oplossing (Een Package)</h3>
+        <p>
+            Een <strong>Package</strong> is een <strong>map</strong> die modules bevat.
+        </p>
+        <p>
+            Om Python te vertellen dat een map een Package is (en geen gewone map), moet er een speciaal (meestal leeg) bestand in staan met de naam: <strong><code>__init__.py</code></strong>.
+        </p>
+        <p>
+            We maken een map (bv. <code>spiderpi_core</code>) en stoppen onze bibliotheek-bestanden daarin.
+        </p>
 
-        <h4>VOOR (Losse Modules):</h4>
-        <pre><code class="language-text">spiderpi_oop/
+        <h3>VOOR (Losse Modules):</h3>
+        <pre><code class="language-text">spiderpi_project/
 ├── leg.py
 ├── main.py
 ├── robot.py
 └── servo.py</code></pre>
 
-        <h4>NA (Package Structuur):</h4>
-        <pre><code class="language-text">spiderpi_oop/
+        <h3>NA (Package Structuur):</h3>
+        <pre><code class="language-text">spiderpi_project/
 ├── main.py           &lt;-- Ons 'hoofdscript' (blijft buiten)
-└── spiderpi_core/    &lt;-- Ons PACKAGE
+└── spiderpi_core/    &lt;-- Ons PACKAGE (een map)
     ├── __init__.py   &lt;-- Het 'label' (mag leeg zijn)
     ├── leg.py
     ├── robot.py
     └── servo.py</code></pre>
-        <p><strong>Let op:</strong> Als je dit doet, crasht je <code>main.py</code>! De imports (adresboeken) kloppen niet meer. Dat lossen we in de volgende lessen op.</p>
 
+        <h3>Het Nieuwe Probleem...</h3>
+        <p>
+            <strong>Let op:</strong> Als je dit nu doet, crasht je hele project!
+        </p>
+        <p>
+            Waarom? De "adressen" (de <code>import</code>-regels) kloppen niet meer.
+        </p>
+        <ol>
+            <li><code>main.py</code> kan <code>robot.py</code> niet meer vinden.</li>
+            <li><code>robot.py</code> kan <code>leg.py</code> niet meer vinden.</li>
+            <li><code>leg.py</code> kan <code>servo.py</code> niet meer vinden.</li>
+        </ol>
+        <p>
+            Dit lossen we in de volgende twee lessen op.
+        </p>
     </main>
 </div>
 

@@ -14,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m3-4.html">« M3.4: Private ('__')</a>
-            <a href="m3-6.html">M3.6: Simple CLI »</a>
+            <a href="../module2/m2-1.html">« M2: Structuur</a>
+            <a href="../module4/m4-1.html">M4: Overerving »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -59,55 +59,93 @@
     <main>
         <h2>M3.5: Debuggen (Basis)</h2>
 
-        <h3>Theorie: Stoppen met <code>print()</code></h3>
+        <h3>Uitleg: Stoppen met <code>print()</code></h3>
         <p>
             <strong>Probleem:</strong> Fouten zoeken met <code>print("DEBUG: waarde is", x)</code> is traag, rommelig en je vergeet ze weg te halen.
         </p>
         <p>
-            <strong>Oplossing:</strong> Een <strong>Visuele Debugger</strong>. Dit is een tool in je IDE (zoals VS Code of PyCharm) die veel krachtiger is.
+            <strong>Oplossing:</strong> Een <strong>Visuele Debugger</strong>. Dit is een tool in je editor (zoals VS Code) die veel slimmer is. We leren 3 knoppen:
         </p>
-        <p>De drie belangrijkste functies zijn:</p>
         <ol>
-            <li><strong>Breakpoints (Rode Stip):</strong> Een "Stop!"-bord voor je code. Je klikt links naast de regelnummers om er een te plaatsen. Je code *pauzeert* daar.</li>
-            <li><strong>Stap-voor-stap Navigatie:</strong>
-                <ul>
-                    <li><strong>Step Over (F10):</strong> Voer de huidige regel uit en ga naar de *volgende* regel.</li>
-                    <li><strong>Step Into (F11):</strong> Als de regel een functie of methode aanroept (bv. <code>Leg(...)</code>), *spring* dan *in* die methode.</li>
-                </ul>
-            </li>
-            <li><strong>Variabelen Inspecteren:</strong> Terwijl de code gepauzeerd is, kun je in het "Variables" of "Debug" venster *live* de inhoud van alle variabelen zien (wat zit er in <code>self</code>? Wat is <code>start_id</code>?).</li>
+            <li><strong>Breakpoint (Rode Stip):</strong> Een "Stop!"-bord voor je code. Je klikt links naast het regelnummer.</li>
+            <li><strong>Step Over (F10):</strong> Voer de huidige (gele) regel uit en ga naar de *volgende* regel.</li>
+            <li><strong>Step Into (F11):</strong> Als de gele regel een functie of methode aanroept (bv. <code>SpiderPi()</code>), *spring* dan *in* die methode om te kijken wat daar gebeurt.</li>
         </ol>
+        <p>Terwijl de code pauzeert, kun je in het "Variables" venster *live* de inhoud van alle variabelen zien.</p>
 
         <hr>
-        <h3>Python Opdracht (Debugger Stappen)</h3>
-        <p>Dit is een opdracht *zonder* nieuwe code. De opdracht is om de debugger te *gebruiken* om de "cascade" van constructors (M1.10) te volgen.</p>
-        <p>Open je <code>main.py</code> en volg deze stappen:</p>
+        <h3>Opdracht: De 'Geboorte' van de Robot Volgen</h3>
+        <p>Dit is een *doe*-opdracht. Je hoeft geen code te schrijven, alleen de debugger te gebruiken om de "kettingreactie" van constructors (uit M1.10) te volgen.</p>
 
+        <h4>Stap 1: Het Breakpoint Zetten</h4>
+        <p>Open <code>main.py</code>. Klik in de 'goot' (de ruimte links van het regelnummer) naast de regel <code>my_robot = SpiderPi()</code>. Er verschijnt een rode stip.</p>
         <pre><code class="language-python"># In main.py
 from spiderpi_core.robot import SpiderPi
+import time
 
-# 1. Zet een Breakpoint op de volgende regel:
-#    (Klik links van het regelnummer 5)
+# 🔴 &lt;-- Zet je Breakpoint (rode stip) hier
 my_robot = SpiderPi()
 
-# 2. Start de Debugger (F5 in VS Code)
-#    De code pauzeert en markeert regel 5 geel.
+my_robot.wake_up()
+time.sleep(1)
+my_robot.sleep()</code></pre>
 
-# 3. Druk op Step Into (F11).
-# 4. Je springt nu IN de __init__ van SpiderPi (in robot.py).
+        <h4>Stap 2: De Eerste Sprong (Step Into)</h4>
+        <p>Start de Debugger (meestal met <strong>F5</strong>). Je code start en pauzeert meteen op de gele regel.</p>
+        <p>Druk nu op <strong>Step Into (F11)</strong>.</p>
+        <p>Je springt nu automatisch naar het bestand <code>robot.py</code> en landt in de <code>__init__</code> methode. Je ziet nu deze code:</p>
+        <pre><code class="language-python"># In spiderpi_core/robot.py
+class SpiderPi(RobotComponent):
 
-# 5. Druk op Step Over (F10) om regel voor regel te gaan.
-# 6. Ga naar het 'VARIABLES' / 'VARIABLES' venster om 'self' te inspecteren.
-#    Je zult zien dat 'self' langzaam wordt opgebouwd.
+    def __init__(self) -> None:
+        # 🟨 &lt;-- Je landt hier
+        super().__init__(name="SpiderPi_Robot")
+        print("SpiderPi robot wordt geassembleerd...")
 
-# 7. Druk nogmaals Step Into (F11) als je op self._leg_front_r = Leg(...) staat.
-# 8. Je springt nu IN de __init__ van Leg (in leg.py).
+        self._leg_front_r = Leg(id_hip=1, id_knee=2, id_ankle=3)
+        # ...</code></pre>
 
-# 9. Druk nogmaals Step Into (F11) als je op self._hip_servo = Servo(...) staat.
-# 10. Je springt nu IN de __init__ van Servo (in servo.py).
+        <h4>Stap 3: Regels Uitvoeren (Step Over)</h4>
+        <p>Je staat nu *in* <code>robot.py</code>. Druk een paar keer op <strong>Step Over (F10)</strong>.</p>
+        <p>Kijk in het "Variables" venster aan de linkerkant. Je ziet dat <code>self</code> (de robot die gemaakt wordt) langzaam wordt opgebouwd. Je ziet de <code>print()</code>-regel in je terminal verschijnen.</p>
+        <p>Blijf op F10 drukken tot je op de regel staat waar de eerste poot (<code>Leg</code>) wordt gemaakt.</p>
+        <pre><code class="language-python"># In spiderpi_core/robot.py
+class SpiderPi(RobotComponent):
 
-print("Debuggen voltooid.")</code></pre>
-        <p>Door dit te doen *zie* je precies hoe de objecten (<code>SpiderPi</code>, <code>Leg</code>, <code>Servo</code>) in elkaar zitten.</p>
+    def __init__(self) -> None:
+        super().__init__(name="SpiderPi_Robot")
+        print("SpiderPi robot wordt geassembleerd...")
+
+        # 🟨 &lt;-- Druk op F10 tot je hier bent
+        self._leg_front_r = Leg(id_hip=1, id_knee=2, id_ankle=3)
+        # ...</code></pre>
+
+        <h4>Stap 4: De Tweede Sprong (De Kettingreactie)</h4>
+        <p>Terwijl je op de <code>Leg</code>-regel staat, druk je *opnieuw* op <strong>Step Into (F11)</strong>.</p>
+        <p>Je springt nu weer een bestand dieper, naar <code>leg.py</code>, en landt in de <code>__init__</code> van de <code>Leg</code> klasse.</p>
+        <pre><code class="language-python"># In spiderpi_core/leg.py
+class Leg(RobotComponent):
+
+    def __init__(self, id_hip: int, id_knee: int, id_ankle: int) -> None:
+        # 🟨 &lt;-- Je landt hier
+        super().__init__(name=f"Leg_{id_hip}_{id_knee}_{id_ankle}")
+
+        self._hip_servo = Servo(start_id=id_hip, start_angle=90.0)
+        # ...</code></pre>
+
+        <h4>Stap 5: De Laatste Sprong</h4>
+        <p>Druk weer een paar keer op <strong>Step Over (F10)</strong> tot je op de regel staat waar de <code>Servo</code> wordt gemaakt.</p>
+        <p>Druk nog één keer op <strong>Step Into (F11)</strong>.</p>
+        <p>Je springt nu naar <code>servo.py</code> en landt in de <code>__init__</code> van de <code>Servo</code>. Je hebt de hele kettingreactie gevolgd!</p>
+        <pre><code class="language-python"># In spiderpi_core/servo.py
+class Servo(RobotComponent):
+
+    def __init__(self, start_id: int, start_angle: float) -> None:
+        # 🟨 &lt;-- Je landt hier
+        super().__init__(name=f"Servo_{start_id}")
+        self._id = start_id
+        # ...</code></pre>
+        <p>Je kunt nu op <strong>Continue (F5)</strong> drukken om de code af te laten spelen tot het einde.</p>
 
     </main>
 </div>

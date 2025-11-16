@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>M2.1: Virtual Environment (venv)</title>
-
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="../../script.js" defer></script>
@@ -15,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="../module1/m1-10.html">« M1.10: Hoofd-Klasse</a>
-            <a href="m2-2.html">M2.2: Requirements »</a>
+            <a href="../module1/m1-1.html">« M1: Fundamenten</a>
+            <a href="../module3/m3-1.html">M3: Kwaliteit »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -58,37 +57,51 @@
     <main>
         <h2>M2.1: Virtual Environment (venv)</h2>
 
-        <h3>Theorie: Je Eigen Gereedschapskist</h3>
+        <h3>Uitleg: Het Probleem (Ruzie makende software)</h3>
         <p>
-            <strong>Probleem:</strong> Je installeert software (libraries) om je robot te besturen (bv. <code>opencv-python</code>). Je installeert deze standaard 'globaal' op je computer. Maar wat als Project A versie 1.0 van een library nodig heeft, en Project B versie 2.0? Ze gaan ruzie maken.
+            Stel je voor dat je Python-software (libraries) op je computer installeert. Project A heeft versie 1.0 van een library nodig, maar Project B heeft versie 2.0 nodig. Ze gaan "ruzie" maken.
         </p>
         <p>
-            <strong>Oplossing:</strong> Een <strong>Virtual Environment (<code>venv</code>)</strong> is een persoonlijke, geïsoleerde 'gereedschapskist' voor alleen jouw project.  Alles wat je installeert komt *alleen* in de <code>venv</code>-map van dit project, en stoort andere projecten niet.
+            <strong>Vergelijking (Gereedschap):</strong> Zonder <code>venv</code> gooi je al je gereedschap voor al je klussen in één grote, rommelige schuur.
         </p>
-        <ul>
-            <li><strong>Vergelijking (Gereedschap):</strong> Zonder <code>venv</code> gooi je al je gereedschap (hamers, zagen) voor al je klussen (projecten) in één grote, rommelige schuur (je 'globale' Python-installatie). Een <code>venv</code> is een <strong>aparte, schone kist</strong> die je pakt voor één specifieke klus.</li>
-        </ul>
 
-        <hr>
-        <h3>Python Voorbeeld (Terminal)</h3>
-        <p><code>venv</code> is een command-line tool. Je gebruikt het in je terminal.</p>
-        <pre><code class="language-bash"># 1. Navigeer naar je projectmap
-cd C:\Projecten\spiderpi_oop
+        <h3>Uitleg: De Oplossing (Je eigen gereedschapskist)</h3>
+        <p>
+            Een <strong>Virtual Environment (<code>venv</code>)</strong> is een persoonlijke, lege "gereedschapskist" voor <em>alleen</em> jouw project. Alles wat je installeert, komt *alleen* in de <code>venv</code>-map van dit project en stoort andere projecten niet.
+        </p>
+        <p>
+            Je maakt en activeert een <code>venv</code> met commando's in je terminal.
+        </p>
 
-# 2. Maak de venv (er verschijnt een 'venv' map)
+        <pre><code class="language-bash"># 1. Navigeer in je terminal naar je projectmap
+#    (bv. cd C:\MijnDocumenten\SpiderPiProject)
+
+# 2. Maak de venv (je zult een nieuwe map 'venv' zien verschijnen)
 python -m venv venv
 
 # 3. Activeer de venv (Windows)
 .\venv\Scripts\activate
 
-# (Op Mac/Linux is het: source venv/bin/activate)
+# (Op Mac/Linux is het: source venv/bin/activate)</code></pre>
 
-# Je terminal-prompt verandert nu naar (venv)...
-(venv) C:\Projecten\spiderpi_oop&gt;
+        <h3>Uitleg: Wat is er gebeurd?</h3>
+        <p>
+            Je terminal-prompt (het regeltje waar je typt) verandert nu. Er staat <code>(venv)</code> vooraan. Dit laat zien dat je "speciale gereedschapskist" actief is.
+        </p>
+        <p>
+            Als je nu software installeert, komt het alleen in deze kist.
+        </p>
 
-# 4. Nu kun je veilig libraries installeren
-(venv) C:\Projecten\spiderpi_oop&gt; pip install lewansoul-servo-bus</code></pre>
+        <pre><code class="language-bash"># Je prompt ziet er zo uit:
+(venv) C:\MijnDocumenten\SpiderPiProject&gt;
 
+# 4. Nu kun je veilig software installeren
+(venv) C:\MijnDocumenten\SpiderPiProject&gt; pip install lewansoul-servo-bus</code></pre>
+
+        <h3>Uitleg: Het Resultaat</h3>
+        <p>
+            De <code>lewansoul-servo-bus</code> library zit nu *alleen* in de map <code>.\venv\Lib\site-packages\</code> en nergens anders op je computer. Je project is nu netjes geïsoleerd.
+        </p>
     </main>
 </div>
 

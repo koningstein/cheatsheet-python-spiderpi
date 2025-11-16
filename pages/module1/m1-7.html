@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M1.7: Named Arguments</title>
+    <title>M1.7: Class Variables</title>
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="../../script.js" defer></script>
@@ -14,8 +14,7 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m1-6.html">« M1.6: Constructor</a>
-            <a href="m1-8.html">M1.8: Compositie »</a>
+            <a href="../module2/m2-1.html">Module 2: Structuur »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -50,7 +49,7 @@
                 <li><a href="m1-4.html">M1.4: Setters</a></li>
                 <li><a href="m1-5.html">M1.5: Getters</a></li>
                 <li><a href="m1-6.html">M1.6: Constructor</a></li>
-                <li><a href="m1-7.html" class="active">M1.7: Named Arguments</a></li>
+                <li><a href="m1-7.html" class="active">M1.7: Class Variables</a></li>
                 <li><a href="m1-8.html">M1.8: Compositie</a></li>
                 <li><a href="m1-9.html">M1.9: Delegatie</a></li>
                 <li><a href="m1-10.html">M1.10: Hoofd-Klasse</a></li>
@@ -59,53 +58,79 @@
     </div>
 
     <main>
-        <h2>M1.7: Named Arguments (Benoemde Argumenten)</h2>
+        <h2>M1.7: Class Variables (Magic Numbers)</h2>
 
-        <h3>Theorie: Leesbare Code Schrijven</h3>
+        <h3>Leeruitkomsten</h3>
+        <ul>
+            <li>Ik kan het probleem van "Magic Numbers" in code identificeren.</li>
+            <li>Ik kan een <strong>Class Variable</strong> definiëren en gebruiken.</li>
+            <li>Ik begrijp het verschil tussen een Class Variable (gedeeld) en een Instance Variable (uniek).</li>
+        </ul>
+
+        <h3>Uitleg: Het "Magic Number" Probleem</h3>
         <p>
-            Dit is een korte les over code-stijl die je veel tijd zal besparen.
+            Kijk terug naar onze <code>set_angle</code> methode uit M1.4: <code>if 0.0 &lt;= new_angle &lt;= 180.0:</code>
         </p>
         <p>
-            <strong>Probleem:</strong> Wat betekent <code>Servo(1, 90.0)</code>? Is <code>1</code> de hoek of het <code>id</code>? Je moet de volgorde in <code>servo.py</code> onthouden om <code>main.py</code> te kunnen schrijven.
+            De getallen <code>0.0</code> en <code>180.0</code> worden "Magic Numbers" genoemd. Ze zijn "hardcoded" in de code. Wat als we de limiet willen aanpassen? Dan moet je <strong>elke</strong> <code>if</code>-statement in je code opzoeken en aanpassen.
         </p>
+
+        <h3>Uitleg: De Oplossing (Class Variables)</h3>
         <p>
-            [cite_start]<strong>Oplossing:</strong> Met <strong>Named Arguments</strong> (Benoemde Argumenten) geef je expliciet aan welke <em>waarde</em> bij welke <em>parameter</em> hoort[cite: 2189]. Dit maakt de code veel leesbaarder en de volgorde maakt niet meer uit.
+            We hebben een centrale plek nodig om deze constanten op te slaan: <strong>Class Variables</strong>.
+        </p>
+        <ul>
+            <li><strong>Instance Variable:</strong> Is uniek per object (bv. <code>self._current_angle</code>).</li>
+            <li><strong>Class Variable:</strong> Wordt <strong>gedeeld</strong> door <strong>alle</strong> objecten van de klasse. Het "leeft" op de klasse zelf.</li>
+        </ul>
+        <p>
+            We definiëren ze direct onder de <code>class</code> regel (met HOOFDLETTERS is de afspraak). We kunnen ze nu ook gebruiken om de <code>start_angle</code> in de <code>__init__</code> te valideren, waarmee we het lek uit M1.6 dichten.
         </p>
 
-        <hr>
-        <h3>Stap-voor-stap Voorbeeld</h3>
-
-        <h4>Stap 1: De Constructor (in `servo.py`)</h4>
-        <p>Onze constructor (uit M1.6) verwacht twee argumenten: <code>start_id</code> en <code>start_angle</code>.</p>
         <pre><code class="language-python"># In servo.py
 class Servo:
-    # De __init__ verwacht 'start_id' en 'start_angle'
-    def __init__(self, start_id: int, start_angle: float):
-        self._id = start_id
-        self.set_angle(start_angle)
-        # ... (rest van de code)</code></pre>
+    # Dit zijn CLASS VARIABLES
+    MIN_ANGLE: float = 0.0
+    MAX_ANGLE: float = 180.0
 
-        <h4>Stap 2: Gebruik in `main.py`</h4>
-        <p>We kunnen de constructor op drie manieren aanroepen. Vergelijk het verschil in leesbaarheid.</p>
+    def __init__(self, id_num: int, start_angle: float):
+        self.id = id_num
+
+        # VALIDATIE IN DE CONSTRUCTOR (dicht het lek uit M1.6)
+        # We gebruiken hier 'self.MIN_ANGLE' om de class variable te lezen
+        if not (self.MIN_ANGLE &lt;= start_angle &lt;= self.MAX_ANGLE):
+            print(f"WAARSCHUWING: start_angle {start_angle} is ongeldig! Zet op MIN.")
+            self._current_angle = self.MIN_ANGLE
+        else:
+            self._current_angle = start_angle
+
+    def set_angle(self, new_angle: float) -> None:
+        """Valideert en stelt de hoek in, nu met Class Variables."""
+
+        # We gebruiken 'self.MIN_ANGLE' om de gedeelde waarde te lezen
+        if self.MIN_ANGLE &lt;= new_angle &lt;= self.MAX_ANGLE:
+            self._current_angle = new_angle
+            print(f"Motor {self.id} beweegt naar {self._current_angle} graden.")
+        else:
+            # De foutmelding is nu ook dynamisch!
+            print(f"FOUT: Hoek {new_angle} moet tussen {self.MIN_ANGLE} en {self.MAX_ANGLE} zijn.")
+
+    @property
+    def current_angle(self) -> float:
+        return self._current_angle</code></pre>
+
+        <h3>Uitleg: Testen</h3>
+        <p>
+            De ongeldige waarde <code>9000.0</code> wordt nu correct afgevangen bij de "geboorte" (in de <code>__init__</code>) van het object.
+        </p>
         <pre><code class="language-python"># In main.py
-from .servo import Servo # (uitgaande van M2 package)
+motor3 = Servo(id_num=3, start_angle=9000.0)
+print(f"Motor 3 staat op {motor3.current_angle} graden.")
 
-# 1. Normale aanroep (positional)
-#    Werkt, maar is onduidelijk. Wat is 1? Wat is 90.0?
-motor1 = Servo(1, 90.0)
-
-# 2. Aanroep met Named Arguments (BENOEMDE ARGUMENTEN)
-#    Veel leesbaarder!
-motor2 = Servo(start_id=2, start_angle=100.0)
-
-# 3. Volgorde maakt niet meer uit!
-#    Dit werkt ook, omdat we de namen gebruiken.
-motor3 = Servo(start_angle=110.0, start_id=3)
-
-print(f"Motor 1 ID: {motor1.id}")
-print(f"Motor 2 ID: {motor2.id}")
-print(f"Motor 3 ID: {motor3.id}")</code></pre>
-        <p><strong>Conclusie:</strong> Gebruik altijd Named Arguments als je een object aanmaakt. Het maakt je code leesbaar en voorkomt fouten.</p>
+# Output:
+# Nieuw Servo object (ID: 3) wordt gemaakt...
+# WAARSCHUWING: start_angle 9000.0 is ongeldig! Zet op MIN.
+# Motor 3 staat op 0.0 graden.</code></pre>
     </main>
 </div>
 

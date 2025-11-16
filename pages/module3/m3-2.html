@@ -14,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m3-1.html">« M3.1: Type Hints</a>
-            <a href="m3-3.html">M3.3: Protected ('_') »</a>
+            <a href="../module2/m2-1.html">« M2: Structuur</a>
+            <a href="../module4/m4-1.html">M4: Overerving »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -59,18 +59,18 @@
     <main>
         <h2>M3.2: Docstrings (Documentatie)</h2>
 
-        <h3>Theorie: Documentatie voor Mensen</h3>
+        <h3>Uitleg: Documentatie voor Mensen</h3>
         <p>
             In Les 3.1 waren Type Hints voor de <em>computer</em>. <strong>Docstrings</strong> zijn voor <em>mensen</em> (je collega's, je docent, en jezelf over 3 weken).
         </p>
         <p>
-            Een docstring is een <code>string</code> (tussen drie dubbele aanhalingstekens <code>"""..."""</code>) die je op de <em>allereerste</em> regel <em>binnen</em> een klasse, module of methode plaatst. Het beschrijft wat iets doet.
+            Een docstring is een <code>string</code> (tekst) tussen drie dubbele aanhalingstekens <code>"""..."""</code>. Je plaatst het op de <em>allereerste</em> regel <em>binnen</em> een module, klasse of methode om uit te leggen wat het doet.
         </p>
-        <p><strong>Het grote voordeel:</strong> Je IDE (zoals VS Code) toont deze docstring automatisch als een pop-up helptekst wanneer je de methode probeert te gebruiken.</p>
+        <p><strong>Het grote voordeel:</strong> Je editor (VS Code) toont deze docstring automatisch als een pop-up helptekst wanneer je de methode probeert te gebruiken.</p>
         <hr>
 
         <h4>Stap 1: Module Docstring</h4>
-        <p>Open <code>servo.py</code>. Voeg *bovenaan* het bestand een docstring toe die de hele *module* beschrijft.</p>
+        <p>Open <code>servo.py</code>. Voeg *bovenaan* het bestand een docstring toe die de hele *module* (het bestand) beschrijft.</p>
         <pre><code class="language-python">"""
 Module voor de Servo-klasse.
 Bevat de blauwdruk voor een enkele motor.
@@ -79,7 +79,7 @@ from .component import RobotComponent
 # ... rest van de code</code></pre>
 
         <h4>Stap 2: Klasse Docstring</h4>
-        <p>Voeg een docstring toe direct *onder* de <code>class Servo...</code> regel. Het beschrijft wat de klasse doet en welke attributen het heeft.</p>
+        <p>Voeg een docstring toe direct *onder* de <code>class Servo...</code> regel. Het beschrijft wat de klasse doet en welke belangrijke eigenschappen (attributen) het heeft.</p>
         <pre><code class="language-python">class Servo(RobotComponent):
     """
     Modelleert een enkele motor (servo) van de SpiderPi.
@@ -89,63 +89,17 @@ from .component import RobotComponent
         _current_angle (float): De interne, afgeschermde hoek.
     """
     _id: int
+    _current_angle: float
     # ...</code></pre>
 
-        <h4>Stap 3: Methode Docstrings (met Args en Returns)</h4>
-        <p>Voeg docstrings toe aan je methoden. We gebruiken speciale keywords (<code>Args:</code>, <code>Returns:</code>, <code>Raises:</code>) die de IDE begrijpt.</p>
-        <pre><code class="language-python">def __init__(self, start_id: int, start_angle: float) -> None:
-    """
-    Initialiseert het Servo object met zijn begin-toestand.
-
-    Args:
-        start_id (int): Het hardware-ID van de servo.
-        start_angle (float): De beginhoek (wordt gevalideerd).
-    """
-    super().__init__(name=f"Servo_{start_id}")
-    # ...
-
-def set_angle(self, new_angle: float) -> None:
-    """
-    Stelt de hoek van de servo in, inclusief validatie.
-
-    Args:
-        new_angle (float): De gewenste hoek (0.0 tot 180.0).
-
-    Returns:
-        None
-
-    Raises:
-        ValueError: Als de hoek buiten bereik is.
-    """
-    if not (self.MIN_ANGLE <= new_angle <= self.MAX_ANGLE):
-        # ...</code></pre>
-        <p><strong>Opdracht:</strong> Voeg nu zelf ook docstrings toe aan je <code>@property</code> getters (<code>current_angle</code> en <code>id</code>).</p>
-
-        <hr>
-        <h3>Python Voorbeeld (Eindresultaat in `servo.py`)</h3>
-        <p>Als je klaar bent, is je <code>servo.py</code> nu professioneel gedocumenteerd.</p>
-        <pre><code class="language-python"># In spiderpi_core/servo.py
-
-"""
-Module voor de Servo-klasse.
-Bevat de blauwdruk voor een enkele motor.
-"""
-from .component import RobotComponent
-
-class Servo(RobotComponent):
-    """
-    Modelleert een enkele motor (servo) van de SpiderPi.
-
-    Attributen:
-        _id (int): Het unieke hardware-ID (1-18).
-        _current_angle (float): De interne, afgeschermde hoek.
-    """
-    _id: int
-    _current_angle: float
-    MIN_ANGLE: float = 0.0
-    MAX_ANGLE: float = 180.0
-
-    def __init__(self, start_id: int, start_angle: float) -> None:
+        <h4>Stap 3: Methode Docstrings (Args, Returns)</h4>
+        <p>Voeg docstrings toe aan je methoden. We gebruiken speciale woorden (<code>Args:</code>, <code>Returns:</code>, <code>Raises:</code>) die de editor begrijpt.</p>
+        <ul>
+            <li><strong>Args:</strong> Welke argumenten (parameters) verwacht de methode?</li>
+            <li><strong>Returns:</strong> Wat voor data geeft de methode terug?</li>
+            <li><strong>Raises:</strong> Welke fouten (Errors) kan deze methode veroorzaken?</li>
+        </ul>
+        <pre><code class="language-python">    def __init__(self, start_id: int, start_angle: float) -> None:
         """
         Initialiseert het Servo object met zijn begin-toestand.
 
@@ -173,7 +127,7 @@ class Servo(RobotComponent):
         if not (self.MIN_ANGLE <= new_angle <= self.MAX_ANGLE):
             raise ValueError(f"Hoek {new_angle} is ongeldig")
         self._current_angle = new_angle</code></pre>
-
+        <p><strong>Opdracht:</strong> Ga nu zelf docstrings toevoegen aan je <code>@property</code> getters (<code>current_angle</code> en <code>id</code>) en aan de klassen <code>Leg</code> en <code>SpiderPi</code>.</p>
     </main>
 </div>
 

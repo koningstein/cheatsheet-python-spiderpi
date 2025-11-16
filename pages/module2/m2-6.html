@@ -14,8 +14,8 @@
   <div class="top-bar-content">
     <div class="nav-group">
       <a href="../../index.html">« Overzicht</a>
-      <a href="m2-5.html">« M2.5: Relative Imports</a>
-      <a href="../module3/m3-1.html">Module 3: Kwaliteit »</a>
+      <a href="../module1/m1-1.html">« M1: Fundamenten</a>
+      <a href="../module3/m3-1.html">M3: Kwaliteit »</a>
     </div>
     <div class="nav-group theme-switcher">
       <label for="theme-switcher">Thema: </label>
@@ -57,20 +57,28 @@
   <main>
     <h2>M2.6: Hoofdprogramma (Absolute Imports)</h2>
 
-    <h3>Theorie: De 'Hoofdingang' Adresboek</h3>
+    <h3>Uitleg: Het Probleem (Van buiten naar binnen)</h3>
     <p>
-      <strong>Probleem:</strong> De imports *binnen* het package zijn gerepareerd (Les 2.5), maar <code>main.py</code> (die *buiten* het package staat) kan <code>robot.py</code> nog steeds niet vinden.
+      De imports <em>binnen</em> het <code>spiderpi_core</code> package zijn gerepareerd (Les 2.5).
     </p>
     <p>
-      <strong>Oplossing:</strong> We moeten een <strong>Absolute Import</strong> gebruiken. We vertellen <code>main.py</code> het *volledige pad* vanaf de hoofdmap: "Kijk in de <code>spiderpi_core</code> package, zoek daarin de <code>robot</code> module, en importeer de <code>SpiderPi</code> klasse."
+      Maar <code>main.py</code> staat <em>buiten</em> het package. Zijn oude import-regel, <code>from robot import SpiderPi</code>, werkt niet meer omdat <code>robot.py</code> nu in een map "verstopt" zit.
     </p>
 
-    <hr>
-    <h3>Python Voorbeeld</h3>
-    <p>We passen <code>main.py</code> aan om de nieuwe package-structuur te gebruiken.</p>
+    <h3>Uitleg: De Oplossing (Absoluut Adres)</h3>
+    <p>
+      We moeten een <strong>Absolute Import</strong> gebruiken. We vertellen <code>main.py</code> het *volledige pad*, beginnend bij de hoofdmap van het project:
+    </p>
+    <p>
+      "Kijk in de <code>spiderpi_core</code> package (de map), zoek daarin de <code>robot</code> module (het bestand), en importeer daaruit de <code>SpiderPi</code> klasse."
+    </p>
+    <p>
+      De "formule" voor het adres is: <code>pakketnaam.bestandsnaam</code>
+    </p>
 
-    <h4>In <code>main.py</code> (in de hoofdmap):</h4>
-    <pre><code class="language-python"># OUD (crasht):
+    <pre><code class="language-python"># In main.py (in de hoofdmap)
+
+# OUD (crasht):
 # from robot import SpiderPi
 
 # NIEUW (werkt):
@@ -78,9 +86,24 @@
 from spiderpi_core.robot import SpiderPi
 
 # --- De rest van de code werkt nu weer ---
+print("Robot starten...")
 my_robot = SpiderPi()
-my_robot.leg_front_r.move_to_angles(100, 100, 100)</code></pre>
-    <p>Als je nu <code>python main.py</code> draait (met je `venv` actief), werkt het project weer volledig. De structuur is nu professioneel.</p>
+my_robot.wake_up()
+print("Klaar.")</code></pre>
+
+    <h3>Uitleg: Conclusie</h3>
+    <p>
+      Als je nu <code>python main.py</code> draait (met je `venv` actief), werkt het project weer volledig.
+    </p>
+    <p>
+      We hebben nu een professionele structuur:
+    </p>
+    <ul>
+      <li><strong><code>venv/</code></strong>: Onze geïsoleerde gereedschapskist (M2.1)</li>
+      <li><strong><code>requirements.txt</code></strong>: De boodschappenlijst (M2.2)</li>
+      <li><strong><code>spiderpi_core/</code></strong>: Onze bibliotheek als een net Package (M2.4)</li>
+      <li><strong><code>main.py</code></strong>: Ons hoofdscript dat de bibliotheek gebruikt (M2.6)</li>
+    </ul>
   </main>
 </div>
 

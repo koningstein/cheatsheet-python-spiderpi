@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>M1.1: Classes en Objecten</title>
-
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="../../script.js" defer></script>
@@ -15,7 +14,7 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m1-2.html">M1.2: Properties »</a>
+            <a href="../module2/m2-1.html">Module 2: Structuur »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -27,7 +26,6 @@
                 <option value="teal">Turquoise</option>
                 <option value="darkblue">Donkerblauw</option>
                 <option value="green">Groen</option>
-
                 <option value="material-dark">Dark (Material)</option>
                 <option value="monokai-pro">Dark (Monokai Pro)</option>
                 <option value="night-owl">Dark (Night Owl)</option>
@@ -51,7 +49,7 @@
                 <li><a href="m1-4.html">M1.4: Setters</a></li>
                 <li><a href="m1-5.html">M1.5: Getters</a></li>
                 <li><a href="m1-6.html">M1.6: Constructor</a></li>
-                <li><a href="m1-7.html">M1.7: Named Arguments</a></li>
+                <li><a href="m1-7.html">M1.7: Class Variables</a></li>
                 <li><a href="m1-8.html">M1.8: Compositie</a></li>
                 <li><a href="m1-9.html">M1.9: Delegatie</a></li>
                 <li><a href="m1-10.html">M1.10: Hoofd-Klasse</a></li>
@@ -62,76 +60,57 @@
     <main>
         <h2>M1.1: Classes en Objecten</h2>
 
-        <h3>Theorie: De Blauwdruk vs. het Gebouw</h3>
-        <p>
-            Welkom bij OOP! We gaan de echte wereld nabootsen in code. We beginnen met het belangrijkste concept: het verschil tussen een <strong>Klasse</strong> en een <strong>Object</strong>.
-        </p>
-
-        <h4>Wat is een Klasse (Class)?</h4>
-        <p>
-            [cite_start]Een <strong>Klasse</strong> is een <em>blauwdruk</em>, een <em>sjabloon</em> of een <em>bouwplan</em>[cite: 2215]. Het beschrijft *hoe* iets gemaakt moet worden, maar het *is* nog niet het ding zelf.
-        </p>
+        <h3>Leeruitkomsten</h3>
         <ul>
-            <li><strong>Analogie:</strong> Het bouwplan van een huis. Je kunt niet in het bouwplan wonen.</li>
-            <li><strong>SpiderPi:</strong> We maken een bouwplan voor één motor. [cite_start]Dat bouwplan noemen we <code>Servo</code>[cite: 2189, 2213].</li>
+            <li>Ik begrijp het concept van een <strong>Klasse</strong> als een blauwdruk in OOP.</li>
+            <li>Ik kan een simpele Klasse definiëren in Python.</li>
+            <li>Ik begrijp wat een <strong>Object</strong> is en kan een Object aanmaken op basis van een Klasse.</li>
         </ul>
 
-        <h4>Wat is een Object (Instance)?</h4>
+        <h3>Uitleg: De Klasse (Blauwdruk)</h3>
         <p>
-            Een <strong>Object</strong> is het <em>echte ding</em> dat je hebt gemaakt met de blauwdruk. [cite_start]Dit wordt ook wel een 'instantie' genoemd[cite: 2226].
+            Een <strong>Klasse</strong> is een <em>blauwdruk</em>, een <em>sjabloon</em> of een <em>bouwplan</em>. Het beschrijft <em>hoe</em> iets gemaakt moet worden, maar het <em>is</em> nog niet het ding zelf.
         </p>
-        <ul>
-            [cite_start]<li><strong>Analogie:</strong> Het <strong>echte huis</strong> dat je hebt gebouwd op basis van het bouwplan[cite: 2228]. Je kunt *meerdere* huizen (objecten) bouwen met *één* bouwplan (klasse).</li>
-            [cite_start]<li><strong>SpiderPi:</strong> De 18 <em>echte, fysieke motortjes</em> op de robot zijn de Objecten[cite: 2189, 2228].</li>
-        </ul>
+        <p>
+            <strong>Vergelijking:</strong> Een architect tekent een <strong>bouwplan</strong> voor een huis. Dat bouwplan is de <strong>Klasse</strong>. Je kunt niet in het bouwplan wonen.
+        </p>
+        <p>
+            We maken een bouwplan voor één motor. Dat bouwplan noemen we <code>Servo</code>. We definiëren een klasse met het <code>class</code> keyword, met de naam in <code>PascalCase</code>.
+        </p>
 
-        <hr>
-        <h3>Stap-voor-stap Voorbeeld</h3>
-        <p>We hebben twee bestanden nodig: de blauwdruk (`servo.py`) en het script dat de objecten maakt (`main.py`).</p>
-
-        <h4>Stap 1: De Blauwdruk (`servo.py`)</h4>
-        <p>Maak een nieuw bestand <code>servo.py</code>. Hier definiëren we de <code>Servo</code> klasse. Omdat we nog geen details hebben, gebruiken we <code>pass</code>.</p>
-        <pre><code class="language-python"># In servo.py
-
+        <pre><code class="language-python"># In een nieuw bestand: servo.py
+# We definiëren de klasse (de blauwdruk)
 class Servo:
-    """
-    De 'blauwdruk' voor een enkele motor (servo).
-    (Opmerking: 'PascalCase' (hoofdletters) is de standaard voor klassen.)
-    """
-    pass # 'pass' betekent 'hier komt later code'.</code></pre>
+    """Modelleert een enkele motor (servo)."""
+    # 'pass' is een placeholder en betekent 'doe (nog) niets'
+    pass</code></pre>
 
-        <h4>Stap 2: De Objecten (`main.py`)</h4>
-        <p>Maak een tweede bestand <code>main.py</code>. Dit is ons hoofdscript.</p>
-        <ol>
-            <li>We <strong>importeren</strong> de blauwdruk.</li>
-            <li>We <strong>bouwen</strong> twee 'echte' objecten (twee motoren) op basis van die blauwdruk.</li>
-        </ol>
-        <pre><code class="language-python"># In main.py
+        <h3>Uitleg: Het Object (Het Echte Ding)</h3>
+        <p>
+            Een <strong>Object</strong> (of <strong>Instantie</strong>) is het <em>echte ding</em> dat je hebt gemaakt met de blauwdruk. Elk object is uniek en heeft zijn eigen specifieke toestand.
+        </p>
+        <p>
+            <strong>Vergelijking:</strong> Het <strong>echte huis</strong> dat je hebt gebouwd op basis van het bouwplan, is het <strong>Object</strong>. De 18 <em>echte, fysieke motortjes</em> op de robot zijn de Objecten.
+        </p>
+        <p>
+            Je maakt een object door de klassenaam aan te roepen alsof het een functie is.
+        </p>
 
-# 1. Importeer de 'Servo' blauwdruk uit het 'servo.py' bestand.
+        <pre><code class="language-python"># In een nieuw bestand: main.py
+# We importeren de blauwdruk (de Servo klasse)
 from servo import Servo
 
-# 2. Maak 'echte' objecten (instanties) van de blauwdruk
-motor_voor_rechts = Servo()
-motor_achter_links = Servo()
+# We 'bouwen' twee echte, unieke objecten op basis van de blauwdruk
+motor_heup_links = Servo()
+motor_knie_links = Servo()
 
-# 3. Verifieer: dit zijn twee unieke, aparte objecten
-print("Object 1 (motor_voor_rechts):")
-print(motor_voor_rechts)
+# Dit zijn twee aparte objecten in het geheugen
+print(motor_heup_links)
+print(motor_knie_links)
 
-print("\nObject 2 (motor_achter_links):")
-print(motor_achter_links)</code></pre>
-
-        <h4>Stap 3: Testen</h4>
-        <p>Voer <code>main.py</code> uit in je terminal:</p>
-        <pre><code class="language-bash">python main.py</code></pre>
-        <p>De output laat zien dat het twee verschillende objecten zijn op twee unieke geheugenlocaties:</p>
-        <pre><code class="language-text">Object 1 (motor_voor_rechts):
-&lt;servo.Servo object at 0x10f2a4f10&gt;
-
-Object 2 (motor_achter_links):
-&lt;servo.Servo object at 0x10f2a4e50&gt;</code></pre>
-
+# Output:
+# &lt;__main__.Servo object at 0x10f2a4f10&gt;
+# &lt;__main__.Servo object at 0x10f2a4e50&gt;</code></pre>
     </main>
 </div>
 

@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M1.2: Properties</title>
-
+    <title>M1.2: Properties (Eigenschappen)</title>
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="../../script.js" defer></script>
@@ -15,8 +14,7 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m1-1.html">« M1.1: Class & Object</a>
-            <a href="m1-3.html">M1.3: Methoden »</a>
+            <a href="../module2/m2-1.html">Module 2: Structuur »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -51,7 +49,7 @@
                 <li><a href="m1-4.html">M1.4: Setters</a></li>
                 <li><a href="m1-5.html">M1.5: Getters</a></li>
                 <li><a href="m1-6.html">M1.6: Constructor</a></li>
-                <li><a href="m1-7.html">M1.7: Named Arguments</a></li>
+                <li><a href="m1-7.html">M1.7: Class Variables</a></li>
                 <li><a href="m1-8.html">M1.8: Compositie</a></li>
                 <li><a href="m1-9.html">M1.9: Delegatie</a></li>
                 <li><a href="m1-10.html">M1.10: Hoofd-Klasse</a></li>
@@ -62,58 +60,56 @@
     <main>
         <h2>M1.2: Properties (Eigenschappen)</h2>
 
-        <h3>Theorie: De Toestand van een Object</h3>
-        <p>
-            Een object (ons 'huis') is pas nuttig als het *data* kan opslaan. [cite_start]Deze data, die de unieke toestand van een object beschrijft, noemen we <strong>Properties</strong> (eigenschappen)[cite: 2277].
-        </p>
+        <h3>Leeruitkomsten</h3>
         <ul>
-            <li><strong>Analogie:</strong> Een <code>Auto</code>-object kan een <code>kleur</code>-property hebben. <code>mijn_auto.kleur = "blauw"</code> en <code>buurman_auto.kleur = "rood"</code>.</li>
-            [cite_start]<li><strong>SpiderPi:</strong> Onze <code>Servo</code>-objecten hebben een <code>id</code> en een <code>current_angle</code> (huidige hoek) nodig[cite: 2189, 2283, 2284, 2285].</li>
+            <li>Ik begrijp het concept van <strong>Properties</strong> als data die de <strong>toestand</strong> van een object definiëren.</li>
+            <li>Ik kan properties toewijzen en uitlezen op een object-instantie met de <strong>punt-notatie</strong>.</li>
         </ul>
-        <p>
-            In Python gebruiken we de <strong>punt-notatie</strong> (<code>.</code>) om een property in te stellen of uit te lezen.
-        </p>
-        <p>
-            <em>(Opmerking: We leren dit nu 'dynamisch' toe te voegen in <code>main.py</code>. In Les M1.6 leren we de professionele manier om dit *in* de klasse te doen met een <code>__init__</code> constructor.)</em>
-        </p>
-        <hr>
-        <h3>Stap-voor-stap Voorbeeld</h3>
-        <p>We passen <code>main.py</code> aan. <code>servo.py</code> blijft leeg (<code>pass</code>).</p>
 
-        <h4>Stap 1: Vóór (Code uit M1.1)</h4>
-        <p>Dit is wat we hadden. De objecten zijn leeg.</p>
+        <h3>Uitleg: Properties Toewijzen</h3>
+        <p>
+            Een object is pas nuttig als het <strong>data</strong> kan opslaan. Deze data, die de unieke toestand van een object beschrijft, noemen we <strong>Properties</strong> (eigenschappen).
+        </p>
+        <p>
+            <strong>Vergelijking (Auto):</strong> Een Auto-object kan een <code>kleur</code>-property hebben. <code>mijn_auto.kleur = "blauw"</code>.
+        </p>
+        <p>
+            De makkelijkste manier om een property toe te wijzen, is door de <strong>punt-notatie</strong> (de <code>.</code>) te gebruiken <em>nadat</em> je het object hebt gemaakt. Het <code>servo.py</code> bestand blijft leeg (<code>pass</code>).
+        </p>
+
         <pre><code class="language-python"># In main.py
 from servo import Servo
 
-motor_voor_rechts = Servo()
-motor_achter_links = Servo()</code></pre>
-
-        <h4>Stap 2: Na (Properties Toevoegen)</h4>
-        <p>We voegen data (toestand) toe aan de objecten *nadat* ze zijn gemaakt.</p>
-        <pre><code class="language-python"># In main.py
-from servo import Servo
-
-# Maak de objecten
-motor_voor_rechts = Servo()
-motor_achter_links = Servo()
+# Maak de 'lege' objecten
+right_hip_motor = Servo()
+left_knee_motor = Servo()
 
 # Stel de unieke properties (toestand) in
-motor_voor_rechts.id = 3
-motor_voor_rechts.current_angle = 90.0
+right_hip_motor.id = 3
+right_hip_motor.current_angle = 90.0
 
-motor_achter_links.id = 16
-motor_achter_links.current_angle = 100.5
+left_knee_motor.id = 11
+left_knee_motor.current_angle = 100.5</code></pre>
+
+        <h3>Uitleg: Properties Lezen</h3>
+        <p>
+            Op dezelfde manier kun je de data <strong>uitlezen</strong> met de punt-notatie.
+        </p>
+
+        <pre><code class="language-python"># In main.py (vervolg)
 
 # Lees de properties uit
-print(f"Motor {motor_voor_rechts.id} heeft hoek: {motor_voor_rechts.current_angle}")
-print(f"Motor {motor_achter_links.id} heeft hoek: {motor_achter_links.current_angle}")</code></pre>
+print(f"Motor {right_hip_motor.id} heeft hoek: {right_hip_motor.current_angle}")
+print(f"Motor {left_knee_motor.id} heeft hoek: {left_knee_motor.current_angle}")
 
-        <h4>Stap 3: Testen</h4>
-        <p>Voer <code>main.py</code> opnieuw uit.</p>
-        <pre><code class="language-bash">python main.py</code></pre>
-        <p>De output laat zien dat elk object zijn eigen, unieke data heeft opgeslagen:</p>
-        <pre><code class="language-text">Motor 3 heeft hoek: 90.0
-Motor 16 heeft hoek: 100.5</code></pre>
+# Output:
+# Motor 3 heeft hoek: 90.0
+# Motor 11 heeft hoek: 100.5</code></pre>
+
+        <h3>Belangrijk</h3>
+        <p>
+            Dit is een snelle manier om te leren wat properties zijn. In een latere les (M1.6) zullen we ontdekken <strong>waarom</strong> dit een slechte gewoonte is (wat als je een property vergeet in te stellen?) en leren we een professionelere manier.
+        </p>
     </main>
 </div>
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M1.6: Constructor (__init__)</title>
+    <title>M1.6: De Constructor (__init__)</title>
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="../../script.js" defer></script>
@@ -14,8 +14,7 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m1-5.html">« M1.5: Getters</a>
-            <a href="m1-7.html">M1.7: Named Arguments »</a>
+            <a href="../module2/m2-1.html">Module 2: Structuur »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -50,7 +49,7 @@
                 <li><a href="m1-4.html">M1.4: Setters</a></li>
                 <li><a href="m1-5.html">M1.5: Getters</a></li>
                 <li><a href="m1-6.html" class="active">M1.6: Constructor</a></li>
-                <li><a href="m1-7.html">M1.7: Named Arguments</a></li>
+                <li><a href="m1-7.html">M1.7: Class Variables</a></li>
                 <li><a href="m1-8.html">M1.8: Compositie</a></li>
                 <li><a href="m1-9.html">M1.9: Delegatie</a></li>
                 <li><a href="m1-10.html">M1.10: Hoofd-Klasse</a></li>
@@ -59,91 +58,75 @@
     </div>
 
     <main>
-        <h2>M1.6: Constructor (__init__)</h2>
+        <h2>M1.6: De Constructor (__init__)</h2>
 
-        <h3>Theorie: De 'Geboorte' van een Object</h3>
+        <h3>Leeruitkomsten</h3>
+        <ul>
+            <li>Ik begrijp het probleem van objecten die in een "ongeldige staat" worden aangemaakt.</li>
+            <li>Ik kan de <strong>Constructor</strong> (<code>__init__</code>) methode implementeren.</li>
+            <li>Ik begrijp dat de constructor <strong>automatisch</strong> wordt aangeroepen bij het aanmaken van een object.</li>
+        </ul>
+
+        <h3>Uitleg: Het Probleem van "Lege" Objecten</h3>
         <p>
-            <strong>Probleem:</strong> In <code>main.py</code> moeten we nu 3 regels code schrijven om één motor te maken:
-            <br><code>motor = Servo()</code>
-            <br><code>motor.id = 1</code>
-            <br><code>motor.set_angle(90.0)</code>
-            <br>Dit is onhandig en je kunt vergeten de <code>id</code> in te stellen.
+            We hebben onze data redelijk beschermd (M1.5). Maar we hebben nog steeds het "opstart" probleem:
         </p>
-        <p>
-            <strong>Oplossing:</strong> Een <strong>Constructor</strong>. [cite_start]Dit is een speciale methode die *automatisch* wordt aangeroepen op het moment dat een object wordt gemaakt (geïnstantieerd)[cite: 2189, 2288].
-        </p>
-        <p>
-            In Python heet deze methode <code>def __init__(self, ...):</code> (met dubbele underscores, "dunder init" genoemd).
-        </p>
-        <p>
-            Dit is de perfecte plek om de begin-properties (de 'toestand') van een object in te stellen. [cite_start]Het *dwingt* de programmeur om de benodigde data (zoals een <code>id</code> en <code>start_angle</code>) direct mee te geven bij het maken van het object [cite: 2288-2292].
-        </p>
-
-        <hr>
-        <h3>Stap-voor-stap Voorbeeld</h3>
-
-        <h4>Stap 1: Vóór (Code uit M1.5)</h4>
-        <p><code>servo.py</code> heeft nog geen <code>__init__</code>. <code>main.py</code> stelt properties handmatig in.</p>
-        <pre><code class="language-python"># In servo.py
-class Servo:
-    _current_angle = 90.0
-    id = 0
-
-    def set_angle(self, new_angle):
-        # ...
-
-    @property
-    def current_angle(self):
-        # ...
-
-# In main.py
+        <pre><code class="language-python"># In main.py
 motor = Servo()
 motor.id = 1
 motor.set_angle(90.0)</code></pre>
+        <p>
+            Dit zijn 3 regels code om één object correct op te zetten. Wat als je <code>motor.id = 1</code> <strong>vergeet</strong>? Dan wordt het object "leeg" en in een ongeldige toestand geboren.
+        </p>
 
-        <h4>Stap 2: Na (Refactor met `__init__`)</h4>
-        <p>We voegen <code>__init__</code> toe aan <code>servo.py</code>. We verplaatsen het instellen van <code>id</code> en <code>_current_angle</code> naar de constructor. We hernoemen ook <code>id</code> naar <code>_id</code> om het 'protected' te maken.</p>
+        <h3>Uitleg: De Constructor Oplossing</h3>
+        <p>
+            De <strong>Constructor</strong> is een speciale methode die <strong>automatisch</strong> wordt aangeroepen op het moment dat je het object aanmaakt. In Python heet deze <code>__init__</code>.
+        </p>
+        <p>
+            Dit is de perfecte plek om alle essentiële properties in te stellen. De klasse <em>dwingt</em> je nu om de data mee te geven.
+        </p>
+
         <pre><code class="language-python"># In servo.py
-MIN_ANGLE = 0.0
-MAX_ANGLE = 180.0
+# (Constanten MIN_ANGLE/MAX_ANGLE staan hierboven, buiten de class)
 
 class Servo:
-    # We definiëren de properties nu hier (zie M3.1)
-    _id: int
+    # We kunnen de types hier alvast aangeven (optioneel, maar netjes)
+    id: int
     _current_angle: float
 
     # De Constructor
-    def __init__(self, start_id: int, start_angle: float):
-        """Wordt automatisch aangeroepen bij Servo(...)"""
-        print(f"Nieuw Servo object (ID: {start_id}) wordt gemaakt...")
+    def __init__(self, id_num: int, start_angle: float):
+        """
+        Wordt automatisch aangeroepen bij 'Servo(1, 90.0)'
+        """
+        print(f"Nieuw Servo object (ID: {id_num}) wordt gemaakt...")
 
-        # We stellen de 'protected' properties in
-        self._id = start_id
-
-        # We kunnen de setter *binnen* de constructor gebruiken
-        # voor validatie bij de 'geboorte'!
-        self.set_angle(start_angle)
+        # We stellen de properties *direct* in
+        self.id = id_num  # 'id' is nog steeds public
+        self._current_angle = start_angle # Stel de 'verborgen' property in
 
     def set_angle(self, new_angle: float):
         """SETTER: Stelt de hoek in, mét validatie."""
+        # (Hier komt de validatie-logica uit M1.4)
         if new_angle >= MIN_ANGLE and new_angle <= MAX_ANGLE:
             self._current_angle = new_angle
+            print(f"Motor {self.id} beweegt naar {self._current_angle} gr.")
         else:
-            # Gooi een 'Error' (Exception)
-            raise ValueError(f"Hoek {new_angle} is ongeldig.")
+            print(f"FOUT: Hoek {new_angle} is ongeldig.")
 
     @property
-    def current_angle(self) -> float:
-        return self._current_angle
+    def current_angle(self):
+        """GETTER: Leest de *protected* property 'read-only' uit."""
+        return self._current_angle</code></pre>
 
-    @property
-    def id(self) -> int:
-        return self._id
-</code></pre>
+        <h3>Uitleg: De Grote Verbetering</h3>
+        <p>
+            Onze <code>main.py</code> code wordt nu veel schoner en veiliger. We kunnen geen "lege" <code>Servo()</code> meer maken. Het object is <strong>gegarandeerd</strong> compleet na één regel code.
+        </p>
 
-        <h4>Stap 3: Testen (in `main.py`)</h4>
-        <p>Onze oude <code>main.py</code> code *crasht* nu, omdat <code>Servo()</code> parameters vereist. Dat is goed! We passen het aan.</p>
         <pre><code class="language-python"># In main.py
+from servo import Servo
 
 # Oude manier (werkt niet meer):
 # motor = Servo() # Crasht: Mist 2 argumenten
@@ -151,26 +134,15 @@ class Servo:
 # motor.set_angle(90.0)
 
 # Nieuwe manier:
-motor1 = Servo(1, 90.0)
-motor2 = Servo(2, 110.0)
+motor1 = Servo(id_num=1, start_angle=90.0)
+motor2 = Servo(id_num=2, start_angle=110.0)
+print(f"Motor 1 staat op {motor1.current_angle} graden.")
 
-print(f"Motor 1 (ID: {motor1.id}) staat op {motor1.current_angle} graden.")
-print(f"Motor 2 (ID: {motor2.id}) staat op {motor2.current_angle} graden.")
-
-# Crasht direct bij aanmaak (dankzij de constructor):
-try:
-    motor3 = Servo(3, 9000.0) # ValueError!
-except ValueError as e:
-    print(f"Fout bij aanmaken motor 3: {e}")
-</code></pre>
-        <p><strong>Output:</strong></p>
-        <pre><code class="language-text">Nieuw Servo object (ID: 1) wordt gemaakt...
-Nieuw Servo object (ID: 2) wordt gemaakt...
-Motor 1 (ID: 1) staat op 90.0 graden.
-Motor 2 (ID: 2) staat op 110.0 graden.
-Nieuw Servo object (ID: 3) wordt gemaakt...
-Fout bij aanmaken motor 3: Hoek 9000.0 is ongeldig</code></pre>
-
+# LET OP: We hebben nog steeds een klein lek!
+# De constructor zelf valideert de 'start_angle' nog niet.
+motor3 = Servo(id_num=3, start_angle=9000.0)
+print(f"Motor 3 staat op {motor3.current_angle} graden.") # Output: 9000.0
+# Dit lossen we in de volgende les op.</code></pre>
     </main>
 </div>
 

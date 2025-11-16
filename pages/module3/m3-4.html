@@ -14,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m3-3.html">« M3.3: Protected ('_')</a>
-            <a href="m3-5.html">M3.5: Debuggen (Basis) »</a>
+            <a href="../module2/m2-1.html">« M2: Structuur</a>
+            <a href="../module4/m4-1.html">M4: Overerving »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -59,17 +59,17 @@
     <main>
         <h2>M3.4: Private Properties ('__')</h2>
 
-        <h3>Theorie: Extreem Afschermen (Private)</h3>
+        <h3>Uitleg: Extreem Afschermen (Private)</h3>
         <p>
             Dit is het strengste niveau van afschermen. In Python gebruiken we een <strong>dubbele underscore (<code>__</code>)</strong>.
         </p>
         <p>
-            Dit is geen <em>conventie</em> (afspraak) zoals de enkele <code>_</code>, maar een <em>technische ingreep</em>. Python doet aan <strong>"Name Mangling"</strong> (Naam Verhaspeling).
+            Dit is geen <em>afspraak</em> (zoals de enkele <code>_</code>), maar een <em>technische ingreep</em>. Python doet aan <strong>"Name Mangling"</strong> (Naam Verhaspeling).
         </p>
         <p>
-            Python hernoemt de property <code>self.__max_temp</code> achter de schermen naar <code>self._Servo__max_temp</code>. Hierdoor is de property *echt* onzichtbaar voor de buitenwereld én voor 'kind'-klassen (subklassen, zien we in M4).
+            Python hernoemt de property <code>self.__max_temp</code> achter de schermen naar <code>self._Servo__max_temp</code>. Hierdoor is de property *echt* onzichtbaar voor de buitenwereld.
         </p>
-        <p><strong>Wanneer gebruik je dit?</strong> Bijna nooit. Alleen voor interne details die je *absoluut* wilt verbergen en waarvan je zeker weet dat niemand (zelfs een kind-klasse) ze mag aanpassen.</p>
+        <p><strong>Wanneer gebruik je dit?</strong> Bijna nooit. Alleen voor interne details die je *absoluut* wilt verbergen.</p>
 
         <hr>
         <h4>Stap 1: Toevoegen aan `servo.py`</h4>
@@ -87,53 +87,29 @@ class Servo(RobotComponent):
         self.__max_temp = 80 # Private property (bv. max veilige temp)
 
     def get_max_temp(self) -> int:
-        # Een getter kan er wel bij
+        """Een publieke getter kan er wel bij."""
         return self.__max_temp
 
     # ... rest van de klasse</code></pre>
 
         <h4>Stap 2: Testen in `main.py`</h4>
-        <p>We proberen de waarde te lezen. De getter *werkt*, maar directe toegang *crasht*.</p>
+        <p>We proberen de waarde te lezen. De getter <em>werkt</em>, maar directe toegang <em>crasht*.</p>
         <pre><code class="language-python"># In main.py
-motor = Servo(1, 90)
+# (Je moet 'from spiderpi_core.servo import Servo' importeren)
+# (En RobotComponent, want Servo erft daarvan)
+from spiderpi_core.component import RobotComponent
+from spiderpi_core.servo import Servo
+
+motor = Servo(1, 90.0)
 
 # Dit werkt (via de publieke getter):
-print(motor.get_max_temp())
+print(f"Max temp (via getter): {motor.get_max_temp()}")
 # Output: 80
 
 # Dit crasht (de "win" van de les):
-print(motor.__max_temp)
-# Fout: 'Servo' object has no attribute '__max_temp'</code></pre>
-
-        <hr>
-        <h3>Python Voorbeeld (Volledig)</h3>
-        <p>Hier is de code die je kunt gebruiken om te testen.</p>
-        <pre><code class="language-python"># In spiderpi_core/servo.py
-class Servo(RobotComponent):
-    _id: int
-    _current_angle: float
-    __max_temp: int # Private property
-
-    def __init__(self, start_id: int, start_angle: float) -> None:
-        super().__init__(name=f"Servo_{start_id}")
-        self._id = start_id
-        self._current_angle = start_angle
-        self.__max_temp = 80 # Private property
-
-    def get_max_temp(self) -> int:
-        # Een getter kan er wel bij
-        return self.__max_temp
-
-# In main.py
-motor = Servo(1, 90)
-
-# Dit werkt:
-print(motor.get_max_temp()) # Output: 80
-
-# Dit crasht:
+print("Proberen direct __max_temp te lezen...")
 # print(motor.__max_temp)
 # Fout: 'Servo' object has no attribute '__max_temp'</code></pre>
-
     </main>
 </div>
 

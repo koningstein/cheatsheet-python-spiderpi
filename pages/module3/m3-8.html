@@ -14,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m3-7.html">« M3.7: CLI Acties</a>
-            <a href="../module4/m4-1.html">Module 4: Overerving »</a>
+            <a href="../module2/m2-1.html">« M2: Structuur</a>
+            <a href="../module4/m4-1.html">M4: Overerving »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -59,50 +59,85 @@
     <main>
         <h2>M3.8: Linting (Kwaliteit)</h2>
 
-        <h3>Theorie: De Spellingscontrole voor Code</h3>
+        <h3>Uitleg: De Spellingscontrole voor Code</h3>
         <p>
-            <strong>Probleem:</strong> Onze code <em>werkt</em>, maar is het <em>goede</em> code? Volgen we de professionele standaarden? Hebben we ongebruikte imports? Te lange regels? Verkeerde naamgeving (<code>mijnKlasse</code> i.p.v. <code>MijnKlasse</code>)?
+            <strong>Probleem:</strong> Onze code <em>werkt</em>, maar is het <em>goede</em> code? Volgen we de professionele standaarden? Hebben we ongebruikte imports? Te lange regels?
         </p>
         <p>
-            <strong>Oplossing:</strong> Een <strong>Linter</strong> (zoals <code>pylint</code>). Dit is een tool die je code *leest* (zonder het uit te voeren) en functioneert als een strenge, automatische docent die je code een *cijfer* geeft (op 10).
+            <strong>Oplossing:</strong> Een <strong>Linter</strong> (zoals <code>pylint</code>). Dit is een tool die je code *leest* en functioneert als een strenge, automatische docent die je code een *cijfer* geeft (op 10).
         </p>
-        <p>Het controleert op Fouten (Errors), Waarschuwingen (Warnings, bv. ongebruikte variabele), en Stijl-Conventies (Conventions, bv. te veel witregels).</p>
+        <p>Het controleert op Fouten (Errors), Waarschuwingen (Warnings, bv. ongebruikte variabele), en Stijl-Afspraken (Conventions, bv. te veel witregels).</p>
         <p>Dit is de laatste stap in Module 3 om onze code 'af' te maken: <strong>Kwaliteit</strong>.</p>
 
         <hr>
-        <h3>Python Stappen (Terminal)</h3>
-        <p><code>pylint</code> is een tool die je installeert en draait vanuit de terminal (met je <code>venv</code> actief).</p>
+        <h3>Stap 1: Installeren</h3>
+        <p>We installeren <code>pylint</code> in onze <code>venv</code> en voegen het toe aan onze "boodschappenlijst" (requirements).</p>
 
         <pre><code class="language-bash"># 1. Installeren (in je venv)
 (venv) C:\...&gt; pip install pylint
 
 # 2. Toevoegen aan je 'recept' (M2.2)
-(venv) C:\...&gt; pip freeze > requirements.txt
+(venv) C:\...&gt; pip freeze &gt; requirements.txt</code></pre>
 
-# 3. Analyseren
-#    Draai dit commando in de hoofdmap van je project.
-#    We wijzen het naar onze 'source' map: de spiderpi_core package.
+        <h3>Stap 2: De Eerste Analyse (Het Slechte Cijfer)</h3>
+        <p>Draai <code>pylint</code> vanuit je hoofdmap en wijs het naar je <code>spiderpi_core</code> package. Je zult waarschijnlijk een lage score krijgen.</p>
+        <pre><code class="language-bash"># 3. Analyseren
 (venv) C:\...&gt; pylint spiderpi_core
 
 # 4. Voorbeeld Output (je krijgt een 'muur van tekst'):
-# ************* Module spiderpi_core.servo
-# spiderpi_core\servo.py:1:0: C0114: Missing module docstring (missing-module-docstring)
-#    (Oeps! Dit hebben we in M3.2 opgelost, maar misschien was je het
-#     vergeten in leg.py?)
-#
+# ************* Module spiderpi_core.robot
 # spiderpi_core\robot.py:3:0: W0611: Unused import time (unused-import)
-#    (In M3.7 hebben we 'import time' toegevoegd, maar daarna
-#     hebben we de 'time.sleep()' regels uitgecommentarieerd.
-#     De import is nu dus overbodig!)
+#
+# ************* Module spiderpi_core.leg
+# spiderpi_core\leg.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+#
+# ************* Module spiderpi_core.robot
+# spiderpi_core\robot.py:1:0: C0114: Missing module docstring (missing-module-docstring)
 #
 # -------------------------------------
-# Your code has been rated at 3.45/10
+# Your code has been rated at 3.45/10</code></pre>
+        <p>De output vertelt ons precies wat er mis is:</p>
+        <ul>
+            <li><code>W0611: Unused import time</code>: In <code>robot.py</code> importeren we <code>time</code>, maar we gebruiken het niet (omdat <code>time.sleep</code> is uitgecommentarieerd).</li>
+            <li><code>C0114: Missing module docstring</code>: We zijn vergeten bovenaan <code>leg.py</code> en <code>robot.py</code> een docstring te zetten (zoals we in M3.2 wel voor <code>servo.py</code> hebben gedaan).</li>
+        </ul>
 
-# 5. De Opdracht:
-#    Probeer de makkelijke fouten (C0114, W0611) op te lossen.
-#    - Voeg de module docstring toe aan robot.py en leg.py.
-#    - Verwijder de 'import time' regel uit robot.py.
-#    Draai 'pylint spiderpi_core' opnieuw en kijk hoe je score stijgt!</code></pre>
+        <h3>Stap 3: De Code Oplossen (Refactoren)</h3>
+        <p>We lossen deze twee problemen nu op.</p>
+
+        <pre><code class="language-python"># In spiderpi_core/robot.py
+
+"""
+Hoofdmodule voor de SpiderPi robot-klasse.
+Bevat de SpiderPi klasse die de robot bestuurt.
+"""
+# from .leg import Leg
+# import time  &lt;-- VERWIJDER DEZE REGEL (of zet er een # voor)
+
+class SpiderPi(RobotComponent):
+    #...</code></pre>
+
+        <pre><code class="language-python"># In spiderpi_core/leg.py
+
+"""
+Module voor de Leg-klasse.
+Bevat de Leg klasse die 3 servo's aanstuurt.
+"""
+from .servo import Servo
+from .component import RobotComponent
+
+class Leg(RobotComponent):
+    #...</code></pre>
+
+        <h3>Stap 4: De Tweede Analyse (Het Resultaat)</h3>
+        <p>Nu we de bestanden hebben opgeslagen, draaien we het commando opnieuw in de terminal.</p>
+        <pre><code class="language-bash">(venv) C:\...&gt; pylint spiderpi_core
+
+# Nieuwe Output:
+#
+# -------------------------------------
+# Your code has been rated at 8.50/10 (previous run: 3.45/10, +5.05)</code></pre>
+        <p>Perfect! De "Warning" en "Convention" fouten zijn weg en ons cijfer is flink gestegen. Een 10/10 is niet altijd het doel (soms ben je het niet eens met <code>pylint</code>), maar dit helpt enorm om je code schoon en professioneel te houden.</p>
 
     </main>
 </div>

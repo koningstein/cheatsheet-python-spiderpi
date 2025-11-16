@@ -14,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m3-2.html">« M3.2: Docstrings</a>
-            <a href="m3-4.html">M3.4: Private ('__') »</a>
+            <a href="../module2/m2-1.html">« M2: Structuur</a>
+            <a href="../module4/m4-1.html">M4: Overerving »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -59,13 +59,12 @@
     <main>
         <h2>M3.3: Encapsulatie (Conventie '_')</h2>
 
-        <h3>Theorie: Data Afschermen (Protected)</h3>
+        <h3>Uitleg: Data Afschermen (Protected)</h3>
         <p>
-            <strong>Encapsulatie</strong> (afschermen) is een kernprincipe van OOP. Het idee is dat een object zijn <em>interne</em> data moet beschermen.
-            In M1.5 zagen we al dat <code>motor.current_angle = 9000</code> een probleem is.
+            <strong>Encapsulatie</strong> (afschermen) is een kernprincipe van OOP. Het idee is dat een object zijn <em>interne</em> data moet beschermen. In M1.5 zagen we al dat <code>motor.current_angle = 9000</code> een probleem is.
         </p>
         <p>
-            In Python hebben we geen <code>protected</code> keyword. We gebruiken een <strong>conventie (afspraak)</strong>: een <strong>enkele underscore (<code>_</code>)</strong> aan het begin van een property-naam.
+            In Python hebben we geen <code>protected</code> woord. We gebruiken een <strong>conventie (afspraak)</strong>: een <strong>enkele underscore (<code>_</code>)</strong> aan het begin van een property-naam.
         </p>
         <p>
             <code>self._current_angle</code> betekent: "Hé, andere programmeur! Dit is interne data. Blijf hier af. Gebruik de <code>.set_angle()</code> (setter) of <code>.current_angle</code> (getter)."
@@ -77,17 +76,18 @@
         <p>Zorg dat in <code>servo.py</code> alle interne data met een <code>_</code> begint en 'read-only' toegang heeft via een <code>@property</code> getter.</p>
         <pre><code class="language-python"># In spiderpi_core/servo.py
 class Servo(RobotComponent):
-    _id: int # Was al _id
-    _current_angle: float # Was al _current_angle
-
-    # ... (__init__ en set_angle) ...
+    _id: int
+    _current_angle: float
+    # ... (__init__ en set_angle gebruiken self._id en self._current_angle) ...
 
     @property
     def id(self) -> int:
+        """GETTER voor het read-only ID."""
         return self._id
 
     @property
     def current_angle(self) -> float:
+        """GETTER voor de read-only hoek."""
         return self._current_angle</code></pre>
 
         <h4>Stap 2: Refactor `leg.py`</h4>
@@ -97,25 +97,25 @@ from .servo import Servo
 from .component import RobotComponent
 
 class Leg(RobotComponent):
-    # VOOR:
-    # hip_servo: Servo
-    # NA:
+    # De properties zijn nu _protected
     _hip_servo: Servo
     _knee_servo: Servo
     _ankle_servo: Servo
 
     def __init__(self, id_hip: int, id_knee: int, id_ankle: int) -> None:
         super().__init__(name=f"Leg_{id_hip}_{id_knee}_{id_ankle}")
-        # VOOR:
-        # self.hip_servo = Servo(...)
-        # NA:
+        # Sla op in _protected variabelen
         self._hip_servo = Servo(start_id=id_hip, start_angle=90.0)
-        self._knee_servo = Servo(start_id=id_knee, start_angle=9.0)
+        self._knee_servo = Servo(start_id=id_knee, start_angle=90.0)
         self._ankle_servo = Servo(start_id=id_ankle, start_angle=90.0)
 
-    # ... (move_to_angles blijft intern self._hip_servo gebruiken) ...
+    def move_to_angles(self, hip: float, knee: float, ankle: float) -> None:
+        # Intern gebruiken we de _protected properties
+        self._hip_servo.set_angle(hip)
+        self._knee_servo.set_angle(knee)
+        self._ankle_servo.set_angle(ankle)
 
-    # Stap 3: Getters toevoegen voor 'read-only' toegang
+    # Getters toevoegen voor 'read-only' toegang
     @property
     def hip_servo(self) -> Servo:
         return self._hip_servo
@@ -128,19 +128,18 @@ class Leg(RobotComponent):
     def ankle_servo(self) -> Servo:
         return self._ankle_servo</code></pre>
 
-        <hr>
-        <h3>Python Voorbeeld (Gebruik in `main.py`)</h3>
-        <p>In <code>main.py</code> kunnen we nu wel de servo *lezen* (via de getter), maar we worden ontmoedigd om hem te *overschrijven*.</p>
+        <h3>Uitleg: Gebruik in `main.py`</h3>
+        <p>In <code>main.py</code> (en <code>robot.py</code>) moeten we nu ook de getters gebruiken.</p>
         <pre><code class="language-python"># In main.py
-my_robot = SpiderPi()
+# (ervan uitgaande dat je my_robot = SpiderPi() hebt)
 
 # GOED (lezen via de public getter):
+# (We gaan er vanuit dat SpiderPi ook een .leg_front_r getter heeft)
 print(my_robot.leg_front_r.hip_servo.id)
 
 # FOUT (direct schrijven naar protected property):
 # my_robot.leg_front_r._hip_servo = "iets anders"
-# ^^^ Dit is een schending van de afspraak.</code></pre>
-
+# ^^^ Dit is een schending van de afspraak. Je IDE kan je waarschuwen.</code></pre>
     </main>
 </div>
 

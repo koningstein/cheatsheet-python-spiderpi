@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>M1.4: Setters met Validatie</title>
-
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="../../script.js" defer></script>
@@ -15,8 +14,7 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m1-3.html">« M1.3: Methoden</a>
-            <a href="m1-5.html">M1.5: Getters »</a>
+            <a href="../module2/m2-1.html">Module 2: Structuur »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -51,7 +49,7 @@
                 <li><a href="m1-4.html" class="active">M1.4: Setters</a></li>
                 <li><a href="m1-5.html">M1.5: Getters</a></li>
                 <li><a href="m1-6.html">M1.6: Constructor</a></li>
-                <li><a href="m1-7.html">M1.7: Named Arguments</a></li>
+                <li><a href="m1-7.html">M1.7: Class Variables</a></li>
                 <li><a href="m1-8.html">M1.8: Compositie</a></li>
                 <li><a href="m1-9.html">M1.9: Delegatie</a></li>
                 <li><a href="m1-10.html">M1.10: Hoofd-Klasse</a></li>
@@ -62,81 +60,67 @@
     <main>
         <h2>M1.4: Setters met Validatie</h2>
 
-        <h3>Theorie: Data Beschermen</h3>
+        <h3>Leeruitkomsten</h3>
+        <ul>
+            <li>Ik begrijp het belang van <strong>Validatie</strong> om de toestand van een object te beschermen.</li>
+            <li>Ik kan <code>if/else</code> logica gebruiken in een methode om data te valideren.</li>
+            <li>Ik begrijp dat een methode die data instelt een <strong>Setter</strong> wordt genoemd.</li>
+        </ul>
+
+        <h3>Uitleg: Data Beschermen (Setters)</h3>
         <p>
-            Een <strong>Setter</strong> is een methode die bedoeld is om een property *veilig* in te stellen. [cite_start]Het grote voordeel hiervan is dat we <strong>validatie</strong> (controles) kunnen inbouwen[cite: 2189].
+            In M1.3 was onze <code>set_angle</code> methode "dom" en accepteerde <code>9000.0</code>, wat de toestand van ons object corrupt maakte.
         </p>
         <p>
-            <strong>Probleem:</strong> Wat als een gebruiker <code>motor.set_angle(9000)</code> aanroept? De echte servo kan maar tot 180 graden en zal kapot gaan.
-        </p>
-        <p>
-            <strong>Oplossing:</strong> We voegen een <code>if/else</code>-statement toe in de setter. Deze controleert de waarde *voordat* deze wordt ingesteld.
+            De oplossing is om "regels" (validatie) toe te voegen <strong>binnen</strong> de methode. Een methode die een property instelt en valideert, noemen we een <strong>Setter</strong>.
         </p>
 
-        <hr>
-        <h3>Stap-voor-stap Voorbeeld</h3>
-
-        <h4>Stap 1: Vóór (in `servo.py`)</h4>
-        <p>Onze methode uit M1.3 was 'dom'. Het accepteerde elke waarde.</p>
-        <pre><code class="language-python"># In servo.py
-class Servo:
-    def set_angle(self, new_angle):
-        self.current_angle = new_angle # Onveilig!
-        print(f"Motor {self.id} beweegt nu naar {self.current_angle} gr.")</code></pre>
-
-        <h4>Stap 2: Na (Validatie toevoegen in `servo.py`)</h4>
-        <p>We voegen <strong>Constanten</strong> (<code>MIN_ANGLE</code>, <code>MAX_ANGLE</code>) toe bovenaan ons bestand. Dit zijn variabelen die nooit veranderen. Daarna voegen we de <code>if/else</code> check toe in de setter.</p>
         <pre><code class="language-python"># In servo.py
 
-# Constanten (bovenaan het bestand, in HOOFDLETTERS)
+# Constanten (bovenaan het bestand)
 MIN_ANGLE = 0.0
 MAX_ANGLE = 180.0
 
 class Servo:
+    # ...
     def set_angle(self, new_angle):
         """Stelt de hoek in, MAAR alleen als deze geldig is."""
 
         # De VALIDATIE-check
         if new_angle >= MIN_ANGLE and new_angle <= MAX_ANGLE:
-            # Alleen als het veilig is, stellen we de property in
             self.current_angle = new_angle
             print(f"Motor {self.id} beweegt naar {self.current_angle} gr.")
         else:
             # Weiger de ongeldige waarde
-            print(f"FOUT: Hoek {new_angle} is ongeldig en wordt genegeerd.")
-</code></pre>
+            print(f"FOUT: Hoek {new_angle} is ongeldig.")</code></pre>
 
-        <h4>Stap 3: Testen (in `main.py`)</h4>
-        <p>Nu testen we onze beveiliging in <code>main.py</code>.</p>
+        <h3>Uitleg: De Setter Testen</h3>
+        <p>
+            Als we nu ongeldige data proberen in te stellen via de <code>set_angle</code> methode, wordt deze netjes geweigerd.
+        </p>
+
         <pre><code class="language-python"># In main.py
 from servo import Servo
 
 motor = Servo()
 motor.id = 1
-motor.current_angle = 90.0 # Stel de beginwaarde in
-print(f"Beginhoek: {motor.current_angle}")
+motor.current_angle = 90.0
 
-# Test 1: Ongeldige waarde (te hoog)
-print("Test 1: Zet hoek naar 200.0")
-motor.set_angle(200.0)
-print(f"Huidige hoek is nog steeds: {motor.current_angle}")
+motor.set_angle(200.0)  # Output: FOUT: Hoek 200.0 is ongeldig.
+motor.set_angle(120.0)  # Output: Motor 1 beweegt naar 120.0 gr.
 
-# Test 2: Geldige waarde
-print("\nTest 2: Zet hoek naar 120.0")
-motor.set_angle(120.0)
-print(f"Huidige hoek is nu: {motor.current_angle}")</code></pre>
+print(f"Uiteindelijke hoek: {motor.current_angle}") # Output: 120.0</code></pre>
 
-        <h4>Stap 4: Resultaat</h4>
-        <p>De output van <code>main.py</code> laat zien dat onze validatie werkt. De ongeldige waarde wordt geweigerd en de property wordt niet aangepast.</p>
-        <pre><code class="language-text">Beginhoek: 90.0
-Test 1: Zet hoek naar 200.0
-FOUT: Hoek 200.0 is ongeldig en wordt genegeerd.
-Huidige hoek is nog steeds: 90.0
-
-Test 2: Zet hoek naar 120.0
-Motor 1 beweegt naar 120.0 gr.
-Huidige hoek is nu: 120.0</code></pre>
-
+        <h3>Het Nieuwe Probleem...</h3>
+        <p>
+            We hebben de "voordeur" (de methode) beveiligd. Maar wat als iemand de "achterdeur" gebruikt?
+        </p>
+        <p>
+            <code>motor.current_angle = 9000.0</code>
+        </p>
+        <p>
+            Dit <strong>omzeilt</strong> onze setter volledig en maakt de property alsnog kapot. Dit "lek" lossen we in de volgende les op.
+        </p>
     </main>
 </div>
 

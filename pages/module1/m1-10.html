@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M1.10: Hoofd-Klasse</title>
+    <title>M1.10: De Hoofd-Class</title>
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="../../script.js" defer></script>
@@ -14,7 +14,6 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m1-9.html">« M1.9: Delegatie</a>
             <a href="../module2/m2-1.html">Module 2: Structuur »</a>
         </div>
         <div class="nav-group theme-switcher">
@@ -50,7 +49,7 @@
                 <li><a href="m1-4.html">M1.4: Setters</a></li>
                 <li><a href="m1-5.html">M1.5: Getters</a></li>
                 <li><a href="m1-6.html">M1.6: Constructor</a></li>
-                <li><a href="m1-7.html">M1.7: Named Arguments</a></li>
+                <li><a href="m1-7.html">M1.7: Class Variables</a></li>
                 <li><a href="m1-8.html">M1.8: Compositie</a></li>
                 <li><a href="m1-9.html">M1.9: Delegatie</a></li>
                 <li><a href="m1-10.html" class="active">M1.10: Hoofd-Klasse</a></li>
@@ -59,97 +58,109 @@
     </div>
 
     <main>
-        <h2>M1.10: Hoofd-Klasse (Integratie)</h2>
+        <h2>M1.10: De Hoofd-Class (Integratie)</h2>
 
-        <h3>Theorie: Het Totaalplaatje (De Top van de Piramide)</h3>
-        <p>
-            We passen het Compositie-principe (M1.8) nog een laatste keer toe om de basisstructuur van onze robot compleet te maken. [cite_start]We bouwen de 'top' van de piramide: de <code>SpiderPi</code>-klasse[cite: 2189].
-        </p>
-        <p>De hiërarchie (structuur) is nu:</p>
+        <h3>Leeruitkomsten</h3>
         <ul>
-            <li>De <code>SpiderPi</code>-robot <em>heeft</em> 6 <code>Leg</code>-objecten.</li>
-            <li>Elke <code>Leg</code> <em>heeft</em> 3 <code>Servo</code>-objecten.</li>
+            <li>Ik kan een hoofd-klasse ontwerpen die het volledige systeem (de robot) modelleert.</li>
+            <li>Ik kan compositie op meerdere niveaus toepassen.</li>
+            <li>Ik kan een hoog-niveau methode schrijven die werk delegeert.</li>
         </ul>
+
+        <h3>Uitleg: De Top van de Piramide</h3>
         <p>
-            De <code>__init__</code> van de <code>SpiderPi</code> maakt 6 <code>Leg</code>-objecten aan. De <code>__init__</code> van *elke* <code>Leg</code> maakt vervolgens 3 <code>Servo</code>-objecten aan.
+            We hebben de bouwstenen voltooid: <code>Servo</code> (laagste niveau) en <code>Leg</code> (middenniveau).
+            Nu is het tijd voor het hoogste niveau: de <strong><code>SpiderPi</code></strong> klasse. Deze klasse is de "baas" van het hele systeem.
         </p>
-        <p>Als we één <code>SpiderPi</code> object maken, worden er dus <strong>automatisch 1 + 6 + (6 * 3) = 25 objecten</strong> in totaal geïnitialiseerd! Dit is de kracht van Compositie.</p>
+        <p>
+            Dit is weer <strong>Compositie</strong>:
+        </p>
+        <ul>
+            <li><code>SpiderPi</code> <strong>heeft</strong> 6 <code>Leg</code> objecten.</li>
+            <li>Elke <code>Leg</code> <strong>heeft</strong> 3 <code>Servo</code> objecten.</li>
+        </ul>
 
-        <hr>
-        <h3>Stap-voor-stap Voorbeeld</h3>
-
-        <h4>Stap 1: Maak `robot.py` (De Hoofd-Klasse)</h4>
-        <p>We maken een nieuw bestand, <code>robot.py</code> (in M2 verplaatsen we dit naar <code>spiderpi_core/robot.py</code>).</p>
-        <pre><code class="language-python"># In robot.py
-from .leg import Leg # (Uitgaande van package-structuur M2)
+        <pre><code class="language-python"># In een nieuw bestand: robot.py
+from .leg import Leg
 
 class SpiderPi:
-    """
-    Modelleert de complete robot.
-    Dit is de 'Hoofd-Klasse' die alles 'bezit'.
-    """
-    _leg_front_r: Leg
-    _leg_mid_r: Leg
-    _leg_rear_r: Leg
-    _leg_front_l: Leg
-    _leg_mid_l: Leg
-    _leg_rear_l: Leg
+    """Modelleert de complete robot."""
+
+    # Properties voor alle 6 de poten
+    leg_front_left: Leg
+    leg_front_right: Leg
+    leg_mid_left: Leg
+    leg_mid_right: Leg
+    leg_back_left: Leg
+    leg_back_right: Leg
 
     def __init__(self):
         """Bouwt de robot door alle 6 poten aan te maken."""
-        print("SpiderPi robot wordt geassembleerd...")
+        print("SpiderPi robot wordt gebouwd...")
 
-        # Compositie van Leg-objecten
-        # (De ID's 1-18 zijn specifiek voor de hardware)
-        self._leg_front_r = Leg(id_hip=1, id_knee=2, id_ankle=3)
-        self._leg_mid_r   = Leg(id_hip=4, id_knee=5, id_ankle=6)
-        self._leg_rear_r  = Leg(id_hip=7, id_knee=8, id_ankle=9)
-        self._leg_front_l = Leg(id_hip=10, id_knee=11, id_ankle=12)
-        self._leg_mid_l   = Leg(id_hip=13, id_knee=14, id_ankle=15)
-        self._leg_rear_l  = Leg(id_hip=16, id_knee=17, id_ankle=18)
+        # Compositie op het hoogste niveau
+        # (Pas de ID's aan naar je eigen robot)
+        self.leg_front_left  = Leg(hip_id=10, knee_id=11, ankle_id=12)
+        self.leg_front_right = Leg(hip_id=1, knee_id=2, ankle_id=3)
+        self.leg_mid_left    = Leg(hip_id=13, knee_id=14, ankle_id=15)
+        self.leg_mid_right   = Leg(hip_id=4, knee_id=5, ankle_id=6)
+        self.leg_back_left   = Leg(hip_id=16, knee_id=17, ankle_id=18)
+        self.leg_back_right  = Leg(hip_id=7, knee_id=8, ankle_id=9)
 
-        print("Robot is klaar voor gebruik!")
+        print("Robot is klaar.")</code></pre>
 
-    # ... (Getters voor de poten)
-    @property
-    def leg_front_r(self) -> Leg:
-        return self._leg_front_r
+        <h3>Uitleg: Delegatie op Hoog Niveau</h3>
+        <p>
+            Net als de <code>Leg</code> een "gemaksmethode" had (<code>set_all_angles</code>), moet de <code>SpiderPi</code> ook "gemaksmethoden" hebben, zoals <code>wake_up()</code>.
+        </p>
+        <p>
+            Deze methode <strong>delegeert</strong> het werk aan al zijn <code>Leg</code> objecten, die het werk <strong>vervolgens</strong> weer delegeren aan hun <code>Servo</code> objecten.
+        </p>
 
-    # ... (en 5 meer getters voor de andere poten) ...
-</code></pre>
+        <pre><code class="language-python"># In robot.py (vervolg)
+class SpiderPi:
+    # ... (init van hierboven) ...
 
-        <h4>Stap 2: De 'Definitieve' `main.py` (voor nu)</h4>
-        <p><code>main.py</code> wordt nu extreem simpel. We hoeven alleen nog maar de <code>SpiderPi</code>-klasse te importeren en één object te maken.</p>
+    def wake_up(self) -> None:
+        """Delegeer 'wake_up' naar alle 6 de poten."""
+        print("Robot is aan het opstaan...")
+        # Zet alle poten in een standaard 'staande' positie (bv. 90 graden)
+        self.leg_front_left.set_all_angles(90.0, 90.0, 90.0)
+        self.leg_front_right.set_all_angles(90.0, 90.0, 90.0)
+        self.leg_mid_left.set_all_angles(90.0, 90.0, 90.0)
+        self.leg_mid_right.set_all_angles(90.0, 90.0, 90.0)
+        self.leg_back_left.set_all_angles(90.0, 90.0, 90.0)
+        self.leg_back_right.set_all_angles(90.0, 90.0, 90.0)
+        print("Robot staat.")
+
+    def sleep(self) -> None:
+        """Delegeer 'sleep' naar alle 6 de poten."""
+        print("Robot gaat slapen...")
+        # Zet alle poten in een 'rust' positie
+        self.leg_front_left.set_all_angles(90.0, 150.0, 150.0)
+        self.leg_front_right.set_all_angles(90.0, 150.0, 150.0)
+        # ... (en zo verder voor alle 6 de poten) ...
+        print("Robot slaapt.")</code></pre>
+
+        <h3>Uitleg: De Finale Test</h3>
+        <p>
+            Nu kunnen we met één commando in <code>main.py</code> de hele kettingreactie starten. Eén <code>SpiderPi</code> object maken roept 19 constructors aan (1 SpiderPi, 6 Legs, 18 Servos). Eén <code>wake_up()</code> call roept 6 keer <code>set_all_angles()</code> aan, wat weer 18 keer <code>set_angle()</code> aanroept.
+        </p>
+
         <pre><code class="language-python"># In main.py
-# Importeer alleen de 'top' van de piramide
-from spiderpi_core.robot import SpiderPi
+from .robot import SpiderPi
+import time
 
-# Dit ene commando start een kettingreactie van __init__ aanroepen!
-print("--- Robot wordt gebouwd ---")
+# Dit ene commando start de hele kettingreactie
 my_robot = SpiderPi()
-print("--- Robot is gebouwd ---")
 
-# We kunnen nu de *hele* keten van delegatie aanroepen:
-# "Robot -> Poot -> Servo's"
-print("\n--- Commando wordt gegeven ---")
-my_robot.leg_front_r.move_to_angles(100.0, 100.0, 100.0)</code></pre>
+print("Robot aanroepen...")
+my_robot.wake_up()
 
-        <h4>Stap 3: Resultaat</h4>
-        <p>De output van <code>main.py</code> toont de volledige 'cascade' van object-creatie.</p>
-        <pre><code class="language-text">--- Robot wordt gebouwd ---
-SpiderPi robot wordt geassembleerd...
-Nieuw Servo object (ID: 1) wordt gemaakt...
-Nieuw Servo object (ID: 2) wordt gemaakt...
-Nieuw Servo object (ID: 3) wordt gemaakt...
-Leg aangemaakt met servo's: 1, 2, 3
-(Dit herhaalt zich nog 5x voor de andere poten...)
-Robot is klaar voor gebruik!
---- Robot is gebouwd ---
+time.sleep(2) # Wacht 2 seconden
 
---- Commando wordt gegeven ---
-Poot (start-ID 1) beweegt...
-(Hier zou de output van 3x servo.set_angle() komen)</code></pre>
-        <p><strong>Gefeliciteerd!</strong> Je hebt de volledige 'body' van de robot in OOP gemodelleerd. In Module 2 gaan we deze bestandsstructuur formaliseren.</p>
+my_robot.sleep()
+</code></pre>
     </main>
 </div>
 
