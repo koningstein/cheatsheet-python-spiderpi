@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>M7.1: Interfaces (Protocol)</title>
-
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="../../script.js" defer></script>
@@ -15,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="../module6/m6-8.html">« M6.8: Debuggen (Vision)</a>
-            <a href="m7-2.html">M7.2: Implementatie (Kleur) »</a>
+            <a href="../module6/m6-1.html">« M6: Vision</a>
+            <a href="../module8/m8-1.html">M8: Integratie »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -60,42 +59,68 @@
     <main>
         <h2>M7.1: Interfaces (Protocol)</h2>
 
-        <h3>Theorie: Het 'Contract' voor Vision</h3>
+        <h3>Uitleg: Het Probleem</h3>
         <p>
-            <strong>Probleem:</strong> In Module 6 hebben we <code>SpiderPi.stream()</code> [cite: 251-252] aangepast om specifiek *kleur* te detecteren. Wat als we morgen *gezichten* willen detecteren? Of *lijnen*? Moeten we dan <code>SpiderPi.stream_faces()</code> en <code>SpiderPi.stream_lines()</code> maken? Dat is niet onderhoudbaar.
+            Stel je voor: je bouwt een robot die vandaag een rode bal moet zoeken, morgen een zwarte lijn moet volgen, en volgende week naar gezichten moet kijken.
         </p>
         <p>
-            <strong>Oplossing:</strong> Een <strong>Interface</strong> (in modern Python een <strong><code>Protocol</code></strong>). We definiëren een **contract**. We zeggen: "Het maakt me niet uit *wat* voor vision-taak je bent (kleur, gezicht, lijn), je *moet* een methode hebben die <code>analyze_frame</code> heet."
+            Als we al die functies direct in de <code>SpiderPi</code> klasse programmeren (bijvoorbeeld <code>detect_red()</code>, <code>follow_line()</code>, <code>find_face()</code>), wordt die klasse gigantisch groot en onoverzichtelijk. Bovendien moet je de robot-code aanpassen telkens als je een nieuwe truc wilt toevoegen.
+        </p>
+
+        <h3>Uitleg: De Oplossing (De Universele Stekker)</h3>
+        <p>
+            We willen een systeem waarbij we verschillende "vision-modules" in de robot kunnen prikken, net zoals je een USB-stick in een computer steekt. De computer hoeft niet te weten <em>wat</em> er op de stick staat, hij hoeft alleen maar te weten hoe de USB-aansluiting werkt.
         </p>
         <p>
-            Dit is de 'stopcontact'-analogie: We definiëren de *vorm* van het stopcontact (bv. twee pinnen, <code>analyze_frame</code>). Het maakt niet uit wat je inplugt (een lamp, een laptop), zolang het maar *past*.
+            In programmeren noemen we zo'n afspraak over de aansluiting een <strong>Interface</strong> of <strong>Protocol</strong>.
+        </p>
+        <p>
+            Wij spreken af: <em>"Iedere Vision Processor moet een methode hebben die een plaatje ontvangt en een bewerkt plaatje teruggeeft."</em>
         </p>
 
         <hr>
-        <h3>Python Voorbeeld (`vision.py`)</h3>
-        <p>We maken een nieuw bestand <code>spiderpi_core/vision.py</code> voor al onze vision-gerelateerde klassen.</p>
+        <h3>Stap 1: Het Protocol Bestand</h3>
+        <p>
+            We maken een nieuw bestand aan speciaal voor deze afspraak. Zo houden we de regels gescheiden van de uitvoering.
+        </p>
+        <p>
+            Maak het bestand <code>spiderpi_core/vision.py</code> en begin met de imports.
+        </p>
 
         <pre><code class="language-python"># In spiderpi_core/vision.py
 from typing import Protocol
-import numpy as np
+import numpy as np</code></pre>
 
-class VisionProcessorProtocol(Protocol):
+        <h3>Stap 2: De Regel Definiëren</h3>
+        <p>
+            Nu schrijven we de klasse. Let op: deze klasse bevat <strong>geen code</strong> die iets doet. Het bevat alleen de <strong>regels</strong>.
+        </p>
+        <p>
+            De drie puntjes (<code>...</code>) in de methode betekenen letterlijk: "Hier hoeft niets te staan, dit is puur om de regel vast te leggen."
+        </p>
+
+        <pre><code class="language-python">class VisionProcessorProtocol(Protocol):
     """
-    HET CONTRACT (de Interface):
-    Elke klasse die 'wil zijn' zoals dit protocol,
-    MOET een 'analyze_frame' methode hebben.
+    HET CONTRACT (de Interface).
+    Elke klasse die dit protocol volgt, MOET de onderstaande methode hebben.
     """
 
     def analyze_frame(self, frame: np.ndarray) -> np.ndarray:
         """
-        Analyseert een videoframe en geeft het (bewerkte) frame terug.
+        Regel:
+        1. De methode MOET 'analyze_frame' heten.
+        2. Hij MOET een 'frame' (numpy array) als input krijgen.
+        3. Hij MOET een 'numpy array' teruggeven.
         """
-        ... # '...' (Ellipsis) is de 'pass' voor protocollen
+        ... # Dit is een placeholder. Geen code nodig hier.</code></pre>
 
-# --- Testen ---
-# Je kunt geen object maken van een Protocol.
-# De "win" is het correct definiëren van het contract-bestand.
-# We *gebruiken* het in de volgende les.</code></pre>
+        <h3>Uitleg: Wat nu?</h3>
+        <p>
+            We hebben nu de "vorm van de stekker" bepaald. We hebben afgesproken hoe een Vision Processor eruit moet zien. Maar we hebben nog geen werkende processor.
+        </p>
+        <p>
+            In de volgende lessen gaan we verschillende apparaten (klassen) bouwen die precies op deze stekker passen.
+        </p>
 
     </main>
 </div>

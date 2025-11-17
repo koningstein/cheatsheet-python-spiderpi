@@ -15,7 +15,7 @@
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
             <a href="m4-6.html">« M4.6: Override (Delegatie)</a>
-            <a href="m4-8.html">M4.8: Protected (Overerving) »</a>
+            <a href="m4-8.html">M4.8: Protected »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -40,7 +40,7 @@
     <div class="header-nav-block">
         <header>
             <h1>Module 4: Overerving & Polymorfisme</h1>
-            <p>De "IS EEN" relatie. Ouders, kinderen, en gedrag overschrijven.</p>
+            <p>De "IS EEN" relatie. Parent classes, Child classes, en gedrag overschrijven.</p>
         </header>
         <nav>
             <ul>
@@ -57,53 +57,61 @@
     </div>
 
     <main>
-        <h2>M4.7: Polymorfisme</h2>
+        <h2>M4.7: Polymorfisme (Vele Vormen)</h2>
 
-        <h3>Theorie: Vele Vormen</h3>
+        <h3>Uitleg: Alles is een Component</h3>
         <p>
-            <strong>Polymorfisme</strong> (een moeilijk woord voor een simpel idee) betekent <strong>"vele vormen"</strong>.
+            <strong>Polymorfisme</strong> is een moeilijk woord voor een simpel idee: "Vele Vormen".
         </p>
         <p>
-            Dankzij overerving (<code>Servo</code> <em>IS EEN</em> <code>RobotComponent</code> en <code>Leg</code> <em>IS EEN</em> <code>RobotComponent</code>), mogen we ze *allemaal* simpelweg "RobotComponent" noemen.
+            Omdat zowel <code>Servo</code> als <code>Leg</code> "kinderen" zijn van <code>RobotComponent</code> (de Parent), mogen we ze allebei behandelen als "gewoon een component".
         </p>
         <p>
-            <strong>De Kracht:</strong> Je kunt een lijst maken met *gemixte* objecten (<code>Leg</code>s en <code>Servo</code>s door elkaar) en ze *exact* hetzelfde behandelen. Als je <code>component.reset()</code> aanroept, kiest Python *automatisch* de juiste (overschreven) methode. Dit is de 'magie' en het hoofddoel van overerving.
+            <strong>De Kracht:</strong> We kunnen een lijst maken met allerlei verschillende objecten (Servo's en Poten door elkaar). We kunnen over die lijst "loopen" en op elk item <code>.reset()</code> aanroepen. We hoeven niet te weten <em>wat</em> het is. Python kiest automatisch de juiste versie van <code>reset()</code>.
         </p>
 
         <hr>
-        <h3>Python Voorbeeld (`main.py`)</h3>
-        <p>We maken een gemixte lijst en roepen op alles <code>.reset()</code> aan.</p>
+        <h3>Stap 1: Een gemengde lijst maken</h3>
+        <p>
+            In <code>main.py</code> maken we een lijst met willekeurige onderdelen.
+        </p>
 
         <pre><code class="language-python"># In main.py
-my_robot = SpiderPi()
+from spiderpi_core.servo import Servo
+from spiderpi_core.leg import Leg
 
-print("--- Componenten aanmaken ---")
+# Een 'gemixte' lijst.
+# Het zijn allemaal RobotComponents.
+my_components = [
+    Servo(1, 120.0),
+    Leg(10, 11, 12),
+    Servo(2, 45.0)
+]</code></pre>
 
-# Een 'gemixte' lijst. Beiden ZIJN EEN 'RobotComponent'.
-componenten_lijst = [
-    my_robot.leg_front_r,       # Dit is een Leg object
-    my_robot.leg_mid_l.hip_servo, # Dit is een Servo object
-    my_robot.leg_rear_r         # Dit is nog een Leg object
-]
+        <h3>Stap 2: Polymorfisme in Actie</h3>
+        <p>
+            Nu gaan we de lijst af. We weten niet of <code>component</code> een Servo of een Leg is. En het boeit ons ook niet!
+        </p>
+        <pre><code class="language-python">print("--- START RESET ---")
 
-print("\n--- START POLYMORFISCHE RESET ---")
-for component in componenten_lijst:
-    # We weten niet wat 'component' is (Leg? Servo?)
-    # ...en het BOEIT NIET! Python kiest de juiste .reset().
-    print(f"--- Volgende component: {component.name} ---")
+for component in my_components:
+    # We roepen .reset() aan.
+    # Python kijkt: "Wat ben jij? Een Servo? Dan doe ik de Servo-reset."
+    # "Ben jij een Leg? Dan doe ik de Leg-reset."
     component.reset()
 
-# Output:
-# --- Volgende component: Leg_1_2_3 ---
-# LEG RESET: Leg_1_2_3 reset al zijn servo's.
-# SERVO RESET: Servo_1 gaat naar 90 graden.
-# ...
-# --- Volgende component: Servo_13 ---
-# SERVO RESET: Servo_13 gaat naar 90 graden.
-# --- Volgende component: Leg_7_8_9 ---
-# LEG RESET: Leg_7_8_9 reset al zijn servo's.
-# ...</code></pre>
+print("--- DONE ---")</code></pre>
 
+        <h3>Uitleg: Het Resultaat</h3>
+        <p>
+            Dit is de output. Zie hoe het gedrag verschilt per regel!
+        </p>
+        <pre><code class="language-text">--- START RESET ---
+SERVO RESET: Servo_1 going to 90 degrees.
+LEG RESET: Leg_10_11_12 resetting all servos.
+(Hier volgen 3 servo resets van de poot...)
+SERVO RESET: Servo_2 going to 90 degrees.
+--- DONE ---</code></pre>
     </main>
 </div>
 

@@ -14,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m7-7.html">« M7.7: Sensor Integratie</a>
-            <a href="../module8/m8-1.html">Module 8: Integratie »</a>
+            <a href="../module6/m6-1.html">« M6: Vision</a>
+            <a href="../module8/m8-1.html">M8: Integratie »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -59,26 +59,24 @@
     <main>
         <h2>M7.8: Testing (Detectors)</h2>
 
-        <h3>Theorie: Vision Testen (Mocking)</h3>
+        <h3>Uitleg: Vision Testen zonder Camera</h3>
         <p>
-            Dit is een *herhaling* van het <code>pytest</code> concept (M5.6) [cite: 249-250].
+            Hoe test je of de <code>ColorDetector</code> werkt? Je kunt niet van een computer verwachten dat hij een echte camera heeft en dat jij er met een rood papiertje voor gaat staan.
         </p>
         <p>
-            <strong>Probleem:</strong> Hoe test je <code>ColorDetector</code> automatisch? Je kunt niet *eisen* dat de build-server (of de docent) een *live camera* en een *rode stift* heeft.
+            We gebruiken <strong>Mocking</strong> (namaken). We maken met code een nep-plaatje.
         </p>
         <p>
-            <strong>Oplossing: Mocking (Test-Data Maken)</strong>.
-            We *maken* een nep-frame (een NumPy array) waarvan we het antwoord *weten*.
+            We gaan twee tests schrijven:
+            1. Een test met een <strong>zwart</strong> plaatje. De detector moet 0 pixels vinden.
+            2. Een test met een <strong>rood</strong> plaatje. De detector moet alle pixels vinden.
         </p>
-        <ul>
-            <li>We maken een *volledig zwart* plaatje met <code>np.zeros()</code>.</li>
-            <li>We maken een *gekleurd* plaatje met <code>np.full()</code>.</li>
-        </ul>
-        <p>We *geven* deze nep-plaatjes aan de detector en *beweren* (<code>assert</code>) dat het antwoord klopt.</p>
 
         <hr>
-        <h3>Python Voorbeeld (`tests/test_vision.py`)</h3>
-        <p>We maken een nieuw testbestand in de <code>tests/</code> map.</p>
+        <h3>Stap 1: De Test Setup</h3>
+        <p>
+            Maak een nieuw testbestand <code>tests/test_vision.py</code>. We definiëren eerst wat we onder "rood" verstaan.
+        </p>
 
         <pre><code class="language-python"># In tests/test_vision.py
 import pytest
@@ -86,45 +84,57 @@ import numpy as np
 import cv2
 from spiderpi_core.vision import ColorDetector
 
-# Definieer de test-kleur
-LOWER_RED = np.array([0, 120, 70])
-UPPER_RED = np.array([10, 255, 255])
-# Een BGR-kleur die binnen de HSV-range valt
-# (HSV(5, 200, 200) -> BGR(50, 42, 200))
-TEST_RED_BGR = (50, 42, 200)
+# Definieer de test-kleur (Rood in HSV)
+LOWER = np.array([0, 120, 70])
+UPPER = np.array([10, 255, 255])
 
-def test_color_detector_finds_nothing():
+# De kleur rood in BGR (voor het maken van het nep-plaatje)
+TEST_RED_BGR = (50, 42, 200) </code></pre>
+
+        <h3>Stap 2: Test Zwart Beeld</h3>
+        <p>
+            We maken een plaatje met alleen maar nullen (zwart).
+        </p>
+
+        <pre><code class="language-python">def test_detector_finds_nothing_in_black_image():
     """Test of de detector een zwart beeld negeert."""
-    # 1. Maak de detector
-    detector = ColorDetector(LOWER_RED, UPPER_RED)
+    detector = ColorDetector(LOWER, UPPER)
 
-    # 2. Maak een nep-beeld (100x100, zwart)
+    # Maak een nep-beeld (100x100 pixels, zwart)
     test_img = np.zeros((100, 100, 3), dtype=np.uint8)
 
-    # 3. Voer de analyse uit
+    # Analyseer
     mask = detector.analyze_frame(test_img)
+
+    # Tel pixels (moet 0 zijn)
     count = cv2.countNonZero(mask)
+    assert count == 0</code></pre>
 
-    # 4. Beweer (Assert)
-    assert count == 0
+        <h3>Stap 3: Test Rood Beeld</h3>
+        <p>
+            We maken een plaatje en vullen het volledig met de rode kleur.
+        </p>
 
-def test_color_detector_finds_red():
-    """Test of de detector een 100% rood beeld volledig detecteert."""
-    detector = ColorDetector(LOWER_RED, UPPER_RED)
+        <pre><code class="language-python">def test_detector_finds_red_in_red_image():
+    """Test of de detector een rood beeld vindt."""
+    detector = ColorDetector(LOWER, UPPER)
 
-    # 2. Maak een nep-beeld (100x100, rood)
+    # Maak een nep-beeld (100x100), gevuld met onze rode kleur
     test_img = np.full((100, 100, 3), TEST_RED_BGR, dtype=np.uint8)
 
-    # 3. Voer de analyse uit
     mask = detector.analyze_frame(test_img)
     count = cv2.countNonZero(mask)
 
-    # 4. Beweer (Assert)
-    assert count == 10000 # 100 * 100 pixels
+    # Omdat het hele plaatje rood is, moet de count gelijk zijn aan
+    # het totaal aantal pixels (100 * 100 = 10000)
+    assert count == 10000</code></pre>
 
-# --- Terminal ---
-# (venv) C:\...&gt; pytest
-# Output: ... 2 passed ... (plus de tests uit M5.6)</code></pre>
+        <h3>Stap 4: Draaien</h3>
+        <p>
+            Draai de test in je terminal.
+        </p>
+        <pre><code class="language-bash">(venv) C:\...&gt; pytest</code></pre>
+        <p>Als het goed is, krijg je groene puntjes!</p>
 
     </main>
 </div>

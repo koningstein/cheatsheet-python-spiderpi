@@ -40,7 +40,7 @@
     <div class="header-nav-block">
         <header>
             <h1>Module 4: Overerving & Polymorfisme</h1>
-            <p>De "IS EEN" relatie. Ouders, kinderen, en gedrag overschrijven.</p>
+            <p>De "IS EEN" relatie. Parent classes, Child classes, en gedrag overschrijven.</p>
         </header>
         <nav>
             <ul>
@@ -59,27 +59,28 @@
     <main>
         <h2>M4.6: Method Overriding (Leg)</h2>
 
-        <h3>Theorie: Overerving + Delegatie</h3>
+        <h3>Uitleg: Overerving + Delegatie</h3>
         <p>
-            We combineren nu twee concepten: Overerving (M4.5) en Compositie/Delegatie (M1.9).
+            We gaan nu ook de <code>Leg</code> (poot) zijn eigen <code>reset()</code> geven. Maar wat betekent een reset voor een poot?
         </p>
         <p>
-            Wat betekent een <code>reset()</code> voor een <code>Leg</code> (poot)?
-            Een <code>Leg</code> reset betekent: "Vertel *al jouw onderdelen* (de 3 servo's) dat *zij* moeten resetten."
+            Een poot resetten betekent: "Vertel <em>al jouw onderdelen</em> (de 3 servo's) dat <em>zij</em> moeten resetten."
         </p>
-        <ol>
-            <li><strong>Overerving:** We <em>overschrijven</em> de standaard <code>.reset()</code> die <code>Leg</code> van <code>RobotComponent</code> erft.</li>
-            <li><strong>Delegatie:** De <em>nieuwe</em> <code>.reset()</code> methode <em>delegeert</em> het werk aan de servo-objecten die de <code>Leg</code> *heeft* (Compositie).</li>
-        </ol>
-        <p>De <code>Leg.reset()</code> is een 'manager' die zijn 3 'werknemers' (de <code>Servo</code>s) aanstuurt om *hun* <code>reset()</code> te doen.</p>
+        <p>
+            We combineren hier twee technieken:
+            1.  <strong>Overerving:</strong> We overschrijven de Parent-methode.
+            2.  <strong>Delegatie:</strong> We geven het werk door aan de servo's (Compositie).
+        </p>
 
         <hr>
-        <h3>Python Voorbeeld (`leg.py`)</h3>
-        <p>We overschrijven nu ook de <code>reset</code> methode in <code>Leg</code>.</p>
+        <h3>Stap 1: Override in Leg</h3>
+        <p>
+            Open <code>spiderpi_core/leg.py</code> en voeg de <code>reset</code> methode toe.
+        </p>
 
         <pre><code class="language-python"># In spiderpi_core/leg.py
 class Leg(RobotComponent):
-    # ... (init, move_to_angles, getters...)
+    # ...
 
     # DIT IS DE OVERRIDE:
     def reset(self) -> None:
@@ -87,23 +88,31 @@ class Leg(RobotComponent):
         Overschrijft de standaard reset.
         Een Leg reset delegeert de reset aan zijn 3 servo's.
         """
-        print(f"LEG RESET: {self.name} reset al zijn servo's.")
+        print(f"LEG RESET: {self.name} resetting all servos.")
 
         # Delegatie! (We roepen de .reset() van de kinderen aan)
-        self._hip_servo.reset()
-        self._knee_servo.reset()
-        self._ankle_servo.reset()
+        self.hip_servo.reset()
+        self.knee_servo.reset()
+        self.ankle_servo.reset()</code></pre>
 
-# --- In main.py ---
-# test_leg = my_robot.leg_front_r
-# test_leg.reset()
+        <h3>Stap 2: Testen</h3>
+        <pre><code class="language-python"># In main.py
+from spiderpi_core.leg import Leg
 
-# Output (Kettingreactie):
-# LEG RESET: Leg_1_2_3 reset al zijn servo's.
-# SERVO RESET: Servo_1 gaat naar 90 graden.
-# SERVO RESET: Servo_2 gaat naar 90 graden.
-# SERVO RESET: Servo_3 gaat naar 90 graden.</code></pre>
+leg = Leg(1, 2, 3)
+leg.reset()</code></pre>
 
+        <h3>Uitleg: De Kettingreactie</h3>
+        <p>
+            Je ziet nu een mooie kettingreactie in de output:
+        </p>
+        <pre><code class="language-text">LEG RESET: Leg_1_2_3 resetting all servos.
+SERVO RESET: Servo_1 going to 90 degrees.
+SERVO RESET: Servo_2 going to 90 degrees.
+SERVO RESET: Servo_3 going to 90 degrees.</code></pre>
+        <p>
+            De poot reset zichzelf door zijn onderdelen te resetten.
+        </p>
     </main>
 </div>
 

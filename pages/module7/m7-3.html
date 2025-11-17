@@ -1,123 +1,133 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>M7.3: Implementatie (Lijnvolger)</title>
-  <link rel="stylesheet" href="../../style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
-  <script src="../../script.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M7.3: Implementatie (Lijn)</title>
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="../../script.js" defer></script>
 </head>
 <body>
 
 <div class="top-bar">
-  <div class="top-bar-content">
-    <div class="nav-group">
-      <a href="../../index.html">« Overzicht</a>
-      <a href="m7-2.html">« M7.2: Implementatie (Kleur)</a>
-      <a href="m7-4.html">M7.4: Implementatie (Gezicht) »</a>
+    <div class="top-bar-content">
+        <div class="nav-group">
+            <a href="../../index.html">« Overzicht</a>
+            <a href="../module6/m6-1.html">« M6: Vision</a>
+            <a href="../module8/m8-1.html">M8: Integratie »</a>
+        </div>
+        <div class="nav-group theme-switcher">
+            <label for="theme-switcher">Thema: </label>
+            <select id="theme-switcher">
+                <option value="blue">Blauw (Standaard)</option>
+                <option value="purple">Paars</option>
+                <option value="red">Rood</option>
+                <option value="orange">Oranje</option>
+                <option value="teal">Turquoise</option>
+                <option value="darkblue">Donkerblauw</option>
+                <option value="green">Groen</option>
+                <option value="material-dark">Dark (Material)</option>
+                <option value="monokai-pro">Dark (Monokai Pro)</option>
+                <option value="night-owl">Dark (Night Owl)</option>
+            </select>
+        </div>
     </div>
-    <div class="nav-group theme-switcher">
-      <label for="theme-switcher">Thema: </label>
-      <select id="theme-switcher">
-        <option value="blue">Blauw (Standaard)</option>
-        <option value="purple">Paars</option>
-        <option value="red">Rood</option>
-        <option value="orange">Oranje</option>
-        <option value="teal">Turquoise</option>
-        <option value="darkblue">Donkerblauw</option>
-        <option value="green">Groen</option>
-        <option value="material-dark">Dark (Material)</option>
-        <option value="monokai-pro">Dark (Monokai Pro)</option>
-        <option value="night-owl">Dark (Night Owl)</option>
-      </select>
-    </div>
-  </div>
 </div>
 
 <div class="container">
 
-  <div class="header-nav-block">
-    <header>
-      <h1>Module 7: Abstracte Vision & Interfaces</h1>
-      <p>Een 'plug-and-play' vision-systeem bouwen met Interfaces (Protocols).</p>
-    </header>
-    <nav>
-      <ul>
-        <li><a href="m7-1.html">M7.1: Interfaces (Protocol)</a></li>
-        <li><a href="m7-2.html">M7.2: Implementatie (Kleur)</a></li>
-        <li><a href="m7-3.html" class="active">M7.3: Implementatie (Lijn)</a></li>
-        <li><a href="m7-4.html">M7.4: Implementatie (Gezicht)</a></li>
-        <li><a href="m7-5.html">M7.5: Implementatie (Gebaar)</a></li>
-        <li><a href="m7-6.html">M7.6: Poly-koppeling</a></li>
-        <li><a href="m7-7.html">M7.7: Sensor Integratie</a></li>
-        <li><a href="m7-8.html">M7.8: Testing (Detectors)</a></li>
-      </ul>
-    </nav>
-  </div>
+    <div class="header-nav-block">
+        <header>
+            <h1>Module 7: Abstracte Vision & Interfaces</h1>
+            <p>Een 'plug-and-play' vision-systeem bouwen met Interfaces (Protocols).</p>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="m7-1.html">M7.1: Interfaces (Protocol)</a></li>
+                <li><a href="m7-2.html">M7.2: Implementatie (Kleur)</a></li>
+                <li><a href="m7-3.html" class="active">M7.3: Implementatie (Lijn)</a></li>
+                <li><a href="m7-4.html">M7.4: Implementatie (Gezicht)</a></li>
+                <li><a href="m7-5.html">M7.5: Implementatie (Gebaar)</a></li>
+                <li><a href="m7-6.html">M7.6: Poly-koppeling</a></li>
+                <li><a href="m7-7.html">M7.7: Sensor Integratie</a></li>
+                <li><a href="m7-8.html">M7.8: Testing (Detectors)</a></li>
+            </ul>
+        </nav>
+    </div>
 
-  <main>
-    <h2>M7.3: Implementatie (Lijnvolg Processor)</h2>
+    <main>
+        <h2>M7.3: Implementatie (Lijnvolger)</h2>
 
-    <h3>Theorie: Het 'Aha!' Moment</h3>
-    <p>
-      Dit is de les waar het concept 'Interface' klikt. We maken een *tweede* klasse, <code>LineFollowProcessor</code>, die *ook* het <code>VisionProcessorProtocol</code> volgt. Hij *moet* dus ook een <code>analyze_frame</code> methode hebben, maar de *inhoud* (logica) is totaal anders.
-    </p>
-    <p>
-      <strong>Lijnvolg-logica (Simpel):</strong>
-    </p>
-    <ol>
-      <li>Filter op de lijnkleur (bv. zwart) -> Krijg een <code>mask</code>.</li>
-      <li>Vind het *midden* van de lijn in dat <code>mask</code>. (Hiervoor gebruiken we <code>cv2.moments</code>).</li>
-      <li>Teken een stip op het *originele* beeld op dat middenpunt.</li>
-      <li>Geef het *originele* beeld (met stip) terug.</li>
-    </ol>
-    <p>De 'buitenwereld' roept <code>.analyze_frame()</code> aan en weet niet (en hoeft niet te weten) welke complexe logica erin zit.</p>
+        <h3>Uitleg: Een Tweede Soort Detector</h3>
+        <p>
+            Om te bewijzen dat ons systeem flexibel is, maken we een tweede detector die iets heel anders doet: de <strong>LineFollowProcessor</strong>.
+        </p>
+        <p>
+            Deze detector moet een lijn (bijvoorbeeld zwart plakband op een witte vloer) vinden. Hij doet meer dan alleen kleuren filteren; hij berekent ook waar het <strong>midden</strong> van die lijn is en tekent daar een stip.
+        </p>
+        <p>
+            Maar voor de buitenwereld (de robot) ziet hij er precies hetzelfde uit als de <code>ColorDetector</code>, want hij heeft dezelfde <code>analyze_frame</code> methode.
+        </p>
 
-    <hr>
-    <h3>Python Voorbeeld (`vision.py`)</h3>
-    <p>We voegen een *tweede* implementatie toe aan <code>vision.py</code>.</p>
+        <hr>
+        <h3>Stap 1: Setup</h3>
+        <p>
+            We voegen deze klasse toe aan <code>spiderpi_core/vision.py</code>. Ook hier slaan we de kleur van de lijn (zwart of wit) op in de <code>__init__</code>.
+        </p>
 
-    <pre><code class="language-python"># In spiderpi_core/vision.py
-# ... (imports en ColorDetector) ...
+        <pre><code class="language-python">class LineFollowProcessor:
+    """Zoekt het midden van een lijn en tekent een stip."""
 
-class LineFollowProcessor:
-    """Een tweede 'stekker' die ook in het 'stopcontact' past."""
+    _lower_line: np.ndarray
+    _upper_line: np.ndarray
 
     def __init__(self, lower_line_hsv: np.ndarray, upper_line_hsv: np.ndarray):
         self._lower_line = lower_line_hsv
-        self._upper_line = upper_line_hsv
+        self._upper_line = upper_line_hsv</code></pre>
 
-    def analyze_frame(self, frame: np.ndarray) -> np.ndarray:
-        """
-        Implementeert het protocol.
-        Vindt het midden van de lijn en tekent een stip.
-        """
-        # 1. Filter op lijnkleur (mask)
+        <h3>Stap 2: Filteren en Rekenen</h3>
+        <p>
+            In <code>analyze_frame</code> doen we eerst hetzelfde als bij de kleurdetector: filteren.
+            Daarna gebruiken we een wiskundige functie van OpenCV, <code>moments</code>, om het zwaartepunt van de witte pixels te berekenen.
+        </p>
+
+        <pre><code class="language-python">    def analyze_frame(self, frame: np.ndarray) -> np.ndarray:
+        # 1. Maak een masker van de lijn
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         mask = cv2.inRange(hsv, self._lower_line, self._upper_line)
 
-        # 2. Vind midden (cv2.moments is een 'recept' om dit te doen)
+        # 2. Bereken het zwaartepunt (M) van de witte vlek
         M = cv2.moments(mask)
-        if M["m00"] > 0: # Zeker weten dat we niet delen door 0
-            # Bereken X en Y van het midden
+
+        if M["m00"] > 0: # Check om delen door 0 te voorkomen
+            # Bereken de X en Y coördinaten van het midden
             cX = int(M["m10"] / M["m00"])
             cY = int(M["m01"] / M["m00"])
 
-            # 3. Teken stip op origineel beeld
-            cv2.circle(frame, (cX, cY), 7, (0, 0, 255), -1) # Rode stip
+            # 3. Teken een rode stip op die plek in het ORIGINELE beeld
+            # (argument -1 betekent: gevulde cirkel)
+            cv2.circle(frame, (cX, cY), 7, (0, 0, 255), -1)
 
-        # 4. Geef originele frame terug
-        return frame
-</code></pre>
+        # 4. Geef het bewerkte plaatje (met stip) terug
+        return frame</code></pre>
 
-  </main>
+        <h3>Uitleg: Het Verschil</h3>
+        <p>
+            De <code>ColorDetector</code> gaf een zwart-wit masker terug.
+            Deze <code>LineFollowProcessor</code> geeft het originele kleurenbeeld terug, maar dan met een rode stip erop getekend.
+        </p>
+        <p>
+            Omdat ze allebei een "plaatje" teruggeven, voldoen ze allebei aan het contract.
+        </p>
+
+    </main>
 </div>
 
 <footer>
-  <div class="footer-content">
-    <p>&copy; 2025 Techniek College Rotterdam</p>
-  </div>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>

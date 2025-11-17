@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M4.1: Basis Klasse (Ouder)</title>
-
+    <title>M4.1: Basis Klasse (Parent)</title>
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="../../script.js" defer></script>
@@ -15,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="../module3/m3-8.html">« M3.8: Linting (Pylint)</a>
-            <a href="m4-2.html">M4.2: Overerving »</a>
+            <a href="../module3/m3-1.html">« M3: Kwaliteit</a>
+            <a href="../module5/m5-1.html">M5: Abstractie »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -41,15 +40,15 @@
     <div class="header-nav-block">
         <header>
             <h1>Module 4: Overerving & Polymorfisme</h1>
-            <p>De "IS EEN" relatie. Ouders, kinderen, en gedrag overschrijven.</p>
+            <p>De "IS EEN" relatie. Parent classes, Child classes, en gedrag overschrijven.</p>
         </header>
         <nav>
             <ul>
-                <li><a href="m4-1.html" class="active">M4.1: Basis Klasse (Ouder)</a></li>
+                <li><a href="m4-1.html" class="active">M4.1: Basis Klasse (Parent)</a></li>
                 <li><a href="m4-2.html">M4.2: Overerving</a></li>
                 <li><a href="m4-3.html">M4.3: super()</a></li>
-                <li><a href="m4-4.html">M4.4: Ouder-methode</a></li>
-                <li><a href="m4-5.html">M4.5: Override (Kind)</a></li>
+                <li><a href="m4-4.html">M4.4: Parent-methode</a></li>
+                <li><a href="m4-5.html">M4.5: Override (Child)</a></li>
                 <li><a href="m4-6.html">M4.6: Override (Delegatie)</a></li>
                 <li><a href="m4-7.html">M4.7: Polymorfisme</a></li>
                 <li><a href="m4-8.html">M4.8: Protected (Overerving)</a></li>
@@ -58,49 +57,51 @@
     </div>
 
     <main>
-        <h2>M4.1: Basis Klasse (Ouderklasse)</h2>
+        <h2>M4.1: Basis Klasse (Parent Class)</h2>
 
-        <h3>Theorie: De "IS EEN" Relatie</h3>
+        <h3>Uitleg: De "IS EEN" Relatie</h3>
         <p>
-            Tot nu toe hebben we <strong>Compositie</strong> (de "Heeft een..." relatie) gebruikt: een <code>SpiderPi</code> <em>heeft</em> <code>Leg</code> objecten .
+            Tot nu toe hebben we <strong>Compositie</strong> gebruikt: een <code>SpiderPi</code> <em>heeft</em> poten. Dit is de "Heeft een..." relatie.
         </p>
         <p>
-            Nu introduceren we <strong>Inheritance (Overerving)</strong>, de <strong>"IS EEN"</strong> relatie.
+            Nu leren we <strong>Overerving</strong> (Inheritance). Dit is de <strong>"IS EEN"</strong> relatie.
         </p>
         <ul>
-            <li>Een <code>Servo</code> <em>IS EEN</em> `RobotComponent`. </li>
-            <li>Een <code>Leg</code> <em>IS EEN</em> `RobotComponent`. </li>
-            <li><strong>Vergelijking (Voertuig):</strong> Een <code>Sportauto</code> <em>IS EEN</em> <code>Voertuig</code>. Een <code>Vrachtwagen</code> <em>IS EEN</em> <code>Voertuig</code>.</li>
+            <li>Een <code>Servo</code> <em>IS EEN</em> Robot-Onderdeel.</li>
+            <li>Een <code>Leg</code> <em>IS EEN</em> Robot-Onderdeel.</li>
         </ul>
         <p>
-            We maken één "Ouder"-klasse (de <strong>Basis Class</strong>) die alle gedeelde eigenschappen bevat. Voor ons is dit <code>RobotComponent</code>, want alles op de robot is een component en heeft (bijvoorbeeld) een naam.
+            <strong>Vergelijking:</strong> Een <code>Sportauto</code> <em>IS EEN</em> <code>Voertuig</code>. Een <code>Vrachtwagen</code> <em>IS EEN</em> <code>Voertuig</code>. Ze zijn verschillend, maar delen eigenschappen van "Voertuig" (zoals wielen en een motor).
         </p>
 
-        <hr>
-        <h3>Python Voorbeeld (Nieuw bestand: `component.py`)</h3>
-        <p>We maken een nieuw bestand <code>spiderpi_core/component.py</code> aan voor de Ouder-klasse.</p>
-        <pre><code class="language-python">"""
-Bevat de basis-klasse (ouder) voor alle hardware-componenten
-op de robot.
-"""
+        <h3>Uitleg: De Parent Class Maken</h3>
+        <p>
+            We maken één <strong>Parent class</strong> (ook wel Basis Class genoemd) die alle gedeelde eigenschappen bevat. Voor onze robot noemen we dit <code>RobotComponent</code>. Alles op de robot is immers een component en heeft bijvoorbeeld een naam.
+        </p>
+
+        <pre><code class="language-python"># Maak een nieuw bestand: spiderpi_core/component.py
+
 class RobotComponent:
     """
-    De 'ouder'-klasse voor alle hardware.
-    Alle componenten hebben een naam.
+    De Parent class voor alle hardware.
+    Alle componenten (Child classes) erven straks van deze klasse.
     """
-    _name: str # Protected property (M3.3)
+    _name: str # Protected property (zoals geleerd in M3)
 
     def __init__(self, name: str) -> None:
         """Initialiseert de component met een naam."""
         self._name = name
-        print(f"Component '{self._name}' wordt geïnitialiseerd...")
+        print(f"Component '{self._name}' initialized.")
 
     @property
     def name(self) -> str:
         """GETTER: Geeft de (read-only) naam van dit component."""
-        return self._name
-</code></pre>
-        <p><strong>Testen:</strong> Deze les heeft geen <code>main.py</code> test. De "win" is het correct aanmaken van het bestand. We gebruiken het in de volgende les.</p>
+        return self._name</code></pre>
+
+        <h3>Uitleg: Wat hebben we nu?</h3>
+        <p>
+            We hebben nu een algemene blauwdruk gemaakt. Op zichzelf doet deze klasse nog niet zoveel, maar in de volgende lessen gaan we onze bestaande klassen (<code>Servo</code>, <code>Leg</code>) een <strong>Child class</strong> maken van deze Parent.
+        </p>
     </main>
 </div>
 

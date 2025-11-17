@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M7.6: Polymorfische Koppeling</title>
+    <title>M7.6: Poly-koppeling</title>
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="../../script.js" defer></script>
@@ -14,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m7-5.html">« M7.5: Implementatie (Gebaar)</a>
-            <a href="m7-7.html">M7.7: Sensor Integratie »</a>
+            <a href="../module6/m6-1.html">« M6: Vision</a>
+            <a href="../module8/m8-1.html">M8: Integratie »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -59,84 +59,79 @@
     <main>
         <h2>M7.6: Polymorfische Koppeling</h2>
 
-        <h3>Theorie: De 'Slimme' Robot</h3>
+        <h3>Uitleg: Het Stopcontact Maken</h3>
         <p>
-            <strong>Probleem:</strong> <code>main.py</code> is nu onze 'router' en testbank. De *robot* (<code>SpiderPi</code>) weet niet eens dat er 'processors' bestaan.
+            We hebben nu 4 verschillende "stekkers" (processors) gebouwd: Kleur, Lijn, Gezicht, Gebaar. Ze doen allemaal iets anders, maar ze passen op dezelfde aansluiting.
         </p>
         <p>
-            <strong>Oplossing (De 'Payoff'):</strong> We maken de robot *slimmer*.
+            Nu moeten we het "stopcontact" in de robot maken.
         </p>
-        <ol>
-            <li>De <code>SpiderPi</code> krijgt een *nieuwe* property: <code>self._processor</code>, die het <strong>Protocol</strong> (het 'stopcontact') als type hint heeft.</li>
-            <li>De <code>SpiderPi</code> krijgt een *nieuwe* methode: <code>set_vision_processor(processor)</code>.</li>
-            <li>De <code>SpiderPi.stream()</code> methode stopt met zelf-detecteren. Het *delegeert* al het analyse-werk aan <code>self._processor.analyze_frame()</code>.</li>
-        </ol>
-        <p><code>main.py</code> wordt nu heel simpel: het kiest (via CLI) welke 'stekker' (<code>FaceDetector</code>, <code>ColorDetector</code>) het in het 'stopcontact' van de robot stopt.</p>
+        <p>
+            De robot hoeft niet te weten <em>welke</em> processor hij heeft. Hij hoeft alleen maar te weten dat hij <code>analyze_frame</code> kan aanroepen. Dit heet <strong>Polymorfisme</strong>.
+        </p>
 
         <hr>
-        <h3>Python Voorbeeld</h3>
-
-        <h4>1. De 'slimme' Robot (in <code>robot.py</code>)</h4>
+        <h3>Stap 1: Robot Voorbereiden</h3>
+        <p>
+            Open <code>spiderpi_core/robot.py</code>. We importeren het Protocol. Daarna maken we een plekje (variabele) in de robot waar we de processor kunnen opslaan.
+        </p>
         <pre><code class="language-python"># In spiderpi_core/robot.py
-# Importeer het CONTRACT (Interface)
 from .vision import VisionProcessorProtocol
 
 class SpiderPi(RobotComponent):
-    _processor: VisionProcessorProtocol | None = None # Het 'stopcontact'
-    # ...
+    # ... (andere properties) ...
+
+    # Nieuw: Het 'stopcontact'. Kan leeg zijn (None).
+    _processor: VisionProcessorProtocol | None = None
 
     def set_vision_processor(self, processor: VisionProcessorProtocol) -> None:
-        """Stelt de actieve 'vision brain' (de 'stekker') in."""
+        """Stopt een 'stekker' (processor) in de robot."""
         self._processor = processor
+        print("Vision processor ingesteld.")</code></pre>
 
-    def stream(self) -> None:
-        """De 'slimme' stream loop."""
-        # ... (camera check)
+        <h3>Stap 2: De Stream Aanpassen</h3>
+        <p>
+            In de <code>stream()</code> methode (die we in M6.5 maakten) gaan we nu de processor gebruiken.
+        </p>
+        <p>
+            We kijken eerst of er een processor is ingesteld. Zo ja, dan laten we die het beeld bewerken.
+        </p>
+        <pre><code class="language-python">    def stream(self) -> None:
+        # ... (camera check en loop) ...
         while True:
             frame = self._camera.get_frame()
             if frame is None: break
 
-            # --- POLYMORFISME ---
+            # --- HIER GEBEURT DE MAGIE ---
             if self._processor:
-                # We weten niet welke het is, en het boeit niet!
+                # De robot vraagt de processor om het beeld te bewerken.
+                # Het maakt de robot niet uit WAT voor processor het is!
                 processed_frame = self._processor.analyze_frame(frame)
             else:
-                processed_frame = frame # Geen processor? Toon origineel.
+                # Geen processor? Toon gewoon het origineel
+                processed_frame = frame
 
             cv2.imshow("SpiderPi Stream", processed_frame)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-        cv2.destroyAllWindows()
-</code></pre>
+            # ... (waitKey en break)</code></pre>
 
-        <h4>2. De 'Router' (in <code>main.py</code>)</h4>
+        <h3>Stap 3: Kiezen in Main</h3>
+        <p>
+            Nu kunnen we in <code>main.py</code> heel makkelijk wisselen van functionaliteit. We kiezen een processor en geven die aan de robot.
+        </p>
         <pre><code class="language-python"># In main.py
-from spiderpi_core.robot import SpiderPi
-from spiderpi_core.vision import (
-    FaceDetector, ColorDetector, LineFollowProcessor
-)
+from spiderpi_core.vision import FaceDetector
 
-# ... (argparse setup voor --detector) ...
-args = parser.parse_args()
 my_robot = SpiderPi()
-processor = None # Default
 
-# --- De 'Processor Factory' ---
-if args.detector == "face":
-    processor = FaceDetector("haarcascade_frontalface_default.xml")
-elif args.detector == "color":
-    processor = ColorDetector(LOWER_RED, UPPER_RED)
-elif args.detector == "line":
-    processor = LineFollowProcessor(LOWER_LINE, UPPER_LINE)
+# We kiezen vandaag voor de FaceDetector
+# (Zorg dat je het XML bestand hebt!)
+processor = FaceDetector("haarcascade_frontalface_default.xml")
 
-# --- De Koppeling ---
-if processor:
-    my_robot.set_vision_processor(processor)  # Stop de 'stekker' erin
+# Koppel hem aan de robot
+my_robot.set_vision_processor(processor)
 
-# --- De Actie ---
-if args.action == "stream":
-    my_robot.stream() # De robot regelt de rest!
-</code></pre>
+# Start de stream. Je ziet nu vierkantjes om gezichten!
+my_robot.stream()</code></pre>
 
     </main>
 </div>

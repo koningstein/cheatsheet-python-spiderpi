@@ -15,7 +15,7 @@
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
             <a href="m4-2.html">« M4.2: Overerving</a>
-            <a href="m4-4.html">M4.4: Ouder-methode »</a>
+            <a href="m4-4.html">M4.4: Parent-methode »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -40,7 +40,7 @@
     <div class="header-nav-block">
         <header>
             <h1>Module 4: Overerving & Polymorfisme</h1>
-            <p>De "IS EEN" relatie. Ouders, kinderen, en gedrag overschrijven.</p>
+            <p>De "IS EEN" relatie. Parent classes, Child classes, en gedrag overschrijven.</p>
         </header>
         <nav>
             <ul>
@@ -59,43 +59,60 @@
     <main>
         <h2>M4.3: <code>super()</code> Gebruiken</h2>
 
-        <h3>Theorie: De Ouder Constructor Aanroepen</h3>
+        <h3>Uitleg: De Parent Bellen</h3>
         <p>
-            <strong>Probleem:</strong> We crashten in Les 4.2. Waarom?
-            Wanneer een 'kind'-klasse (<code>Servo</code>) zijn *eigen* <code>__init__</code> definieert, "vervangt" (override) het de <code>__init__</code> van de 'ouder' (<code>RobotComponent</code>). De <code>__init__</code> van de ouder (die de <code>name</code> instelt) wordt dus *nooit* aangeroepen.
+            We crashten in de vorige les omdat de Parent class niet werd geïnitialiseerd.
+            Wanneer een <strong>Child class</strong> (<code>Servo</code>) zijn <em>eigen</em> <code>__init__</code> heeft, wordt de <code>__init__</code> van de <strong>Parent class</strong> (<code>RobotComponent</code>) genegeerd.
         </p>
         <p>
-            <strong>Oplossing:</strong> We moeten de <code>__init__</code> van het kind *ook* de <code>__init__</code> van de ouder laten aanroepen. Dit doen we met <code>super()</code>.
+            <strong>De Oplossing:</strong> We moeten de <code>__init__</code> van het Child <em>ook</em> de <code>__init__</code> van de Parent laten aanroepen. Dit doen we met de functie <strong><code>super()</code></strong>.
         </p>
-        <p><code>super()</code> verwijst naar de "ouder-klasse". <code>super().__init__(...)</code> roept de constructor van de ouder aan.</p>
+        <p>
+            <code>super()</code> betekent letterlijk: "mijn Parent class".
+        </p>
 
         <hr>
-        <h3>Python Voorbeeld (`servo.py`)</h3>
-        <p>We repareren de <code>__init__</code> in <code>Servo</code> (en ook in <code>Leg</code> en <code>SpiderPi</code>).</p>
-        <pre><code class="language-python">from .component import RobotComponent
+        <h3>Stap 1: Servo Repareren</h3>
+        <p>
+            In <code>servo.py</code> voegen we de <code>super()</code> aanroep toe. We moeten een naam bedenken voor de servo (bv. <code>Servo_1</code>).
+        </p>
 
-class Servo(RobotComponent):
+        <pre><code class="language-python"># In spiderpi_core/servo.py
 
     def __init__(self, start_id: int, start_angle: float) -> None:
 
-        # 1. Roep EERST de __init__ van de OUDER aan
-        # We geven het een logische naam
+        # 1. Roep EERST de __init__ van de PARENT aan
+        # We geven het een logische naam (bv. "Servo_1")
         super().__init__(name=f"Servo_{start_id}")
 
-        # 2. Doe DAN je eigen kind-specifieke dingen
+        # 2. Doe DAN je eigen child-specifieke dingen
         self._id = start_id
-        self._current_angle = start_angle
-        print(f"Servo {self.name} specifiek geïnitialiseerd.")
+        self.set_angle(start_angle)</code></pre>
 
-    # ... (rest van de Servo klasse)
+        <h3>Stap 2: Leg Repareren</h3>
+        <p>
+            Hetzelfde doen we voor <code>leg.py</code>.
+        </p>
 
-# --- In main.py ---
-# (Nadat je dit ook voor Leg en SpiderPi hebt gedaan)
-# my_robot = SpiderPi()
-# print(f"De naam van de poot is: {my_robot.leg_front_r.name}")
-# Output: De naam van de poot is: Leg_1_2_3
-# (Het bewijs dat de 'name' property is geërfd én ingesteld!)</code></pre>
+        <pre><code class="language-python"># In spiderpi_core/leg.py
 
+    def __init__(self, id_hip: int, id_knee: int, id_ankle: int) -> None:
+        # 1. Parent aanroepen
+        super().__init__(name=f"Leg_{id_hip}_{id_knee}_{id_ankle}")
+
+        # 2. Eigen dingen doen
+        self._hip_servo = Servo(start_id=id_hip, start_angle=90.0)
+        # ... (rest van de init)</code></pre>
+
+        <h3>Stap 3: Testen</h3>
+        <p>
+            Als je nu <code>main.py</code> draait, werkt alles weer! En je zult in de output zien dat de Parent class ook zijn werk doet.
+        </p>
+        <pre><code class="language-text">Component 'Servo_1' initialized.
+Component 'Leg_1_2_3' initialized.</code></pre>
+        <p>
+            Je ziet nu twee berichten: eentje van de Parent (Component...) en eentje van het Child (indien aanwezig).
+        </p>
     </main>
 </div>
 

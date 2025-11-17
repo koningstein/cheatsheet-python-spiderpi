@@ -14,7 +14,7 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m8-6.html">« M8.6: AI Logica (Gebaar)</a>
+            <a href="m8-6.html">« M8.6: AI Gebaar</a>
             <a href="m8-8.html">M8.8: Eindopdracht »</a>
         </div>
         <div class="nav-group theme-switcher">
@@ -39,18 +39,18 @@
 
     <div class="header-nav-block">
         <header>
-            <h1>Module 8: Integratie & Eindopdracht</h1>
-            <p>Alles samenbrengen in een 'Sense-Think-Act' loop.</p>
+            <h1>Module 8: Integratie & Sturing</h1>
+            <p>Vision en gedrag samenbrengen.</p>
         </header>
         <nav>
             <ul>
-                <li><a href="m8-1.html">M8.1: Integratie (Stop op Rood)</a></li>
-                <li><a href="m8-2.html">M8.2: Sturing (Lijnvolgen)</a></li>
-                <li><a href="m8-3.html">M8.3: Integratie (Gezicht Volgen)</a></li>
-                <li><a href="m8-4.html">M8.4: Integratie (Gebaar Actie)</a></li>
-                <li><a href="m8-5.html">M8.5: AI Logica (Gezicht)</a></li>
-                <li><a href="m8-6.html">M8.6: AI Logica (Gebaar)</a></li>
-                <li><a href="m8-7.html" class="active">M8.7: Code Kwaliteit</a></li>
+                <li><a href="m8-1.html">M8.1: Stop op Rood</a></li>
+                <li><a href="m8-2.html">M8.2: Lijnvolgen</a></li>
+                <li><a href="m8-3.html">M8.3: Gezicht Volgen</a></li>
+                <li><a href="m8-4.html">M8.4: Gebaar Actie</a></li>
+                <li><a href="m8-5.html">M8.5: AI Gezicht</a></li>
+                <li><a href="m8-6.html">M8.6: AI Gebaar</a></li>
+                <li><a href="m8-7.html" class="active">M8.7: Kwaliteit</a></li>
                 <li><a href="m8-8.html">M8.8: Eindopdracht</a></li>
             </ul>
         </nav>
@@ -59,47 +59,53 @@
     <main>
         <h2>M8.7: Code Kwaliteit (Refactoring)</h2>
 
-        <h3>Theorie: De Grote Schoonmaak</h3>
+        <h3>Uitleg: Opruimen</h3>
         <p>
-            Dit is een *herhaling* van <strong>Linting</strong> (M3.8) [cite: 245-246] en de introductie van een <strong>Formatter</strong> (<code>black</code>).
+            Onze <code>main.py</code> bestanden zijn nu vaak een rommeltje met lange <code>while True</code> loops.
+            Voordat we aan het eindproject beginnen, gaan we opruimen. Dit heet <strong>Refactoring</strong>.
         </p>
-        <p>
-            We hebben M6 en M7 [cite: 251-254] er snel 'bijgebouwd'. Er zitten nu waarschijnlijk 'unused imports', 'lines too long', en inconsistent witgebruik in.
-        </p>
-        <ul>
-            <li><strong>Formatter (<code>black</code>):</strong> <em>Repareert</em> automatisch alle *stijl*-fouten (witregels, komma's, regel-afbreking).</li>
-            <li><strong>Linter (<code>pylint</code>):</strong> <em>Klaagt</em> over *logische* fouten (bv. <code>W0611: Unused import cv2</code>) en conventies.</li>
-        </ul>
 
         <hr>
-        <h3>Python Voorbeeld (Terminal)</h3>
-        <p>De opdracht is om de code-score van het project te verhogen.</p>
+        <h3>Stap 1: De Controller Klasse</h3>
+        <p>
+            In plaats van losse code in <code>main.py</code>, maken we een klasse die het gedrag beheert.
+            Maak <code>spiderpi_core/controller.py</code>.
+        </p>
 
-        <pre><code class="language-bash"># 1. Installeer de Formatter (in je venv)
-(venv) C:\...&gt; pip install black
+        <pre><code class="language-python">class RobotController:
+    def __init__(self, robot):
+        self.robot = robot
+        self.is_running = True
 
-# 2. Update je 'recept'
-(venv) C:\...&gt; pip freeze > requirements.txt
+    def run(self):
+        """De hoofdloop van de applicatie."""
+        print("Controller gestart.")
+        try:
+            while self.is_running:
+                self.update()
+        except KeyboardInterrupt:
+            print("Gestopt.")
 
-# 3. Draai 'black' (de Formatter)
-#    De '.' betekent 'formatteer alles in deze map'
-(venv) C:\...&gt; black .
-# Output:
-# reformatted spiderpi_core\vision.py
-# reformatted spiderpi_core\robot.py
-# All done!
+    def update(self):
+        """Eén 'tick' van de logica."""
+        pass # Dit overschrijf je in subklassen</code></pre>
 
-# 4. Draai 'pylint' (de Linter) (herhaling M3.8)
-(venv) C:\...&gt; pylint spiderpi_core
+        <h3>Stap 2: Schone Main</h3>
+        <p>
+            Je <code>main.py</code> wordt nu super simpel.
+        </p>
 
-# 5. Bekijk de output en los handmatig de 'Warnings' op.
-#    BV: "W0611: Unused import time" in robot.py
-#    Oplossing: Open robot.py en verwijder de 'import time' regel.
+        <pre><code class="language-python">from spiderpi_core.robot import SpiderPi
+from my_smart_controller import SmartController
 
-# 6. Draai 'pylint' opnieuw
-(venv) C:\...&gt; pylint spiderpi_core
-# ...
-# Your code has been rated at 9.50/10 (hogere score!)</code></pre>
+robot = SpiderPi()
+app = SmartController(robot)
+app.run()</code></pre>
+
+        <h3>Uitleg: Waarom?</h3>
+        <p>
+            Door de loop in een klasse te stoppen, kun je makkelijker variabelen (zoals <code>state</code>) bijhouden en methoden maken voor specifieke taken.
+        </p>
 
     </main>
 </div>

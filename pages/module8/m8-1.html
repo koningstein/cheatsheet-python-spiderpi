@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>M8.1: Integratie (Stop op Rood)</title>
-
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="../../script.js" defer></script>
@@ -15,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="../module7/m7-8.html">« M7.8: Testing (Detectors)</a>
-            <a href="m8-2.html">M8.2: Sturing (Lijnvolgen) »</a>
+            <a href="../module7/m7-8.html">« M7: Interfaces</a>
+            <a href="m8-2.html">M8.2: Lijnvolgen »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -40,18 +39,18 @@
 
     <div class="header-nav-block">
         <header>
-            <h1>Module 8: Integratie & Eindopdracht</h1>
-            <p>Alles samenbrengen in een 'Sense-Think-Act' loop.</p>
+            <h1>Module 8: Integratie & Sturing</h1>
+            <p>Vision en gedrag samenbrengen.</p>
         </header>
         <nav>
             <ul>
-                <li><a href="m8-1.html" class="active">M8.1: Integratie (Stop op Rood)</a></li>
-                <li><a href="m8-2.html">M8.2: Sturing (Lijnvolgen)</a></li>
-                <li><a href="m8-3.html">M8.3: Integratie (Gezicht Volgen)</a></li>
-                <li><a href="m8-4.html">M8.4: Integratie (Gebaar Actie)</a></li>
-                <li><a href="m8-5.html">M8.5: AI Logica (Gezicht)</a></li>
-                <li><a href="m8-6.html">M8.6: AI Logica (Gebaar)</a></li>
-                <li><a href="m8-7.html">M8.7: Code Kwaliteit</a></li>
+                <li><a href="m8-1.html" class="active">M8.1: Stop op Rood</a></li>
+                <li><a href="m8-2.html">M8.2: Lijnvolgen</a></li>
+                <li><a href="m8-3.html">M8.3: Gezicht Volgen</a></li>
+                <li><a href="m8-4.html">M8.4: Gebaar Actie</a></li>
+                <li><a href="m8-5.html">M8.5: AI Gezicht</a></li>
+                <li><a href="m8-6.html">M8.6: AI Gebaar</a></li>
+                <li><a href="m8-7.html">M8.7: Kwaliteit</a></li>
                 <li><a href="m8-8.html">M8.8: Eindopdracht</a></li>
             </ul>
         </nav>
@@ -60,65 +59,70 @@
     <main>
         <h2>M8.1: Integratie (Stop op Rood)</h2>
 
-        <h3>Theorie: De 'Sense-Think-Act' Loop</h3>
+        <h3>Uitleg: De Reflex</h3>
         <p>
-            Dit is de meest fundamentele loop in robotica. We combineren concepten uit eerdere modules tot één werkend geheel.
+            We beginnen met een simpele reflex: "Als ik rood zie, stop ik meteen."
+            We gebruiken hiervoor de <code>ColorVisionSensor</code> uit Module 7.
         </p>
-        <ol>
-            <li><strong>Sense (Zien):</strong> We gebruiken de <code>ColorVisionSensor</code> (M7.7) [cite: 253-254] om een *getal* (aantal pixels) te lezen.</li>
-            <li><strong>Think (Denken):</strong> We gebruiken een simpele <code>if</code>-statement om dat getal te vergelijken met een drempel (threshold).</li>
-            <li><strong>Act (Doen):</strong> We roepen een <code>AbstractRobotAction</code> (M5.3) [cite: 249-250] aan om de robot te laten reageren.</li>
-        </ol>
         <p>
-            We bouwen een <code>while</code>-loop in <code>main.py</code> die de robot een actie laat uitvoeren (bv. zwaaien) *totdat* hij 'rood' ziet, en dan stopt.
+            We maken een nieuw bestand <code>main_reflex.py</code>. Eerst importeren we alles en maken we de robot.
         </p>
 
-        <hr>
-        <h3>Python Voorbeeld (`main.py`)</h3>
-        <p>We bouwen een script dat stopt zodra het 'rood' ziet.</p>
-
-        <pre><code class="language-python"># In main.py
-import numpy as np
+        <pre><code class="language-python"># main_reflex.py
 import time
+import numpy as np
 from spiderpi_core.robot import SpiderPi
-from spiderpi_core.camera import Camera
 from spiderpi_core.sensors import ColorVisionSensor
-from spiderpi_core.actions import WaveAction # (Uit M5.4)
+from spiderpi_core.actions import WalkAction
 
-# --- 1. Sense (Setup) ---
-# Definieer de grenzen voor rood (herhaling van M7)
+# 1. Maak de robot
+my_robot = SpiderPi()</code></pre>
+
+        <h3>Uitleg: De Sensor Instellen</h3>
+        <p>
+            Nu maken we de "rode" sensor aan. We vertellen hem welke kleur hij moet zoeken (HSV).
+        </p>
+
+        <pre><code class="language-python"># 2. Definieer Rood (HSV)
 LOWER_RED = np.array([0, 120, 70])
 UPPER_RED = np.array([10, 255, 255])
-# De 'drempel': hoeveel rode pixels telt als 'stop'
-RED_THRESHOLD = 5000
 
-# --- 3. Act (Setup) ---
-my_robot = SpiderPi()
-wave_action = WaveAction(my_robot)
-# We hebben de camera nodig voor de sensor
-cam = Camera()
-red_sensor = ColorVisionSensor(cam, LOWER_RED, UPPER_RED)
+# 3. Maak de sensor (gekoppeld aan de camera)
+red_sensor = ColorVisionSensor(my_robot.camera, LOWER_RED, UPPER_RED)
 
-print("Starten... Hou iets roods voor de camera om te stoppen.")
+# 4. Maak een actie (om te testen)
+walker = WalkAction(my_robot)</code></pre>
 
-# --- De Sense-Think-Act Loop ---
-while True:
-    # 1. Sense
-    pixel_count = red_sensor.read_value()
-    print(f"Rode pixels: {pixel_count}")
+        <h3>Uitleg: De Loop</h3>
+        <p>
+            Nu maken we de "hersenen". Een oneindige loop die kijkt en beslist.
+        </p>
 
-    # 2. Think
-    if pixel_count > RED_THRESHOLD:
-        print("ROOD GEDETECTEERD! Stoppen.")
-        break # Stopt de while-loop
+        <pre><code class="language-python">print("Reflex test gestart. Ctrl+C om te stoppen.")
+try:
+    while True:
+        # A. Waarnemen (Sense)
+        pixels = red_sensor.read_value()
+        print(f"Rood niveau: {pixels}")
 
-    # 3. Act (als 'Think' niet stopt)
-    print("Actie: Zwaaien... (geen rood gezien)")
-    wave_action.execute()
+        # B. Beslissen (Think)
+        if pixels > 5000:
+            # C. Doen (Act) - STOP
+            print("STOP! Gevaar!")
+            # my_robot.stop()
+        else:
+            # C. Doen (Act) - GA
+            print("Veilig. Lopen...")
+            walker.execute()
 
-    time.sleep(1) # Wacht 1 seconde
+        time.sleep(0.1)
+except KeyboardInterrupt:
+    print("Gestopt.")</code></pre>
 
-print("Programma gestopt.")</code></pre>
+        <h3>Uitleg: Resultaat</h3>
+        <p>
+            Als je dit script draait en iets roods voor de camera houdt, zie je de tekst veranderen. De robot reageert op zijn omgeving!
+        </p>
 
     </main>
 </div>

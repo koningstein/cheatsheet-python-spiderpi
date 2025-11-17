@@ -14,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m5-6.html">« M5.6: Unit Testing</a>
-            <a href="m5-8.html">M5.8: Class Variables »</a>
+            <a href="../module4/m4-1.html">« M4: Overerving</a>
+            <a href="../module6/m6-1.html">M6: Vision »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -59,43 +59,51 @@
     <main>
         <h2>M5.7: Static Methoden</h2>
 
-        <h3>Theorie: 'Hulpfuncties' van de Klasse</h3>
+        <h3>Uitleg: Hulpfuncties</h3>
         <p>
-            Tot nu toe was alles van het *object* (de *instance*). Alle methoden begonnen met <code>self</code> omdat ze de data van het object nodig hadden (<code>self._id</code>, etc.).
+            Tot nu toe was alles van het *object* (de *instance*). Alle methoden begonnen met <code>self</code>.
         </p>
         <p>
-            Een <strong>Static Method</strong> is een gewone functie die "toevallig" *in* een klasse woont (omdat het daar logisch bij hoort). Het heeft <strong>geen <code>self</code></strong> (object) nodig.
+            Soms heb je een functie nodig die wel bij de klasse hoort, maar <strong>geen object-data nodig heeft</strong>.
         </p>
         <p>
-            Je roept ze aan op de *Klasse*, niet op het *object*.
+            Dit is een <strong>Static Method</strong>. Je herkent hem aan <code>@staticmethod</code> en hij heeft <strong>GEEN <code>self</code></strong>.
         </p>
-        <ul>
-            <li><strong>Vergelijking (Wiskunde):</strong> Je hebt geen 'wiskunde-object' nodig om <code>Math.sqrt(9)</code> (worteltrekken) te doen.</li>
-            <li><strong>SpiderPi:</strong> We hebben misschien een hulpfunctie nodig: <code>RobotUtils.cm_naar_inches(10)</code>. </li>
-        </ul>
+        <p>
+            <strong>Vergelijking (Wiskunde):</strong> Je hebt geen 'wiskunde-object' nodig om wortel te trekken.
+        </p>
 
         <hr>
-        <h3>Python Voorbeeld (`utils.py`)</h3>
-        <p>We maken een nieuw bestand <code>spiderpi_core/utils.py</code>.</p>
+        <h3>Stap 1: Utils Klasse Maken</h3>
+        <p>
+            We maken een bestand <code>spiderpi_core/utils.py</code> voor handige rekenfuncties.
+        </p>
+
         <pre><code class="language-python"># In spiderpi_core/utils.py
+
 class RobotUtils:
     """Een 'hulp-klasse' die geen objecten (instances) nodig heeft."""
 
-    # Static Method (GEEN 'self' parameter)
+    # Static Method (GEEN 'self' parameter!)
     @staticmethod
-    def cm_naar_inches(cm: float) -> float:
+    def cm_to_inches(cm: float) -> float:
         """Zet centimeters om naar inches."""
-        return cm * 0.393701
+        return cm * 0.393701</code></pre>
 
-# --- In main.py ---
+        <h3>Stap 2: Gebruiken</h3>
+        <p>
+            Je roept een statische methode aan op de <strong>Klasse</strong>, niet op een object.
+        </p>
+
+        <pre><code class="language-python"># In main.py
 from spiderpi_core.utils import RobotUtils
 
-# Je hoeft GEEN object te maken:
+# Je hoeft GEEN object te maken (geen haakjes):
 # utils = RobotUtils() # NIET NODIG
 
 # Roep direct aan op de Klasse:
-inches = RobotUtils.cm_naar_inches(20.5)
-print(f"20.5 cm is {inches} inches")</code></pre>
+inches = RobotUtils.cm_to_inches(20.5)
+print(f"20.5 cm is {inches:.2f} inches")</code></pre>
 
     </main>
 </div>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M7.5: Implementatie (Gebarenherkenning)</title>
+    <title>M7.5: Implementatie (Gebaar)</title>
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="../../script.js" defer></script>
@@ -14,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m7-4.html">« M7.4: Implementatie (Gezicht)</a>
-            <a href="m7-6.html">M7.6: Poly-koppeling »</a>
+            <a href="../module6/m6-1.html">« M6: Vision</a>
+            <a href="../module8/m8-1.html">M8: Integratie »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -59,69 +59,58 @@
     <main>
         <h2>M7.5: Implementatie (Gebarenherkenning)</h2>
 
-        <h3>Theorie: Vormen Vinden (Contours)</h3>
+        <h3>Uitleg: Vormen Vinden</h3>
         <p>
-            <strong>Probleem:</strong> Hoe detecteer je een "open hand"? Het heeft geen vaste kleur (zoals de lijn) of vaste vorm (zoals een gezicht).
+            De laatste processor is de <code>GestureDetector</code>. We willen een simpel gebaar herkennen, bijvoorbeeld iemand die zijn hand voor de lens houdt.
         </p>
         <p>
-            <strong>Oplossing:</strong> We zoeken naar *vormen* (contouren). We implementeren een *vierde* processor die het <code>analyze_frame</code> contract volgt.
+            Een hand heeft geen vaste kleur en vorm. Daarom gebruiken we een andere techniek:
+            1. Maak het beeld extreem contrastrijk (alles is zwart of wit). Dit heet <strong>Thresholding</strong>.
+            2. Zoek de omtreklijnen van alle witte vlakken. Dit heten <strong>Contours</strong>.
+            3. Als een vlak heel groot is, tekenen we er een lijn omheen.
         </p>
-        <p><strong>Logica (Simpel):</strong></p>
-        <ol>
-            <li>Maak het beeld *extreem* contrastrijk (binair: alleen zwart of wit). Dit heet <strong>Thresholding</strong>.</li>
-            <li>Vraag <code>OpenCV</code> om *alle* vormen (omtrekken) te vinden: <code>cv2.findContours()</code>.</li>
-            <li>Vind de *grootste* vorm (contour) in de lijst.</li>
-            <li>Kijk naar de *oppervlakte* (<code>cv2.contourArea()</code>). Als de oppervlakte > 5000 (een 'magic number'), gaan we ervan uit dat het een gebaar is.</li>
-            <li>Teken die grootste vorm op het *originele* beeld.</li>
-            <li>Geef het *originele* beeld terug.</li>
-        </ol>
 
         <hr>
-        <h3>Python Voorbeeld (`vision.py`)</h3>
-        <p>We voegen een *vierde* implementatie toe aan <code>vision.py</code>.</p>
+        <h3>Stap 1: Thresholding (Contrast)</h3>
+        <p>
+            Eerst maken we het beeld grijswaarden. Daarna gebruiken we <code>cv2.threshold</code> om alles wat donkerder is dan een bepaalde waarde zwart te maken, en de rest wit.
+        </p>
 
-        <pre><code class="language-python"># In spiderpi_core/vision.py
-# ... (FaceDetector) ...
-
-class GestureDetector:
-    """Een vierde 'stekker'. Detecteert grote vormen/gebaren."""
-
+        <pre><code class="language-python">class GestureDetector:
+    """Detecteert grote vormen/gebaren."""
     _min_area: int
 
     def __init__(self, min_area: int = 5000):
+        # We zoeken alleen vormen die groter zijn dan 5000 pixels
         self._min_area = min_area
 
     def analyze_frame(self, frame: np.ndarray) -> np.ndarray:
-        """
-        Implementeert het protocol.
-        Vindt grote 'contouren' (bv. een hand).
-        """
-        # 1. Converteer en filter (Threshold)
+        # 1. Maak zwart-wit en vervaag een beetje (tegen ruis)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         blur = cv2.GaussianBlur(gray, (5, 5), 0)
-        # 'Threshold' zet alles < 70 op Zwart (0), alles > 70 op Wit (255)
-        _, thresh = cv2.threshold(blur, 70, 255, cv2.THRESH_BINARY_INV)
 
-        # 2. Vind vormen
+        # 2. Threshold: Maak extreem contrast
+        # Alles lichter dan 70 wordt zwart, de rest wit (Inverse)
+        _, thresh = cv2.threshold(blur, 70, 255, cv2.THRESH_BINARY_INV)</code></pre>
+
+        <h3>Stap 2: Contouren Vinden en Tekenen</h3>
+        <p>
+            Nu vragen we OpenCV om alle vormen in dat zwart-wit beeld te vinden. We zoeken de grootste uit en kijken of hij groot genoeg is.
+        </p>
+
+        <pre><code class="language-python">        # 3. Vind alle vormen (contours)
         contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-        if contours: # Als er vormen zijn gevonden
-            # 3. Vind de grootste
-            biggest_contour = max(contours, key=cv2.contourArea)
+        if contours: # Als er überhaupt iets gevonden is
+            # Zoek de allergrootste vorm
+            biggest = max(contours, key=cv2.contourArea)
 
-            # 4. Check oppervlakte
-            if cv2.contourArea(biggest_contour) > self._min_area:
-                # 5. Teken de vorm
-                cv2.drawContours(frame, [biggest_contour], -1, (0, 255, 0), 3) # Groen
+            # 4. Check of hij groot genoeg is (is het een hand?)
+            if cv2.contourArea(biggest) > self._min_area:
+                # 5. Teken de vorm in groen op het originele beeld
+                cv2.drawContours(frame, [biggest], -1, (0, 255, 0), 3)
 
-        # 6. Geef frame terug
-        return frame
-</code></pre>
-        <p><strong>Testen in <code>main.py</code>:</strong></p>
-        <pre><code class="language-python"># processor = GestureDetector(min_area=10000)
-# my_robot.set_vision_processor(processor)
-# my_robot.stream()</code></pre>
-
+        return frame</code></pre>
     </main>
 </div>
 

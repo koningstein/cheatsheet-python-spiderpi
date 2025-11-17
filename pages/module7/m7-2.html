@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M7.2: Implementatie (Kleurdetector)</title>
+    <title>M7.2: Implementatie (Kleur)</title>
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="../../script.js" defer></script>
@@ -14,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m7-1.html">« M7.1: Protocol</a>
-            <a href="m7-3.html">M7.3: Implementatie (Lijn) »</a>
+            <a href="../module6/m6-1.html">« M6: Vision</a>
+            <a href="../module8/m8-1.html">M8: Integratie »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -59,56 +59,73 @@
     <main>
         <h2>M7.2: Implementatie (Kleurdetector)</h2>
 
-        <h3>Theorie: Het Contract Vervullen (Deel 1)</h3>
+        <h3>Uitleg: De Eerste Implementatie</h3>
         <p>
-            In Les 7.1 hebben we het *contract* (het 'stopcontact') gemaakt. Nu maken we de *implementatie* (de 'stekker').
+            Nu we het contract (het Protocol) hebben, gaan we onze eerste echte machine bouwen die zich aan dat contract houdt: de <strong>ColorDetector</strong>.
         </p>
         <p>
-            We maken een klasse <code>ColorDetector</code>. In Python hoef je niet expliciet <code>implements</code> te schrijven. Als jouw klasse een methode heeft die *exact* <code>analyze_frame(self, frame)</code> heet, "implementeert" het automatisch het protocol. Dit heet <strong>Duck Typing</strong>.
+            Deze klasse doet precies wat we in Module 6 hebben geleerd: hij zoekt naar een specifieke kleur (met HSV) en maakt daar een zwart-wit masker van.
         </p>
         <p>
-            We verplaatsen de logica uit Module 6 (HSV, <code>inRange</code>) [cite: 251-252] *uit* de <code>Camera</code> / <code>Robot</code> klassen en *in* deze nieuwe, gespecialiseerde klasse.
+            Het verschil is dat deze code nu netjes in zijn eigen klasse zit, los van de camera en los van de robot.
         </p>
 
         <hr>
-        <h3>Python Voorbeeld (`vision.py`)</h3>
-        <p>We voegen de <code>ColorDetector</code> klasse toe aan <code>spiderpi_core/vision.py</code>.</p>
+        <h3>Stap 1: De Klasse en Instellingen</h3>
+        <p>
+            We werken verder in <code>spiderpi_core/vision.py</code>. Voeg bovenaan <code>import cv2</code> toe.
+        </p>
+        <p>
+            De <code>ColorDetector</code> heeft instellingen nodig: naar welke kleur moet hij zoeken? Deze grenzen (<code>lower</code> en <code>upper</code>) geven we mee als we de detector aanmaken.
+        </p>
 
         <pre><code class="language-python"># In spiderpi_core/vision.py
-from typing import Protocol
-import numpy as np
 import cv2
+import numpy as np
+# ... (VisionProcessorProtocol staat hierboven) ...
 
-# ... (VisionProcessorProtocol van Les 7.1) ...
-
-class ColorDetector: # Erft *niet* (voor nu)
+class ColorDetector:
     """
-    Een concrete implementatie van een vision processor.
-    Vindt een specifieke kleur.
-    Deze klasse 'past' op het VisionProcessorProtocol.
+    Een Vision Processor die zoekt naar een specifieke kleur.
     """
     _lower_bound: np.ndarray
     _upper_bound: np.ndarray
 
     def __init__(self, lower_bound: np.ndarray, upper_bound: np.ndarray) -> None:
-        """Slaat de te zoeken kleurgrenzen op."""
+        """
+        Sla de kleur-grenzen op zodat we ze later kunnen gebruiken.
+        """
         self._lower_bound = lower_bound
-        self._upper_bound = upper_bound
+        self._upper_bound = upper_bound</code></pre>
 
-    def analyze_frame(self, frame: np.ndarray) -> np.ndarray:
+        <h3>Stap 2: Het Contract Uitvoeren</h3>
+        <p>
+            Nu komt het belangrijkste deel. Om aan het protocol te voldoen, <strong>MOETEN</strong> we een methode hebben die precies <code>analyze_frame(self, frame)</code> heet.
+        </p>
+        <p>
+            In deze methode zetten we de logica uit Module 6.6.
+        </p>
+
+        <pre><code class="language-python">    def analyze_frame(self, frame: np.ndarray) -> np.ndarray:
         """
         Implementeert het protocol.
         Vindt de kleur en geeft een 'mask' (zwart-wit) beeld terug.
         """
-        # 1. Converteer naar HSV (Logica uit M6.6)
+        # 1. Converteer het beeld naar HSV-kleuren
         hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-        # 2. Maak de 'mask'
+        # 2. Filter de kleur eruit (maak het masker)
+        #    Alles binnen de grenzen wordt wit, de rest zwart.
         mask = cv2.inRange(hsv_frame, self._lower_bound, self._upper_bound)
 
-        return mask # Geeft het zwart-wit masker terug
-</code></pre>
-        <p><strong>Testen:</strong> Je kunt <code>main.py</code> tijdelijk aanpassen om deze processor te gebruiken en <code>cv2.imshow("Mask", mask)</code> te tonen.</p>
+        # Geef het masker terug. Dit is ook een 'frame' (plaatje), dus dat mag.
+        return mask</code></pre>
+
+        <h3>Uitleg: Klaar voor Gebruik</h3>
+        <p>
+            We hebben nu een los onderdeel gemaakt: de <code>ColorDetector</code>. Je kunt hem aanmaken, instellen op "Rood", en vervolgens elk plaatje dat je hem geeft laten analyseren. Hij weet niets van de robot, en dat maakt hem heel flexibel.
+        </p>
+
     </main>
 </div>
 

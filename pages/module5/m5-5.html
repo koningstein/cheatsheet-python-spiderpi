@@ -14,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m5-4.html">« M5.4: Implementatie (Complex)</a>
-            <a href="m5-6.html">M5.6: Unit Testing »</a>
+            <a href="../module4/m4-1.html">« M4: Overerving</a>
+            <a href="../module6/m6-1.html">M6: Vision »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -59,19 +59,19 @@
     <main>
         <h2>M5.5: Abstractie voor Sensoren</h2>
 
-        <h3>Theorie: Een Contract voor Data</h3>
+        <h3>Uitleg: Een Contract voor Data</h3>
         <p>
-            Dit is een <em>herhaling</em> van het abstractie-concept (M5.1 & M5.2), maar nu toegepast op een nieuw domein: <strong>Sensoren</strong>.
+            We passen hetzelfde trucje (Abstractie) nu toe op een ander onderdeel: <strong>Sensoren</strong>.
         </p>
         <p>
-            <strong>Probleem:</strong> Een Ultrasoon-sensor geeft *afstand in cm*. Een Temperatuur-sensor geeft *graden Celsius*. Ze lijken verschillend, maar ze doen conceptueel hetzelfde: ze <strong>lezen een waarde</strong>.
+            Elke sensor is anders. Een Ultrasoon-sensor meet afstand, een Temperatuur-sensor meet graden. Maar ze doen allemaal hetzelfde: ze <strong>lezen een waarde</strong>.
         </p>
         <p>
-            <strong>Oplossing:</strong> We maken een <code>AbstractSensor</code> contract (ABC) dat *eist* dat elke sensor die we op de robot aansluiten, een <code>.read_value()</code> methode heeft.
+            We maken een <code>AbstractSensor</code> contract (ABC) dat <em>eist</em> dat elke sensor een <code>.read_value()</code> methode heeft.
         </p>
 
         <hr>
-        <h3>Python Voorbeeld (`sensors.py`)</h3>
+        <h3>Stap 1: AbstractSensor Maken</h3>
         <p>We maken een nieuw bestand <code>spiderpi_core/sensors.py</code>.</p>
 
         <pre><code class="language-python"># In spiderpi_core/sensors.py
@@ -80,34 +80,38 @@ from abc import ABC, abstractmethod
 class AbstractSensor(ABC):
     """
     Contract voor alle sensoren.
-    Elke sensor MOET een waarde kunnen lezen.
     """
 
     @abstractmethod
     def read_value(self) -> float:
         """
         Leest de waarde van de sensor.
-
-        Returns:
-            float: De gemeten waarde (bv. cm, graden, etc.)
+        MOET een getal (float) teruggeven.
         """
-        pass
+        pass</code></pre>
 
-# --- Concrete implementatie (om te testen) ---
+        <h3>Stap 2: Een 'Mock' (Nep) Sensor Maken</h3>
+        <p>
+            Omdat we misschien nog geen echte sensor hebben, maken we een <strong>Mock</strong> (nep) sensor om te testen.
+        </p>
+
+        <pre><code class="language-python"># Ook in spiderpi_core/sensors.py
+
 class MockUltrasonicSensor(AbstractSensor):
     """Een neppe sensor voor test-doeleinden."""
 
     def read_value(self) -> float:
         """Implementeert het contract. Geeft een neppe waarde terug."""
-        print("Ultrasoon sensor leest...")
-        return 10.5 # Gesimuleerde afstand
+        print("Reading ultrasonic sensor...")
+        return 10.5 # Gesimuleerde afstand</code></pre>
 
-# --- In main.py ---
-# from spiderpi_core.sensors import MockUltrasonicSensor
-# us_sensor = MockUltrasonicSensor()
-# afstand = us_sensor.read_value()
-# print(f"Afstand is: {afstand}") # Output: 10.5</code></pre>
+        <h3>Stap 3: Testen</h3>
+        <pre><code class="language-python"># In main.py
+from spiderpi_core.sensors import MockUltrasonicSensor
 
+sensor = MockUltrasonicSensor()
+distance = sensor.read_value()
+print(f"Distance: {distance} cm")</code></pre>
     </main>
 </div>
 

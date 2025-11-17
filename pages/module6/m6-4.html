@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M6.4: Integratie (SpiderPi Compositie)</title>
+    <title>M6.4: Integratie Camera</title>
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="../../script.js" defer></script>
@@ -14,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m6-3.html">« M6.3: .get_frame()</a>
-            <a href="m6-5.html">M6.5: Videostream CLI »</a>
+            <a href="../module5/m5-8.html">« M5: Abstractie</a>
+            <a href="../module7/m7-1.html">M7: Interfaces »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -59,55 +59,53 @@
     <main>
         <h2>M6.4: Integratie (SpiderPi Compositie)</h2>
 
-        <h3>Theorie: De Ogen in de Robot Zetten</h3>
+        <h3>Uitleg: De Ogen in de Robot Zetten</h3>
         <p>
-            We hebben nu twee losse "hoofd-objecten":
-            <code>my_robot = SpiderPi()</code> en <code>cam = Camera()</code>.
+            We hebben nu een <code>Camera</code> klasse. Maar de camera zweeft nog los rond. De camera is <em>onderdeel</em> van de robot.
         </p>
         <p>
-            Dit is niet logisch. De camera is <em>onderdeel</em> van de robot.
             De relatie is: Een <code>SpiderPi</code> <em>HEEFT EEN</em> <code>Camera</code>.
         </p>
         <p>
-            Dit is <strong>Compositie</strong> (herhaling van M1.8 en M1.10). [cite: 247-248] We passen de <code>__init__</code> van <code>SpiderPi</code> aan zodat deze *automatisch* een <code>Camera</code>-object aanmaakt en beheert.
+            Dit is weer <strong>Compositie</strong> (zoals de poten). We passen de <code>SpiderPi</code> klasse aan zodat hij automatisch een camera aanmaakt bij het opstarten.
         </p>
 
         <hr>
-        <h3>Python Voorbeeld (`robot.py`)</h3>
-        <p>We passen <code>robot.py</code> aan om de <code>Camera</code> te 'bevatten'.</p>
+        <h3>Stap 1: Robot aanpassen</h3>
+        <p>
+            Open <code>spiderpi_core/robot.py</code>. We importeren de Camera en voegen hem toe aan de <code>__init__</code>.
+        </p>
 
         <pre><code class="language-python"># In spiderpi_core/robot.py
 from .leg import Leg
 from .component import RobotComponent
-from .camera import Camera # Stap 1: Importeer de Camera
-import cv2 # Nodig voor de IOError
+from .camera import Camera # IMPORTEREN
+import cv2
 
 class SpiderPi(RobotComponent):
-    # ... (alle _leg... properties)
-    _camera: Camera | None # Stap 2: Voeg de property type hint toe
+    # ... (andere properties)
+    _camera: Camera | None # Type Hint (kan None zijn als hij stuk is)
 
     def __init__(self) -> None:
         super().__init__(name="SpiderPi_Robot")
-        # ... (alle 6 de poten aanmaken) ...
+        # ... (poten aanmaken) ...
 
-        # Stap 3: Maak het Camera object (met foutafhandeling)
+        # COMPOSITIE: Maak de Camera
         try:
             self._camera = Camera()
         except (IOError, cv2.error) as e:
             print(f"WAARSCHUWING: Kon camera niet starten: {e}")
-            self._camera = None # Robot werkt door, maar zonder camera
+            self._camera = None # We gaan door zonder camera
 
-    # Stap 4: Maak een 'getter'
+    # Een getter om erbij te kunnen
     @property
     def camera(self) -> Camera | None:
-        return self._camera
+        return self._camera</code></pre>
 
-# --- In main.py (om te testen) ---
-# my_robot = SpiderPi() # Maakt nu ook de camera aan
-# if my_robot.camera:
-#     frame = my_robot.camera.get_frame()
-#     if frame is not None:
-#         print("Test geslaagd: Frame gelezen *via de robot*.")</code></pre>
+        <h3>Uitleg: Wat hebben we nu?</h3>
+        <p>
+            Als we nu <code>my_robot = SpiderPi()</code> doen, wordt automatisch de camera gestart. Als de camera niet werkt (bijvoorbeeld niet aangesloten), crasht de robot niet, maar geeft hij een waarschuwing.
+        </p>
 
     </main>
 </div>

@@ -14,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m8-3.html">« M8.3: Integratie (Gezicht)</a>
-            <a href="m8-5.html">M8.5: AI Logica (Gezicht) »</a>
+            <a href="m8-3.html">« M8.3: Gezicht Volgen</a>
+            <a href="m8-5.html">M8.5: AI Gezicht »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -39,18 +39,18 @@
 
     <div class="header-nav-block">
         <header>
-            <h1>Module 8: Integratie & Eindopdracht</h1>
-            <p>Alles samenbrengen in een 'Sense-Think-Act' loop.</p>
+            <h1>Module 8: Integratie & Sturing</h1>
+            <p>Vision en gedrag samenbrengen.</p>
         </header>
         <nav>
             <ul>
-                <li><a href="m8-1.html">M8.1: Integratie (Stop op Rood)</a></li>
-                <li><a href="m8-2.html">M8.2: Sturing (Lijnvolgen)</a></li>
-                <li><a href="m8-3.html">M8.3: Integratie (Gezicht Volgen)</a></li>
-                <li><a href="m8-4.html" class="active">M8.4: Integratie (Gebaar Actie)</a></li>
-                <li><a href="m8-5.html">M8.5: AI Logica (Gezicht)</a></li>
-                <li><a href="m8-6.html">M8.6: AI Logica (Gebaar)</a></li>
-                <li><a href="m8-7.html">M8.7: Code Kwaliteit</a></li>
+                <li><a href="m8-1.html">M8.1: Stop op Rood</a></li>
+                <li><a href="m8-2.html">M8.2: Lijnvolgen</a></li>
+                <li><a href="m8-3.html">M8.3: Gezicht Volgen</a></li>
+                <li><a href="m8-4.html" class="active">M8.4: Gebaar Actie</a></li>
+                <li><a href="m8-5.html">M8.5: AI Gezicht</a></li>
+                <li><a href="m8-6.html">M8.6: AI Gebaar</a></li>
+                <li><a href="m8-7.html">M8.7: Kwaliteit</a></li>
                 <li><a href="m8-8.html">M8.8: Eindopdracht</a></li>
             </ul>
         </nav>
@@ -59,75 +59,64 @@
     <main>
         <h2>M8.4: Integratie (Gebaar Actie)</h2>
 
-        <h3>Theorie: Event-Driven Actie</h3>
+        <h3>Uitleg: Actie-Reactie</h3>
         <p>
-            Dit is een <em>event-driven</em> (gebeurtenis-gestuurd) systeem. We combineren M5 (Acties) [cite: 249-250] en M7 (Vision) [cite: 253-254].
+            We willen dat de robot wacht op een commando. Niet via het toetsenbord, maar via een visueel gebaar.
+            "Als ik mijn hand opsteek, moet de robot zwaaien."
         </p>
-        <ul>
-            <li><strong>Event (Gebeurtenis):</strong> De <code>GestureDetector</code> (M7.5) [cite: 253-254] vindt een grote vorm (een 'gebaar').</li>
-            <li><strong>Actie:</strong> De <code>WaveAction</code> (M5.4) [cite: 249-250] wordt uitgevoerd.</li>
-        </ul>
         <p>
-            <strong>Refactor:</strong> We passen <code>GestureDetector.analyze_frame</code> (M7.5) [cite: 253-254] aan zodat het een boolean (<code>True</code>/<code>False</code>) teruggeeft naast het frame.
+            We gebruiken de <code>GestureDetector</code> uit Module 7 en koppelen die aan de <code>WaveAction</code>.
         </p>
 
         <hr>
-        <h3>Python Voorbeeld</h3>
+        <h3>Stap 1: Detector Uitbreiden</h3>
+        <p>
+            De detector moet onthouden <em>of</em> er iets is gezien. Voeg <code>_detected</code> toe aan <code>GestureDetector</code> in <code>vision.py</code>.
+        </p>
 
-        <h4>1. Refactor (in <code>vision.py</code>)</h4>
-        <pre><code class="language-python"># In spiderpi_core/vision.py
-class GestureDetector:
-    # ... (init)
-    def analyze_frame(self, frame: np.ndarray) -> tuple[np.ndarray, bool]:
-        # ... (cvtColor, adaptiveThreshold, findContours) ...
+        <pre><code class="language-python">class GestureDetector:
+    _detected: bool = False
 
-        gesture_found = False
-        if contours:
-            biggest_contour = max(contours, key=cv2.contourArea)
-            if cv2.contourArea(biggest_contour) > self._min_area:
-                cv2.drawContours(frame, [biggest_contour], -1, (0, 255, 0), 3)
-                gesture_found = True # Event gevonden!
+    def analyze_frame(self, frame):
+        # ... (detectie code) ...
 
-        return frame, gesture_found # Geef frame en boolean terug</code></pre>
+        # Als er een grote contour is:
+        if groot_genoeg:
+            self._detected = True
+        else:
+            self._detected = False
 
-        <h4>2. De Loop (in <code>main.py</code>)</h4>
-        <pre><code class="language-python"># In main.py
-from spiderpi_core.robot import SpiderPi
-from spiderpi_core.camera import Camera
-from spiderpi_core.vision import GestureDetector
-from spiderpi_core.actions import WaveAction
-import time
+    @property
+    def detected(self) -> bool:
+        return self._detected</code></pre>
 
-my_robot = SpiderPi()
-cam = Camera()
-processor = GestureDetector(min_area=10000)
-wave_action = WaveAction(my_robot)
+        <h3>Stap 2: De Hoofdloop</h3>
+        <p>
+            In de main loop checken we de status en vuren we de actie af.
+        </p>
 
-is_waving = False # 'Debounce' variabele
-
-print("Starten... Zwaai met je hand om de robot te triggeren.")
+        <pre><code class="language-python"># In main_gesture.py
+print("Wachten op gebaar...")
 
 while True:
-    frame = cam.get_frame()
-    if frame is None: break
+    frame = my_robot.camera.get_frame()
+    gesture_proc.analyze_frame(frame)
 
-    # 1. Sense
-    (frame, gesture_found) = processor.analyze_frame(frame)
+    # CHECK: Is er een gebaar?
+    if gesture_proc.detected:
+        print("Gebaar gezien! Ik zwaai terug!")
 
-    # 2. Think
-    if gesture_found and not is_waving:
-        # 3. Act
-        print("GEBAAR GEDETECTEERD! Zwaaien...")
-        wave_action.execute()
-        is_waving = True # Zorg dat hij niet 30x p/s zwaait
-        time.sleep(3) # Wacht 3 seconden
-    elif not gesture_found:
-        is_waving = False # Reset
+        # ACTIE: Zwaai!
+        my_robot.wave()
 
-    cv2.imshow("Gebaar Detector", frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-cv2.destroyAllWindows()</code></pre>
+        # Wacht even (zodat hij niet blijft zwaaien)
+        time.sleep(2)
+        print("Klaar. Wachten...")</code></pre>
+
+        <h3>Uitleg: Interactie</h3>
+        <p>
+            Je hebt nu een robot gemaakt waarmee je kunt communiceren zonder hem aan te raken of te typen.
+        </p>
 
     </main>
 </div>

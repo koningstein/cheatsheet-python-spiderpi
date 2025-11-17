@@ -14,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m6-4.html">« M6.4: Integratie Camera</a>
-            <a href="m6-6.html">M6.6: HSV Theorie »</a>
+            <a href="../module5/m5-8.html">« M5: Abstractie</a>
+            <a href="../module7/m7-1.html">M7: Interfaces »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -59,43 +59,39 @@
     <main>
         <h2>M6.5: Videostream CLI</h2>
 
-        <h3>Theorie: De Monitor (`cv2.imshow`)</h3>
+        <h3>Uitleg: Een Video is Veel Foto's</h3>
         <p>
-            <strong>Probleem:</strong> <code>.get_frame()</code> (Les 6.3) haalt *één* foto. Een video is *veel* foto's achter elkaar (bv. 30 per seconde).
+            <code>.get_frame()</code> haalt één foto. Een video is simpelweg heel veel foto's achter elkaar (bijvoorbeeld 30 per seconde).
         </p>
         <p>
-            <strong>Oplossing:</strong> We hebben een <code>while True:</code> loop nodig die continu frames ophaalt en toont.
+            We hebben een <strong>Loop</strong> (herhaling) nodig die continu:
+            1. Een frame ophaalt.
+            2. Het frame op het scherm toont.
         </p>
-        <p>Om een video te tonen, heb je 3 <code>cv2</code> commando's nodig *binnen* een loop:</p>
-        <ol>
-            <li><strong><code>frame = ...get_frame()</code></strong>: Haal de foto.</li>
-            <li><strong><code>cv2.imshow("Titel", frame)</code></strong>: Toon de foto in een venster. </li>
-            <li><strong><code>cv2.waitKey(1)</code></strong>: Wacht 1 milliseconde op een toetsaanslag. *Dit is cruciaal!* Zonder <code>waitKey</code> ververst het venster niet.</li>
-        </ol>
-        <p>We stoppen deze loop in een nieuwe methode <code>stream()</code> in <code>SpiderPi</code> en koppelen die aan een CLI-commando (herhaling M3.7) [cite: 245-246].</p>
+        <p>
+            We gebruiken hiervoor <code>cv2.imshow</code> (toon venster) en <code>cv2.waitKey</code>.
+        </p>
 
         <hr>
-        <h3>Python Voorbeeld</h3>
+        <h3>Stap 1: De Stream Methode</h3>
+        <p>
+            We voegen een methode <code>stream()</code> toe aan de <code>SpiderPi</code> klasse.
+        </p>
 
-        <h4>1. De methode (in <code>robot.py</code>)</h4>
         <pre><code class="language-python"># In spiderpi_core/robot.py
-import cv2 # Nu ook hier nodig!
-
-class SpiderPi(RobotComponent):
-    # ... (init, wave, getters ...)
 
     def stream(self) -> None:
         """Start een live videostream naar het scherm."""
         if not self._camera:
-            print("Kan niet streamen, geen camera gevonden.")
+            print("Geen camera, kan niet streamen.")
             return
 
         print("Stream gestart. Druk op 'q' om te stoppen.")
         while True:
-            # 1. Haal frame (via delegatie)
+            # 1. Haal frame
             frame = self._camera.get_frame()
             if frame is None:
-                break # Stop als frame mislukt
+                break
 
             # 2. Toon frame op scherm
             cv2.imshow("SpiderPi Stream", frame)
@@ -104,21 +100,28 @@ class SpiderPi(RobotComponent):
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
-        # Opruimen
+        # Sluit het venster netjes af
         cv2.destroyAllWindows()</code></pre>
 
-        <h4>2. De koppeling (in <code>main.py</code>)</h4>
+        <h3>Stap 2: De CLI Koppeling</h3>
+        <p>
+            We willen dit starten met een commando in de terminal. We voegen <code>stream</code> toe aan onze 'router' in <code>main.py</code>.
+        </p>
+
         <pre><code class="language-python"># In main.py
-# ... (argparse setup uit M3.6) ...
 
-# In de 'Router'
+# ... (in de if/else blok) ...
 elif args.action == "stream":
-    my_robot.stream()
-</code></pre>
+    my_robot.stream()</code></pre>
 
-        <h4>3. Testen (in Terminal)</h4>
-        <pre><code class="language-bash">(venv) C:\...&gt; python main.py --action stream
-# Resultaat: Een venster opent met live video.</code></pre>
+        <h3>Stap 3: Testen</h3>
+        <p>
+            Voer het commando uit in je terminal:
+        </p>
+        <pre><code class="language-bash">(venv) C:\...&gt; python main.py --action stream</code></pre>
+        <p>
+            Er moet nu een venster openen waarin je jezelf ziet! Druk op 'q' om te stoppen.
+        </p>
 
     </main>
 </div>

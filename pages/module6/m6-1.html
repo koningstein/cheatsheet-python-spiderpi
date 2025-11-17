@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>M6.1: De Camera Klasse</title>
-
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="../../script.js" defer></script>
@@ -15,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="../module5/m5-8.html">« M5.8: Class Variables</a>
-            <a href="m6-2.html">M6.2: VideoCapture »</a>
+            <a href="../module5/m5-8.html">« M5: Abstractie</a>
+            <a href="../module7/m7-1.html">M7: Interfaces »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -60,35 +59,37 @@
     <main>
         <h2>M6.1: De Camera Klasse</h2>
 
-        <h3>Theorie: De Robot 'Ogen' Geven</h3>
+        <h3>Uitleg: De Robot 'Ogen' Geven</h3>
         <p>
-            We hebben een compleet, werkend *model* van de robot (M1-M5). Nu gaan we de robot *zintuigen* geven. We beginnen met 'zien'.
+            We hebben een werkend <em>model</em> van de robot (M1-M5). Nu gaan we de robot zintuigen geven. We beginnen met 'zien'.
         </p>
         <p>
-            Om met een camera te praten in Python, gebruiken we de <strong><code>OpenCV</code></strong> (Open Computer Vision) library. Dit is de wereldwijde standaard voor alle taken die met 'zien' te maken hebben (beelden openen, gezichten herkennen, etc.). De import-naam voor deze library is <code>cv2</code>.
-        </p>
-        <p>
-            Net als in M1.1 beginnen we met het maken van een blauwdruk. We maken een <code>Camera</code> klasse  die *verantwoordelijk* is voor alles wat met de camera te maken heeft.
+            Om met een camera te praten in Python, gebruiken we de bibliotheek <strong>OpenCV</strong> (Open Computer Vision). Dit is de wereldwijde standaard voor alles wat met beelden te maken heeft. In de code heet deze library <code>cv2</code>.
         </p>
 
-        <hr>
-        <h3>Python Voorbeeld</h3>
-        <p>We installeren <code>OpenCV</code> en maken het <code>camera.py</code> bestand met de lege klasse.</p>
+        <h3>Stap 1: Installeren</h3>
+        <p>
+            Eerst moeten we de software installeren in onze virtuele omgeving (venv).
+        </p>
 
-        <h4>1. Installeren (in Terminal)</h4>
         <pre><code class="language-bash"># Zorg dat je venv actief is
 (venv) C:\...&gt; pip install opencv-python
 
 # Update je 'boodschappenlijst'
 (venv) C:\...&gt; pip freeze > requirements.txt</code></pre>
 
-        <h4>2. Definiëren (in <code>spiderpi_core/camera.py</code>)</h4>
-        <pre><code class="language-python">"""
+        <h3>Stap 2: De Blauwdruk Maken</h3>
+        <p>
+            Net als bij de Servo en de Leg, maken we een klasse die verantwoordelijk is voor de camera. Maak een nieuw bestand <code>spiderpi_core/camera.py</code>.
+        </p>
+
+        <pre><code class="language-python"># In spiderpi_core/camera.py
+"""
 Modelleert de Camera van de SpiderPi.
 Deze klasse beheert de OpenCV video stream.
 """
 import cv2 # De OpenCV library
-import numpy as np
+import numpy as np # Nodig voor de beelden (straks)
 
 class Camera:
     """
@@ -98,9 +99,12 @@ class Camera:
     def __init__(self) -> None:
         """Initialiseert de camera."""
         # Wordt in de volgende les gevuld
-        pass
-</code></pre>
-        <p><strong>Testen:</strong> Deze les heeft geen <code>main.py</code> test. De "win" is het succesvol installeren van <code>opencv-python</code> en het correct aanmaken van het <code>camera.py</code> bestand.</p>
+        pass</code></pre>
+
+        <h3>Uitleg: Status</h3>
+        <p>
+            We hebben nu het bestand en de klasse. De code doet nog niets, maar de basis staat klaar. In de volgende les gaan we de echte hardware aanzetten.
+        </p>
 
     </main>
 </div>

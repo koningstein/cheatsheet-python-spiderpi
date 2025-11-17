@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M8.8: Eindopdracht (Polymorfisme Totaal)</title>
+    <title>M8.8: Eindopdracht (Smart Pet)</title>
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="../../script.js" defer></script>
@@ -14,7 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m8-7.html">« M8.7: Code Kwaliteit</a>
+            <a href="m8-7.html">« M8.7: Kwaliteit</a>
+            <span class="disabled">Einde Curriculum</span>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -38,136 +39,76 @@
 
     <div class="header-nav-block">
         <header>
-            <h1>Module 8: Integratie & Eindopdracht</h1>
-            <p>Alles samenbrengen in een 'Sense-Think-Act' loop.</p>
+            <h1>Module 8: Integratie & Sturing</h1>
+            <p>Vision en gedrag samenbrengen.</p>
         </header>
         <nav>
             <ul>
-                <li><a href="m8-1.html">M8.1: Integratie (Stop op Rood)</a></li>
-                <li><a href="m8-2.html">M8.2: Sturing (Lijnvolgen)</a></li>
-                <li><a href="m8-3.html">M8.3: Integratie (Gezicht Volgen)</a></li>
-                <li><a href="m8-4.html">M8.4: Integratie (Gebaar Actie)</a></li>
-                <li><a href="m8-5.html">M8.5: AI Logica (Gezicht)</a></li>
-                <li><a href="m8-6.html">M8.6: AI Logica (Gebaar)</a></li>
-                <li><a href="m8-7.html">M8.7: Code Kwaliteit</a></li>
+                <li><a href="m8-1.html">M8.1: Stop op Rood</a></li>
+                <li><a href="m8-2.html">M8.2: Lijnvolgen</a></li>
+                <li><a href="m8-3.html">M8.3: Gezicht Volgen</a></li>
+                <li><a href="m8-4.html">M8.4: Gebaar Actie</a></li>
+                <li><a href="m8-5.html">M8.5: AI Gezicht</a></li>
+                <li><a href="m8-6.html">M8.6: AI Gebaar</a></li>
+                <li><a href="m8-7.html">M8.7: Kwaliteit</a></li>
                 <li><a href="m8-8.html" class="active">M8.8: Eindopdracht</a></li>
             </ul>
         </nav>
     </div>
 
     <main>
-        <h2>M8.8: Eindopdracht (Polymorfisme Totaal)</h2>
+        <h2>M8.8: Eindopdracht (Smart Pet)</h2>
 
-        <h3>Theorie: De Eindmontage</h3>
+        <h3>Uitleg: Alles Samenvoegen</h3>
         <p>
-            Dit is de eindopdracht . We bouwen de *definitieve* <code>main.py</code> die alle concepten (CLI, Polymorfisme, Acties, Detectors) combineert tot één flexibel besturingsscript.
+            Je bent klaar om je meesterproef te bouwen. Je gaat een <strong>"Smart Pet"</strong> maken. De robot moet zelfstandig schakelen tussen gedragingen.
         </p>
-        <p><strong>De Architectuur:</strong></p>
-        <ol>
-            <li><strong>CLI (<code>argparse</code>):</strong> Leest <code>--detector</code> (wat te zien?) en <code>--on-detect</code> (wat te doen?).</li>
-            <li><strong><code>main.py</code> (Router):</strong>
-                <ul>
-                    <li>Maakt de juiste <code>VisionProcessor</code> (M7) [cite: 253-254] (de 'stekker').</li>
-                    <li>Maakt de juiste <code>AbstractRobotAction</code> (M5) [cite: 249-250] (de 'actie').</li>
-                </ul>
-            </li>
-            <li><strong><code>Robot</code> (Koppeling):</strong> <code>main.py</code> *geeft* de processor en de actie aan de robot.</li>
-            <li><strong><code>Robot.run_loop()</code>:</strong> De robot handelt de 'Sense-Think-Act' loop (M8.1)  <em>intern</em> en <em>polymorfisch</em> af.</li>
-        </ol>
+        <p>
+            <strong>Gedrag:</strong>
+            1. <strong>Rust (Idle):</strong> Als hij niets ziet, kijkt hij rustig rond.
+            2. <strong>Volgen (Tracking):</strong> Als hij een gezicht ziet, focust hij daarop.
+            3. <strong>Groeten:</strong> Als hij een hand ziet, zwaait hij.
+            4. <strong>Angst:</strong> Als hij rood ziet, doet hij een stap achteruit.
+        </p>
 
         <hr>
-        <h3>Python Voorbeeld</h3>
+        <h3>Structuur: State Machine</h3>
+        <p>
+            Gebruik een variabele <code>state</code> om te onthouden wat de robot aan het doen is.
+        </p>
 
-        <h4>1. Refactor (in <code>robot.py</code>)</h4>
-        <p>Maak een 'hoofd-loop' in de robot die de actie uitvoert.</p>
-        <pre><code class="language-python"># In spiderpi_core/robot.py
-# ... (imports)
-from .actions import AbstractRobotAction
-from .vision import VisionProcessorProtocol
+        <pre><code class="language-python">state = "IDLE"
 
-class SpiderPi(RobotComponent):
-    # ... (init, set_vision_processor, etc.) ...
+while True:
+    # 1. Verzamel informatie (Sense)
+    frame = camera.get_frame()
+    face_x = face_detector.analyze(frame)
+    is_gesture = gesture_detector.detected
+    red_amount = red_sensor.read_value()
 
-    def run_vision_loop(self, action_on_detect: AbstractRobotAction) -> None:
-        """
-        De definitieve 'Sense-Think-Act' loop.
-        Voert de gegeven 'action' uit als de 'processor' iets vindt.
-        """
-        if not self._camera or not self._processor:
-            print("Fout: Camera of Processor niet ingesteld.")
-            return
-
-        print("Vision loop gestart. Druk 'q' om te stoppen.")
-        while True:
-            frame = self._camera.get_frame()
-            if frame is None: break
-
-            # 1. Sense (Polymorfisch)
-            processed_frame, data = self._processor.analyze_frame(frame)
-
-            # 2. Think
-            if data:
-                # 3. Act (Polymorfisch)
-                # We geven de data (bv. (cX, cY)) mee aan de actie
-                action_on_detect.execute(data)
-
-            cv2.imshow("SpiderPi Vision", processed_frame)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-        cv2.destroyAllWindows()</code></pre>
-
-        <h4>2. Refactor (in <code>actions.py</code>)</h4>
-        <p>Pas het <code>execute</code> contract (M5.2) aan zodat het <code>data</code> kán accepteren.</p>
-        <pre><code class="language-python"># In spiderpi_core/actions.py
-class AbstractRobotAction(ABC):
-    @abstractmethod
-    def execute(self, data=None) -> None: # 'data=None' toegevoegd
-        pass
-
-class WaveAction(AbstractRobotAction):
-    def execute(self, data=None) -> None: # 'data=None' toegevoegd
-        self._robot.wave()</code></pre>
-
-        <h4>3. De Eindbaas (in <code>main.py</code>)</h4>
-        <pre><code class="language-python"># In main.py
-# ... (alle imports: argparse, robot, camera, vision, actions, numpy)
-
-def main():
-    # 1. CLI (argparse)
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--detector", default="face", help="face, color, line, gesture")
-    parser.add_argument("--on-detect", default="wave", help="wave, aim, ...")
-    args = parser.parse_args()
-
-    # Setup
-    my_robot = SpiderPi()
-    processor = None
-    action = None
-
-    # 2. Processor Factory (Stekker kiezen)
-    if args.detector == "face":
-        processor = FaceDetector("haarcascade_frontalface_default.xml")
-    elif args.detector == "color":
-        LOWER_RED = np.array([0, 120, 70])
-        UPPER_RED = np.array([10, 255, 255])
-        processor = ColorDetector(LOWER_RED, UPPER_RED)
-    # ... (elif voor line en gesture) ...
-
-    # 3. Action Factory (Actie kiezen)
-    if args.on_detect == "wave":
-        action = WaveAction(my_robot)
-    # elif args.on_detect == "aim":
-    #    action = AimAction(my_robot) # (Nog te bouwen)
-
-    # 4. Koppelen & 5. Uitvoeren
-    if processor and action:
-        my_robot.set_vision_processor(processor)
-        my_robot.run_vision_loop(action)
+    # 2. Bepaal toestand (Think)
+    if red_amount > 5000:
+        state = "SCARED"
+    elif is_gesture:
+        state = "GREETING"
+    elif face_x is not None:
+        state = "TRACKING"
     else:
-        print("Fout: Kon detector of actie niet vinden.")
+        state = "IDLE"
 
-if __name__ == "__main__":
-    main()</code></pre>
+    # 3. Voer uit (Act)
+    if state == "IDLE":
+        head.look_around()
+    elif state == "TRACKING":
+        head.track(face_x)
+    elif state == "GREETING":
+        robot.wave()
+    elif state == "SCARED":
+        robot.step_back()</code></pre>
+
+        <p>
+            <strong>Succes!</strong> Je hebt nu een volledig object-georiënteerde, autonome robot gebouwd.
+        </p>
 
     </main>
 </div>

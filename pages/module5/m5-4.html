@@ -14,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m5-3.html">« M5.3: Implementatie</a>
-            <a href="m5-5.html">M5.5: Abstractie (Sensor) »</a>
+            <a href="../module4/m4-1.html">« M4: Overerving</a>
+            <a href="../module6/m6-1.html">M6: Vision »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -59,52 +59,59 @@
     <main>
         <h2>M5.4: Implementatie (Complex)</h2>
 
-        <h3>Theorie: Hergebruik en Delegatie</h3>
+        <h3>Uitleg: Hergebruik en Delegatie</h3>
         <p>
-            Dit is een *herhaling* van de vorige les, maar nu met een complexere implementatie. We maken een <code>WaveAction</code> die het <code>execute</code>-contract vervult.
+            We maken nu een tweede actie: <code>WaveAction</code> (Zwaaien).
         </p>
         <p>
-            In plaats van *nieuwe* code te schrijven, kan de <code>execute</code> methode ook *bestaande* code hergebruiken. We <strong>delegeren</strong> (M1.9) [cite: 58-59] het werk aan de <code>wave()</code> methode die al in onze <code>SpiderPi</code>-klasse (M3.7) [cite: 245-246] bestaat.
+            We hebben in Module 3 al een <code>wave()</code> methode gemaakt in de <code>SpiderPi</code>-klasse. We willen die code niet overtypen (kopiëren).
         </p>
         <p>
-            Dit is "clean code": de <code>WaveAction</code>-klasse is alleen de 'knop', de <code>SpiderPi</code>-klasse bevat de 'logica'.
+            We gebruiken <strong>Delegatie</strong>. De <code>WaveAction</code> is alleen de 'knop'. Als je op de knop drukt (<code>execute</code>), vraagt hij de robot om het echte werk te doen.
         </p>
 
         <hr>
-        <h3>Python Voorbeeld (`actions.py`)</h3>
-        <p>We voegen een *tweede* concrete klasse toe en testen met Polymorfisme (M4.7) [cite: 247-248].</p>
+        <h3>Stap 1: WaveAction Maken</h3>
+        <p>
+            We voegen de tweede actie toe aan <code>actions.py</code>.
+        </p>
 
         <pre><code class="language-python"># In spiderpi_core/actions.py
-# ... (AbstractRobotAction en WalkAction) ...
+# ... (WalkAction) ...
 
 class WaveAction(AbstractRobotAction):
     """
-    Een TWEEDE CONCRETE actie. Vervult ook het contract.
-    DELEGEERT het zwaai-werk aan de SpiderPi klasse.
+    Een TWEEDE CONCRETE actie.
     """
 
     def execute(self) -> None:
-        """
-        Implementatie van het 'execute' contract.
-        """
-        print("Actie: Zwaaien...")
+        print("Action: Waving...")
 
         # We hebben self._robot (een SpiderPi object)
         # en die *heeft* al een wave() methode!
-        self._robot.wave() # Delegatie!
+        self._robot.wave() # Delegatie!</code></pre>
 
-# --- In main.py (Polymorfisme!) ---
+        <h3>Stap 2: Polymorfisme Testen</h3>
+        <p>
+            Nu komt de echte kracht. We maken een lijst van acties. Omdat ze allebei dezelfde Parent hebben (en het contract volgen), kunnen we ze hetzelfde behandelen.
+        </p>
+
+        <pre><code class="language-python"># In main.py
 from spiderpi_core.actions import WalkAction, WaveAction
 
-acties = [
+# Maak een lijst met verschillende acties
+actions_list = [
     WalkAction(my_robot),
     WaveAction(my_robot)
 ]
 
-print("--- Start Polymorfische Actie Loop ---")
-for actie in acties:
-    actie.execute() # Python kiest automatisch de juiste!</code></pre>
+print("--- Start Action Loop ---")
+for action in actions_list:
+    # We weten niet wat voor actie het is...
+    # Maar we weten ZEKER dat hij .execute() heeft!
+    action.execute()
 
+print("--- Done ---")</code></pre>
     </main>
 </div>
 

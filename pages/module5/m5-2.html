@@ -59,45 +59,60 @@
     <main>
         <h2>M5.2: Abstracte Methoden</h2>
 
-        <h3>Theorie: Het 'Contract' (Deel 2: De Eis)</h3>
+        <h3>Uitleg: De Eis (Het Contract)</h3>
         <p>
-            Een <code>ABC</code> (Les 5.1) wordt pas krachtig als we het combineren met <code>@abstractmethod</code>.
+            Een Abstracte Klasse wordt pas krachtig als we het combineren met <strong>Abstracte Methoden</strong>.
         </p>
         <p>
-            Dit is een 'decorator' die je boven een methode zet. Het betekent: "Ik (de Ouder) heb geen code voor deze methode, maar ik <em>eis</em> dat elk 'kind' (subklasse) dat deze klasse erft, deze methode <em>zelf implementeert</em>."
+            Dit betekent: "Ik (de Parent) heb geen code voor deze methode, maar ik <strong>eis</strong> dat elk Kind (Child class) deze methode <strong>zelf implementeert</strong>."
         </p>
         <p>
-            Een klasse met één of meer abstracte methoden kan zelf <strong>niet</strong> meer geïnstantieerd (aangemaakt) worden.
+            We gebruiken hiervoor de decorator <code>@abstractmethod</code>.
         </p>
 
-        <hr>
-        <h3>Python Voorbeeld (`actions.py`)</h3>
-        <p>We passen <code>AbstractRobotAction</code> aan en voegen de 'eis' toe.</p>
+        <h3>Stap 1: De Eis Toevoegen</h3>
+        <p>
+            We passen <code>actions.py</code> aan. We eisen dat elke actie een methode <code>execute()</code> (uitvoeren) heeft.
+        </p>
 
-        <pre><code class="language-python">from abc import ABC, abstractmethod
-from spiderpi_core.robot import SpiderPi
+        <pre><code class="language-python"># In spiderpi_core/actions.py
+from abc import ABC, abstractmethod # Importeer abstractmethod
+from .robot import SpiderPi
 
 class AbstractRobotAction(ABC):
-    # ... (init van Les 5.1) ...
+    # ... (init blijft hetzelfde) ...
 
     # DIT IS HET CONTRACT:
     @abstractmethod
     def execute(self) -> None:
         """
         Voert de specifieke robot-actie uit.
-        Kind-klassen MOETEN dit implementeren.
+        Child classes MOETEN dit implementeren.
         """
-        pass # Geen code hier
+        pass # Geen code hier, alleen 'pass'</code></pre>
 
-# --- In main.py ---
-# from spiderpi_core.actions import AbstractRobotAction
-#
-# actie = AbstractRobotAction(my_robot)
-#
-# ^^^ DIT CRASHT NU (TypeError)
-# Fout: Can't instantiate abstract class AbstractRobotAction
-#       with abstract method execute
-# Dit is de "win" van de les! Het contract werkt.</code></pre>
+        <h3>Stap 2: Testen (De Crash)</h3>
+        <p>
+            Nu proberen we in <code>main.py</code> een object te maken van deze klasse.
+        </p>
+
+        <pre><code class="language-python"># In main.py
+from spiderpi_core.actions import AbstractRobotAction
+
+# Dit crasht NU!
+try:
+    actie = AbstractRobotAction(my_robot)
+except TypeError as e:
+    print(f"FOUT: {e}")</code></pre>
+
+        <h3>Uitleg: Het Resultaat</h3>
+        <p>
+            Je krijgt een foutmelding:
+            <br><code>Can't instantiate abstract class AbstractRobotAction with abstract method execute</code>.
+        </p>
+        <p>
+            Dit is precies wat we wilden! Je mag geen object maken van een contract. Je moet eerst een Child class maken die zich aan de regels houdt. Dat doen we in de volgende les.
+        </p>
 
     </main>
 </div>

@@ -14,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m8-1.html">« M8.1: Integratie (Stop)</a>
-            <a href="m8-3.html">M8.3: Integratie (Gezicht) »</a>
+            <a href="m8-1.html">« M8.1: Stop op Rood</a>
+            <a href="m8-3.html">M8.3: Gezicht Volgen »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -39,18 +39,18 @@
 
     <div class="header-nav-block">
         <header>
-            <h1>Module 8: Integratie & Eindopdracht</h1>
-            <p>Alles samenbrengen in een 'Sense-Think-Act' loop.</p>
+            <h1>Module 8: Integratie & Sturing</h1>
+            <p>Vision en gedrag samenbrengen.</p>
         </header>
         <nav>
             <ul>
-                <li><a href="m8-1.html">M8.1: Integratie (Stop op Rood)</a></li>
-                <li><a href="m8-2.html" class="active">M8.2: Sturing (Lijnvolgen)</a></li>
-                <li><a href="m8-3.html">M8.3: Integratie (Gezicht Volgen)</a></li>
-                <li><a href="m8-4.html">M8.4: Integratie (Gebaar Actie)</a></li>
-                <li><a href="m8-5.html">M8.5: AI Logica (Gezicht)</a></li>
-                <li><a href="m8-6.html">M8.6: AI Logica (Gebaar)</a></li>
-                <li><a href="m8-7.html">M8.7: Code Kwaliteit</a></li>
+                <li><a href="m8-1.html">M8.1: Stop op Rood</a></li>
+                <li><a href="m8-2.html" class="active">M8.2: Lijnvolgen</a></li>
+                <li><a href="m8-3.html">M8.3: Gezicht Volgen</a></li>
+                <li><a href="m8-4.html">M8.4: Gebaar Actie</a></li>
+                <li><a href="m8-5.html">M8.5: AI Gezicht</a></li>
+                <li><a href="m8-6.html">M8.6: AI Gebaar</a></li>
+                <li><a href="m8-7.html">M8.7: Kwaliteit</a></li>
                 <li><a href="m8-8.html">M8.8: Eindopdracht</a></li>
             </ul>
         </nav>
@@ -59,88 +59,74 @@
     <main>
         <h2>M8.2: Sturing (Lijnvolgen)</h2>
 
-        <h3>Theorie: Genuanceerde Sturing</h3>
+        <h3>Uitleg: Weten WAAR iets is</h3>
         <p>
-            In Les 8.1 was de output een `float` (pixel_count) en de actie `ja/nee` (stoppen).
-            Nu willen we de *positie* van de lijn gebruiken. De <code>LineFollowProcessor</code> (M7.3) [cite: 253-254] vindt het midden <code>(cX, cY)</code> van de lijn.
+            Bij het volgen van een lijn is alleen "ja/nee" niet genoeg. We moeten weten of de lijn <strong>links</strong>, <strong>rechts</strong> of in het <strong>midden</strong> is.
         </p>
         <p>
-            <strong>Refactor:</strong> We moeten de <code>LineFollowProcessor.analyze_frame</code> aanpassen zodat het niet alleen het beeld teruggeeft, maar ook de <strong>data</strong> (het <code>cX</code> coördinaat).
-            <br><code>return frame, cX</code> (of <code>return frame, None</code> als geen lijn is gevonden).
+            We moeten onze <code>LineFollowProcessor</code> (uit M7.3) aanpassen zodat hij de positie onthoudt.
         </p>
-        <p>
-            <strong>De 'Think' Logica:</strong> (Uitgaande van een 640px breed beeld)
-        </p>
-        <ul>
-            <li><code>if cX is None:</code> -> Stop!</li>
-            <li><code>elif cX &lt; 220:</code> -> Lijn is links, stuur links.</li>
-            <li><code>elif cX > 420:</code> -> Lijn is rechts, stuur rechts.</li>
-            <li><code>else:</code> -> Lijn is in het midden, ga rechtdoor.</li>
-        </ul>
 
         <hr>
-        <h3>Python Voorbeeld</h3>
+        <h3>Stap 1: Processor Aanpassen</h3>
+        <p>
+            Open <code>spiderpi_core/vision.py</code>. Voeg een variabele <code>_last_x</code> toe aan de <code>LineFollowProcessor</code>.
+        </p>
 
-        <h4>1. Refactor (in <code>vision.py</code>)</h4>
-        <pre><code class="language-python"># In spiderpi_core/vision.py
-import cv2
-import numpy as np
+        <pre><code class="language-python">class LineFollowProcessor:
+    # Start in het midden (beeld is 640 breed)
+    _last_x: int = 320
 
-class LineFollowProcessor:
-    # ... (init)
+    # ... (__init__) ...</code></pre>
 
-    # We passen de return-type hint aan
-    def analyze_frame(self, frame: np.ndarray) -> tuple[np.ndarray, int | None]:
-        # ... (cvtColor, inRange) ...
-        M = cv2.moments(mask)
+        <h3>Stap 2: Positie Opslaan</h3>
+        <p>
+            In de <code>analyze_frame</code> methode berekenen we het midden (<code>cX</code>). Sla dit op!
+        </p>
+
+        <pre><code class="language-python">    def analyze_frame(self, frame: np.ndarray) -> np.ndarray:
+        # ... (code voor mask en moments) ...
+
         if M["m00"] > 0:
             cX = int(M["m10"] / M["m00"])
-            cY = int(M["m01"] / M["m00"])
-            cv2.circle(frame, (cX, cY), 7, (0, 0, 255), -1)
-            return frame, cX # Geef data (cX) terug!
-        else:
-            return frame, None # Geen lijn gevonden</code></pre>
 
-        <h4>2. Nieuwe methoden (in <code>robot.py</code>)</h4>
-        <pre><code class="language-python"># In spiderpi_core/robot.py
-class SpiderPi(RobotComponent):
-    # ...
-    def walk_forward(self) -> None:
-        print("Actie: Loop vooruit")
-        # (Hier zou echte poot-logica komen)
-    def turn_left(self) -> None:
-        print("Actie: Draai links")
-    def turn_right(self) -> None:
-        print("Actie: Draai rechts")
-    def stop(self) -> None:
-        print("Actie: Stop")</code></pre>
+            # SLA OP: Hier is de lijn!
+            self._last_x = cX
 
-        <h4>3. De Loop (in <code>main.py</code>)</h4>
-        <pre><code class="language-python"># In main.py
-# ... (imports, init robot, cam, en LineFollowProcessor) ...
+            # ... (tekenen) ...
+
+        return frame</code></pre>
+
+        <h3>Stap 3: De Getter</h3>
+        <p>
+            Maak de waarde leesbaar voor de buitenwereld.
+        </p>
+        <pre><code class="language-python">    @property
+    def last_x(self) -> int:
+        return self._last_x</code></pre>
+
+        <h3>Stap 4: Stuur-Logica</h3>
+        <p>
+            Maak <code>main_line.py</code>. We verdelen het beeld in drie zones.
+        </p>
+        <pre><code class="language-python"># ... (setup robot en line_processor) ...
 
 while True:
-    frame = cam.get_frame()
+    # 1. Haal beeld en analyseer
+    frame = my_robot.camera.get_frame()
     if frame is None: break
+    line_processor.analyze_frame(frame)
 
-    # 1. Sense
-    analyzed_frame, cX = processor.analyze_frame(frame)
+    # 2. Waar is de lijn?
+    x = line_processor.last_x
 
-    # 2. Think & 3. Act
-    if cX is None:
-        my_robot.stop()
-    elif cX < 220: # Zone links (pas 220/420 aan)
-        my_robot.turn_left()
-    elif cX > 420: # Zone rechts
-        my_robot.turn_right()
-    else: # Zone midden
-        my_robot.walk_forward()
-
-    cv2.imshow("Lijnvolger", analyzed_frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-cv2.destroyAllWindows()</code></pre>
-
+    # 3. Beslis
+    if x < 250:
+        print("<< STUUR LINKS")
+    elif x > 390:
+        print(">> STUUR RECHTS")
+    else:
+        print("^^ RECHTDOOR")</code></pre>
     </main>
 </div>
 

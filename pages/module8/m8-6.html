@@ -14,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m8-5.html">« M8.5: AI Logica (Gezicht)</a>
-            <a href="m8-7.html">M8.7: Code Kwaliteit »</a>
+            <a href="m8-5.html">« M8.5: AI Gezicht</a>
+            <a href="m8-7.html">M8.7: Kwaliteit »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -39,18 +39,18 @@
 
     <div class="header-nav-block">
         <header>
-            <h1>Module 8: Integratie & Eindopdracht</h1>
-            <p>Alles samenbrengen in een 'Sense-Think-Act' loop.</p>
+            <h1>Module 8: Integratie & Sturing</h1>
+            <p>Vision en gedrag samenbrengen.</p>
         </header>
         <nav>
             <ul>
-                <li><a href="m8-1.html">M8.1: Integratie (Stop op Rood)</a></li>
-                <li><a href="m8-2.html">M8.2: Sturing (Lijnvolgen)</a></li>
-                <li><a href="m8-3.html">M8.3: Integratie (Gezicht Volgen)</a></li>
-                <li><a href="m8-4.html">M8.4: Integratie (Gebaar Actie)</a></li>
-                <li><a href="m8-5.html">M8.5: AI Logica (Gezicht)</a></li>
-                <li><a href="m8-6.html" class="active">M8.6: AI Logica (Gebaar)</a></li>
-                <li><a href="m8-7.html">M8.7: Code Kwaliteit</a></li>
+                <li><a href="m8-1.html">M8.1: Stop op Rood</a></li>
+                <li><a href="m8-2.html">M8.2: Lijnvolgen</a></li>
+                <li><a href="m8-3.html">M8.3: Gezicht Volgen</a></li>
+                <li><a href="m8-4.html">M8.4: Gebaar Actie</a></li>
+                <li><a href="m8-5.html">M8.5: AI Gezicht</a></li>
+                <li><a href="m8-6.html" class="active">M8.6: AI Gebaar</a></li>
+                <li><a href="m8-7.html">M8.7: Kwaliteit</a></li>
                 <li><a href="m8-8.html">M8.8: Eindopdracht</a></li>
             </ul>
         </nav>
@@ -59,67 +59,42 @@
     <main>
         <h2>M8.6: AI Logica (Gebaar Deep Dive)</h2>
 
-        <h3>Theorie: De Knoppen van 'Vorm'</h3>
+        <h3>Uitleg: Contouren Verbeteren</h3>
         <p>
-            Net als bij de <code>FaceDetector</code>, heeft onze <code>GestureDetector</code> (M7.5) [cite: 253-254] "magic numbers" die we kunnen 'tunen'.
-        </p>
-        <ol>
-            <li><strong><code>cv2.threshold(blur, 70, ...)</code></strong>: De drempel <code>70</code> is *globaal*. Als het lichter of donkerder wordt in de kamer, werkt deze drempel niet meer.</li>
-            <li><strong><code>if cv2.contourArea(...) > 5000:</code></strong>: Het getal <code>5000</code> is een 'magic number'.</li>
-        </ol>
-        <p>
-            <strong>Oplossing 1: Adaptive Thresholding</strong><br>
-            We vervangen <code>cv2.threshold</code> (globale drempel) door <strong><code>cv2.adaptiveThreshold</code></strong>. Deze berekent de drempel *niet* voor het hele beeld, maar *per regio*. Het past zich aan aan schaduwen en fel licht.
+            Onze gebaardetector keek alleen naar "iets groots". Maar een witte muur is ook groot. Hoe weten we zeker dat het een hand is?
         </p>
         <p>
-            <strong>Oplossing 2: Parameter in <code>__init__</code></strong><br>
-            We maken <code>min_area=5000</code> een parameter in de constructor.
+            We kunnen kijken naar de <strong>vorm</strong> van de contour.
+            - Is het rond?
+            - Heeft het hoeken?
         </p>
 
         <hr>
-        <h3>Python Voorbeeld (`vision.py`)</h3>
-        <p>We refactoren <code>GestureDetector</code> voor tuning.</p>
+        <h3>Stap 1: Convex Hull (De Omtrek)</h3>
+        <p>
+            Een hand heeft vingers. De omtrek is grillig. Een bal is glad.
+            OpenCV kan de "Convex Hull" berekenen (een elastiekje om de vorm).
+        </p>
+        <p>
+            Als het verschil tussen de Hull (elastiek) en de Contour (de hand) groot is, dan zijn er gaten (tussen de vingers).
+        </p>
 
-        <pre><code class="language-python"># In spiderpi_core/vision.py
-class GestureDetector:
-    _min_area: int
+        <pre><code class="language-python"># In detector
+hull = cv2.convexHull(biggest_contour)
+hull_area = cv2.contourArea(hull)
+contour_area = cv2.contourArea(biggest_contour)
 
-    def __init__(self, min_area: int = 5000) -> None:
-        """Accepteert nu een 'magic number' als parameter."""
-        self._min_area = min_area
+# Solidity: Hoe 'massief' is de vorm?
+solidity = float(contour_area) / hull_area</code></pre>
 
-    def analyze_frame(self, frame: np.ndarray) -> tuple[np.ndarray, bool]:
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        blur = cv2.GaussianBlur(gray, (5, 5), 0)
-
-        # OUD:
-        # _, thresh = cv2.threshold(blur, 70, 255, cv2.THRESH_BINARY_INV)
-
-        # NIEUW: Adaptive Threshold
-        thresh = cv2.adaptiveThreshold(
-            blur, 255, # Max waarde
-            cv2.ADAPTIVE_THRESH_GAUSSIAN_C, # Methode
-            cv2.THRESH_BINARY_INV, # Zwart-wit omgekeerd
-            11, # Block size (moet oneven zijn)
-            2   # 'C' (een fijnafstelling)
-        )
-
-        contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-        gesture_found = False
-        if contours:
-            biggest_contour = max(contours, key=cv2.contourArea)
-
-            # Gebruik de parameter ipv 'magic number'
-            if cv2.contourArea(biggest_contour) > self._min_area:
-                cv2.drawContours(frame, [biggest_contour], -1, (0, 255, 0), 3)
-                gesture_found = True
-
-        return frame, gesture_found
-
-# --- In main.py ---
-# Nu kun je 'tunen':
-# processor = GestureDetector(min_area=10000) # Minder gevoelig</code></pre>
+        <h3>Uitleg: Waarden</h3>
+        <ul>
+            <li><strong>Solidity > 0.9:</strong> Waarschijnlijk een blok of bal (heel massief).</li>
+            <li><strong>Solidity < 0.7:</strong> Waarschijnlijk een hand (veel lucht tussen vingers).</li>
+        </ul>
+        <p>
+            Door deze check toe te voegen, reageert je robot niet meer op elk willekeurig object, maar alleen op complexe vormen.
+        </p>
 
     </main>
 </div>

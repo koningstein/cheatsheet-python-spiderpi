@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>M5.1: Abstract Base Class (ABC)</title>
-
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="../../script.js" defer></script>
@@ -15,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="../module4/m4-8.html">« M4.8: Protected</a>
-            <a href="m5-2.html">M5.2: Abstracte Methoden »</a>
+            <a href="../module4/m4-1.html">« M4: Overerving</a>
+            <a href="../module6/m6-1.html">M6: Vision »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -60,24 +59,27 @@
     <main>
         <h2>M5.1: Abstract Base Class (ABC)</h2>
 
-        <h3>Theorie: Het 'Contract' (Deel 1)</h3>
+        <h3>Uitleg: Het Contract (Deel 1)</h3>
         <p>
-            <strong>Probleem:</strong> In Module 4 (Polymorfisme) [cite: 247-248] maakten we een <code>for</code>-loop die <code>component.reset()</code> aanriep. Dit *werkte* alleen omdat we *toevallig* in <code>Servo</code> en <code>Leg</code> een <code>reset()</code> methode hadden geïmplementeerd. Wat als we het vergeten? De code crasht.
+            In de vorige module maakten we een lijst met <code>reset()</code> commando's. Dat werkte omdat we toevallig in zowel <code>Servo</code> als <code>Leg</code> een <code>reset</code> methode hadden gemaakt. Maar wat als we dat vergeten waren? Dan crasht de code.
         </p>
         <p>
-            <strong>Oplossing:</strong> Een <strong>Abstract Base Class (ABC)</strong>. Dit is een 'ouder'-klasse die dient als een <strong>contract</strong>. We kunnen deze klasse "abstract" maken om later regels af te dwingen.
+            We willen dit afdwingen. We willen een <strong>Contract</strong> maken.
         </p>
         <p>
-            In Python doen we dit door de klasse te laten erven van <code>ABC</code> (die we moeten importeren). Dit is stap 1.
+            Een <strong>Abstract Base Class (ABC)</strong> is een speciale Parent class die dient als zo'n contract. Je kunt van deze klasse zelf <em>geen</em> objecten maken (je kunt geen "Contract" bouwen, alleen iets dat zich aan het contract houdt).
         </p>
 
-        <hr>
-        <h3>Python Voorbeeld (`actions.py`)</h3>
-        <p>We maken een nieuw bestand <code>spiderpi_core/actions.py</code> voor al onze robot-acties.</p>
+        <h3>Stap 1: De Abstracte Klasse Maken</h3>
+        <p>
+            We maken een nieuw bestand <code>spiderpi_core/actions.py</code>. We importeren de <code>ABC</code> module uit Python.
+        </p>
 
-        <pre><code class="language-python"># We importeren ABC (Abstract Base Class)
-from abc import ABC, abstractmethod
-from spiderpi_core.robot import SpiderPi # Aanname dat robot.py bestaat
+        <pre><code class="language-python"># In spiderpi_core/actions.py
+
+# We importeren ABC (Abstract Base Class)
+from abc import ABC
+from .robot import SpiderPi
 
 # Stap 1: Laat de klasse erven van ABC
 class AbstractRobotAction(ABC):
@@ -90,12 +92,19 @@ class AbstractRobotAction(ABC):
     def __init__(self, robot: SpiderPi) -> None:
         """Initialiseert de actie met de robot die hij moet besturen."""
         self._robot = robot
-        print("Abstracte actie wordt voorbereid...")
+        print("Abstract action initialized.")</code></pre>
 
-# --- In main.py ---
-# Dit werkt nu nog gewoon!
-# actie = AbstractRobotAction(my_robot)
-# We hebben de 'eis' (M5.2) nog niet toegevoegd.</code></pre>
+        <h3>Uitleg: Wat hebben we nu?</h3>
+        <p>
+            We hebben nu een klasse die "Abstract" heet. Maar... hij doet nog niks bijzonders. We kunnen er nog steeds objecten van maken.
+        </p>
+
+        <pre><code class="language-python"># In main.py (Test)
+# Dit werkt nu nog gewoon (maar dat willen we eigenlijk niet!):
+# action = AbstractRobotAction(my_robot)</code></pre>
+        <p>
+            Om het echt een contract te maken, moeten we in de volgende les een <strong>Eis</strong> toevoegen.
+        </p>
 
     </main>
 </div>

@@ -14,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m6-2.html">« M6.2: VideoCapture</a>
-            <a href="m6-4.html">M6.4: Integratie Camera »</a>
+            <a href="../module5/m5-8.html">« M5: Abstractie</a>
+            <a href="../module7/m7-1.html">M7: Interfaces »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -59,31 +59,35 @@
     <main>
         <h2>M6.3: De .get_frame() Methode</h2>
 
-        <h3>Theorie: Een Foto Nemen (Een Frame Lezen)</h3>
+        <h3>Uitleg: Een Foto Nemen</h3>
         <p>
-            <strong>Probleem:</strong> De camera is *aan* (dankzij <code>__init__</code>), maar we 'kijken' nog niet.
+            De camera staat aan, maar we zien niks. We moeten een <strong>Frame</strong> (een foto) opvragen.
         </p>
         <p>
-            <strong>Oplossing:</strong> We hebben een methode nodig om één 'foto' op te vragen. In video heet een foto een <strong>Frame</strong>. Het <code>VideoCapture</code> object (dat in <code>self._capture</code> zit) heeft hiervoor een methode: <strong><code>.read()</code></strong>.
+            Het OpenCV-object heeft hiervoor de methode <code>.read()</code>. Deze geeft twee dingen terug:
         </p>
-        <p><code>succes, frame = self._capture.read()</code>  geeft <strong>twee</strong> dingen terug:</p>
         <ol>
-            <li><code>succes</code>: Een <strong>boolean</strong> (<code>True</code> / <code>False</code>). <code>True</code> als het gelukt is om een frame te lezen.</li>
-            <li><code>frame</code>: Het <strong>beeld</strong> zelf. Dit is een groot 'rooster' met getallen (een NumPy array) dat alle pixelkleuren bevat.</li>
+            <li><strong>success:</strong> Een <code>True</code> of <code>False</code>. Is het gelukt?</li>
+            <li><strong>frame:</strong> Het plaatje zelf (een lijst met pixels).</li>
         </ol>
-        <p>Onze eigen <code>.get_frame()</code> methode moet deze aanroep 'wrappen' (inpakken), controleren of het gelukt is, en alleen het <code>frame</code> teruggeven.</p>
+        <p>
+            We maken onze eigen methode <code>get_frame()</code> die dit netjes voor ons regelt.
+        </p>
 
         <hr>
-        <h3>Python Voorbeeld (`camera.py`)</h3>
-        <p>We voegen <code>numpy</code> toe voor de type hints en bouwen de methode.</p>
-
-        <h4>1. Installeren (Terminal)</h4>
+        <h3>Stap 1: NumPy Installeren</h3>
+        <p>
+            Een "plaatje" is voor een computer een gigantische tabel met getallen (pixels). Python gebruikt hiervoor de bibliotheek <strong>NumPy</strong>.
+        </p>
         <pre><code class="language-bash">(venv) C:\...&gt; pip install numpy
 (venv) C:\...&gt; pip freeze > requirements.txt</code></pre>
 
-        <h4>2. Methode toevoegen (in <code>camera.py</code>)</h4>
-        <pre><code class="language-python"># ... (imports bovenaan)
-import numpy as np
+        <h3>Stap 2: De Methode Bouwen</h3>
+        <p>
+            In <code>camera.py</code> voegen we de methode toe. We gebruiken <code>np.ndarray</code> als Type Hint voor "een plaatje".
+        </p>
+
+        <pre><code class="language-python"># ... (imports bovenaan) ...
 
 class Camera:
     # ... (__init__ van Les 6.2) ...
@@ -91,10 +95,7 @@ class Camera:
     def get_frame(self) -> np.ndarray | None:
         """
         Leest één frame van de camera.
-
-        Returns:
-            np.ndarray: Het frame (beeld) als een NumPy array.
-            None: Als het lezen van het frame mislukt is.
+        Geeft None terug als het mislukt.
         """
         # Vraag het frame op bij het OpenCV object
         success, frame = self._capture.read()
@@ -103,15 +104,12 @@ class Camera:
             print("FOUT: Kon geen frame lezen van camera.")
             return None
 
-        return frame
+        return frame</code></pre>
 
-# --- In main.py (om te testen) ---
-# cam = Camera()
-# test_frame = cam.get_frame()
-# if test_frame is not None:
-#     print("Frame succesvol gelezen!")
-#     print(f"Dimensies van het frame: {test_frame.shape}")
-# Output: Dimensies van het frame: (480, 640, 3)</code></pre>
+        <h3>Uitleg: Resultaat</h3>
+        <p>
+            We kunnen nu <code>camera.get_frame()</code> aanroepen. We krijgen dan een plaatje terug waar we iets mee kunnen doen (opslaan, tonen, analyseren).
+        </p>
 
     </main>
 </div>

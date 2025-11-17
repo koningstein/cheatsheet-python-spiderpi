@@ -14,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m6-6.html">« M6.6: HSV Theorie</a>
-            <a href="m6-8.html">M6.8: Debuggen (Vision) »</a>
+            <a href="../module5/m5-8.html">« M5: Abstractie</a>
+            <a href="../module7/m7-1.html">M7: Interfaces »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -59,79 +59,65 @@
     <main>
         <h2>M6.7: Basale Detectie (Pixels Tellen)</h2>
 
-        <h3>Theorie: Het Masker Tellen</h3>
+        <h3>Uitleg: Hoeveel Rood?</h3>
         <p>
-            In Les 6.6 hebben we een "mask" (masker) gemaakt.
-        </p>
-        <ul>
-            <li><strong>Mask:</strong> Een zwart-wit plaatje.</li>
-            <li><strong>Wit (waarde 255):</strong> De pixels die *wel* voldeden aan ons HSV-kleurbereik.</li>
-            <li><strong>Zwart (waarde 0):</strong> De pixels die *niet* voldeden.</li>
-        </ul>
-        <p>
-            <strong>Probleem:</strong> We hebben een plaatje, maar we willen een *getal*. Hoeveel rood *is* er?
+            We kunnen nu een masker maken: een plaatje met alleen de rode pixels (wit) en de rest zwart.
         </p>
         <p>
-            <strong>Oplossing:</strong> <strong><code>cv2.countNonZero()</code></strong>.
-            Deze <code>OpenCV</code> functie telt simpelweg alle pixels die *niet nul* (dus wit) zijn in een masker.
+            Om te weten <em>hoeveel</em> rood er is, hoeven we alleen maar de witte pixels te tellen. OpenCV heeft daar een functie voor: <code>cv2.countNonZero()</code>.
         </p>
-        <ul>
-            <li>Als <code>cv2.countNonZero(mask)</code> <code>0</code> teruggeeft -> Geen rood gezien.</li>
-            <li>Als <code>cv2.countNonZero(mask)</code> <code>5000</code> teruggeeft -> 5000 rode pixels gezien.</li>
-        </ul>
 
         <hr>
-        <h3>Python Voorbeeld (`robot.py` en `main.py`)</h3>
-        <p>We maken een <code>get_color_amount()</code> methode en tonen het getal in onze <code>stream</code>.</p>
+        <h3>Stap 1: De Methode Maken</h3>
+        <p>
+            In <code>camera.py</code> maken we een functie die het masker maakt én de pixels telt.
+        </p>
 
-        <h4>1. De methode (in <code>camera.py</code>)</h4>
         <pre><code class="language-python"># In spiderpi_core/camera.py
-class Camera:
-    # ... (init, get_frame, _check_hsv_range) ...
 
     def get_color_amount(self, frame: np.ndarray, lower_bound: np.ndarray, upper_bound: np.ndarray) -> int:
         """
-        Detecteert en telt pixels van een specifieke kleur.
-
-        Returns:
-            int: Het aantal pixels dat de kleur matcht.
+        Telt hoeveel pixels van een bepaalde kleur er zijn.
         """
-        # Stap 1: Krijg het masker (herhaling Les 6.6)
+        # 1. Maak het masker (via de hulpfunctie van vorige les)
         mask = self._check_hsv_range(frame, lower_bound, upper_bound)
 
-        # Stap 2: Tel de witte pixels
+        # 2. Tel de witte pixels
         pixel_count = cv2.countNonZero(mask)
 
         return pixel_count</code></pre>
 
-        <h4>2. De stream (in <code>robot.py</code>)</h4>
-        <pre><code class="language-python"># In spiderpi_core/robot.py
-import numpy as np
-import cv2
+        <h3>Stap 2: Het Resultaat Tonen</h3>
+        <p>
+            We passen de <code>stream</code> in <code>robot.py</code> aan om dit getal op het scherm te zetten. We moeten eerst definiëren wat "rood" is (de HSV-grenzen).
+        </p>
 
-# Definieer 'rood' als class variable
+        <pre><code class="language-python"># In spiderpi_core/robot.py
+import numpy as np # Vergeet deze niet!
+
+# Dit zijn de HSV-waarden voor 'Rood'
 LOWER_RED = np.array([0, 120, 70])
 UPPER_RED = np.array([10, 255, 255])
 
 class SpiderPi(RobotComponent):
     # ...
     def stream(self) -> None:
-        # ... (while True loop)
-        frame = self._camera.get_frame()
-        if frame is None: break
+        # ... (in de while loop) ...
 
-        # --- NIEUW ---
-        pixel_aantal = self._camera.get_color_amount(frame, LOWER_RED, UPPER_RED)
+        # Tel de rode pixels
+        amount = self._camera.get_color_amount(frame, LOWER_RED, UPPER_RED)
 
-        # Zet dit aantal op het scherm
-        cv2.putText(frame, f"Rode Pixels: {pixel_aantal}", (10, 30),
+        # Schrijf de tekst op het beeld
+        cv2.putText(frame, f"Rood: {amount}", (10, 50),
                     cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-        # --- EINDE NIEUW ---
 
         cv2.imshow("SpiderPi Stream", frame)
-        # ... (waitKey)</code></pre>
+        # ...</code></pre>
 
-        <p><strong>Testen:</strong> <code>python main.py --action stream</code>. Houd iets roods voor de camera en het getal moet omhoog schieten.</p>
+        <h3>Stap 3: Testen</h3>
+        <p>
+            Start de stream: <code>python main.py --action stream</code>. Houd iets roods voor de camera. Het getal linksboven moet omhoog schieten!
+        </p>
 
     </main>
 </div>

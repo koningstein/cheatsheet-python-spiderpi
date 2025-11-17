@@ -40,15 +40,15 @@
     <div class="header-nav-block">
         <header>
             <h1>Module 4: Overerving & Polymorfisme</h1>
-            <p>De "IS EEN" relatie. Ouders, kinderen, en gedrag overschrijven.</p>
+            <p>De "IS EEN" relatie. Parent classes, Child classes, en gedrag overschrijven.</p>
         </header>
         <nav>
             <ul>
                 <li><a href="m4-1.html">M4.1: Basis Klasse (Ouder)</a></li>
                 <li><a href="m4-2.html" class="active">M4.2: Overerving</a></li>
                 <li><a href="m4-3.html">M4.3: super()</a></li>
-                <li><a href="m4-4.html">M4.4: Ouder-methode</a></li>
-                <li><a href="m4-5.html">M4.5: Override (Kind)</a></li>
+                <li><a href="m4-4.html">M4.4: Parent-methode</a></li>
+                <li><a href="m4-5.html">M4.5: Override (Child)</a></li>
                 <li><a href="m4-6.html">M4.6: Override (Delegatie)</a></li>
                 <li><a href="m4-7.html">M4.7: Polymorfisme</a></li>
                 <li><a href="m4-8.html">M4.8: Protected (Overerving)</a></li>
@@ -59,51 +59,54 @@
     <main>
         <h2>M4.2: Overerving Toepassen</h2>
 
-        <h3>Theorie: Het 'Kind' Koppelen</h3>
+        <h3>Uitleg: De Child Class Koppelen</h3>
         <p>
-            Nu we de Ouder (<code>RobotComponent</code>) hebben, moeten we de kinderen (<code>Servo</code>, <code>Leg</code>) vertellen wie hun ouder is.
+            Nu we de <strong>Parent class</strong> (<code>RobotComponent</code>) hebben, moeten we de <strong>Child classes</strong> (<code>Servo</code>, <code>Leg</code>) vertellen wie hun Parent is.
         </p>
         <p>
             In Python gebruiken we hiervoor <strong>haakjes <code>()</code></strong> achter de klassenaam. Dit vertelt Python dat <code>Servo</code> nu <em>automatisch</em> alle methoden en properties van <code>RobotComponent</code> "erft".
         </p>
-        <p><code>class Servo(RobotComponent):</code> betekent: "Ik ben een <code>Servo</code>, en ik <em>ben ook een</em> <code>RobotComponent</code>."</p>
+        <p>
+            <code>class Servo(RobotComponent):</code> betekent: "Ik ben een <code>Servo</code>, en ik <em>ben ook een</em> <code>RobotComponent</code>."
+        </p>
 
-        <hr>
-        <h3>Python Voorbeeld</h3>
-        <p>We passen <code>servo.py</code>, <code>leg.py</code> en <code>robot.py</code> aan.</p>
+        <h3>Stap 1: Servo aanpassen</h3>
+        <p>
+            Open <code>spiderpi_core/servo.py</code>. We moeten eerst de Parent class importeren en dan de klassenaam aanpassen.
+        </p>
 
-        <h4>In <code>spiderpi_core/servo.py</code>:</h4>
-        <pre><code class="language-python"># Importeer de Ouder-klasse
+        <pre><code class="language-python"># In spiderpi_core/servo.py
+
+# 1. Importeer de Parent class
 from .component import RobotComponent
 
-# Geef de Ouder aan tussen de haakjes
+# 2. Geef de Parent aan tussen de haakjes
 class Servo(RobotComponent):
     """
     Servo 'IS EEN' RobotComponent.
-    Het erft nu .name en .__init__(name)
     """
+    # ... (rest van de code laten we even staan)</code></pre>
 
-    def __init__(self, start_id: int, start_angle: float) -> None:
-        # ... (doet nog niks met de ouder, dit crasht!)
-        self._id = start_id
-        # ...</code></pre>
+        <h3>Stap 2: Leg aanpassen</h3>
+        <p>
+            Doe hetzelfde voor <code>spiderpi_core/leg.py</code>.
+        </p>
 
-        <h4>In <code>spiderpi_core/leg.py</code>:</h4>
-        <pre><code class="language-python"># Importeer de Ouder-klasse
-from .component import RobotComponent
+        <pre><code class="language-python"># In spiderpi_core/leg.py
+
+from .component import RobotComponent # Importeren
 from .servo import Servo
 
-# Geef de Ouder aan tussen de haakjes
-class Leg(RobotComponent):
-    # ... (de rest van de klasse)</code></pre>
+class Leg(RobotComponent): # Koppelen aan Parent
+    # ...</code></pre>
 
-        <h4>Testen (CRASH!)</h4>
-        <p>Als je nu <code>main.py</code> draait, crasht de code. Dit is de *bedoeling*!</p>
-        <pre><code class="language-bash">(venv) C:\...&gt; python main.py
-# ...
-# TypeError: __init__() missing 1 required positional argument: 'name'</code></pre>
-        <p>Dit gebeurt omdat de <code>__init__</code> van <code>Servo</code> wordt aangeroepen, maar Python weet dat zijn Ouder (<code>RobotComponent</code>) een <code>name</code> verwacht in *zijn* <code>__init__</code>. Die geven we nog niet mee. Dat lossen we in de volgende les op.</p>
-
+        <h3>Uitleg: De Crash</h3>
+        <p>
+            Als je nu <code>main.py</code> probeert te draaien, zal je code <strong>crashen</strong> met een foutmelding: <code>TypeError</code>.
+        </p>
+        <p>
+            <strong>Waarom?</strong> De Parent class (<code>RobotComponent</code>) verwacht een <code>name</code> in zijn constructor. Maar onze Child classes (<code>Servo</code>, <code>Leg</code>) hebben hun eigen constructor en roepen die van de Parent niet aan. Dat lossen we op in de volgende les.
+        </p>
     </main>
 </div>
 

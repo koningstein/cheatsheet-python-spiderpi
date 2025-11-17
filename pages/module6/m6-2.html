@@ -14,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m6-1.html">« M6.1: Camera Klasse</a>
-            <a href="m6-3.html">M6.3: .get_frame() »</a>
+            <a href="../module5/m5-8.html">« M5: Abstractie</a>
+            <a href="../module7/m7-1.html">M7: Interfaces »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -59,23 +59,25 @@
     <main>
         <h2>M6.2: Compositie (VideoCapture)</h2>
 
-        <h3>Theorie: De Camera 'Connectie'</h3>
+        <h3>Uitleg: De Verbinding Maken</h3>
         <p>
-            <strong>Probleem:</strong> Onze <code>Camera</code> klasse (M6.1) is leeg. Het is een 'doos' zonder inhoud.
+            Onze <code>Camera</code> klasse is nu nog een lege doos. We moeten verbinding maken met de echte hardware.
         </p>
         <p>
-            <strong>Oplossing:</strong> We moeten *in* de <code>__init__</code> de *echte* verbinding met de camera-hardware maken. In <code>OpenCV</code> is het object dat de *fysieke camera* vertegenwoordigt: <strong><code>cv2.VideoCapture(0)</code></strong>.
+            In OpenCV heet het object dat de camera bestuurt: <strong><code>cv2.VideoCapture</code></strong>.
         </p>
         <p>
-            Het getal <code>0</code> betekent "pak de eerste camera die je kunt vinden" (meestal de ingebouwde webcam of de Pi-camera).
+            We gebruiken <strong>Compositie</strong> (M1.8). Onze <code>Camera</code> klasse <em>heeft een</em> <code>VideoCapture</code> object. We maken dit object aan in de <code>__init__</code>.
         </p>
         <p>
-            Onze <code>Camera</code> klasse (de 'doos') *bevat* (heeft een) dit <code>VideoCapture</code> object. Dit is <strong>Compositie</strong> (herhaling van M1.8). [cite: 247-248]
+            Het getal <code>0</code> betekent "de eerste camera die je vindt" (meestal je webcam).
         </p>
 
         <hr>
-        <h3>Python Voorbeeld (`camera.py`)</h3>
-        <p>We vullen de <code>__init__</code> van onze <code>Camera</code> klasse.</p>
+        <h3>Stap 1: De __init__ vullen</h3>
+        <p>
+            Pas <code>spiderpi_core/camera.py</code> aan. We slaan de verbinding op in een <code>_protected</code> variabele.
+        </p>
 
         <pre><code class="language-python"># In spiderpi_core/camera.py
 import cv2
@@ -90,21 +92,19 @@ class Camera:
     def __init__(self) -> None:
         """Initialiseert de camera en 'grijpt' de hardware."""
 
-        # Maak het OpenCV object
+        # Maak het OpenCV object (0 = standaard webcam)
         self._capture = cv2.VideoCapture(0)
 
+        # Check of het gelukt is
         if not self._capture.isOpened():
-            # Een check of de camera wel echt gevonden is
             raise IOError("Kan de camera niet openen op index 0.")
 
-        print("Camera succesvol geïnitialiseerd.")
+        print("Camera succesvol geïnitialiseerd.")</code></pre>
 
-# --- In main.py (om te testen) ---
-# try:
-#     cam = Camera()
-#     print("Camera-object succesvol gemaakt.")
-# except IOError as e:
-#     print(f"FOUT: {e}")</code></pre>
+        <h3>Uitleg: Wat gebeurt er?</h3>
+        <p>
+            Als je nu een <code>Camera()</code> object zou maken, gaat het lampje van je webcam aan. De verbinding is open. Maar... we zien nog geen beeld. We moeten de camera nog vragen om een foto te maken.
+        </p>
 
     </main>
 </div>

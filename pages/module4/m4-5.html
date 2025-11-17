@@ -14,7 +14,7 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m4-4.html">« M4.4: Ouder-methode</a>
+            <a href="m4-4.html">« M4.4: Parent-methode</a>
             <a href="m4-6.html">M4.6: Override (Delegatie) »</a>
         </div>
         <div class="nav-group theme-switcher">
@@ -40,7 +40,7 @@
     <div class="header-nav-block">
         <header>
             <h1>Module 4: Overerving & Polymorfisme</h1>
-            <p>De "IS EEN" relatie. Ouders, kinderen, en gedrag overschrijven.</p>
+            <p>De "IS EEN" relatie. Parent classes, Child classes, en gedrag overschrijven.</p>
         </header>
         <nav>
             <ul>
@@ -59,25 +59,24 @@
     <main>
         <h2>M4.5: Method Overriding (Servo)</h2>
 
-        <h3>Theorie: Gedrag Specialiseren</h3>
+        <h3>Uitleg: Gedrag Specialiseren</h3>
         <p>
-            <strong>Probleem:</strong> De standaard <code>.reset()</code> (Les 4.4) is niet nuttig. Een <code>Servo</code> reset zou iets specifieks moeten doen: <strong>naar 90 graden gaan</strong>.
+            De standaard <code>.reset()</code> van de Parent class is niet nuttig genoeg voor een Servo. Een Servo-reset moet iets specifieks doen: <strong>naar 90 graden gaan</strong>.
         </p>
         <p>
-            <strong>Oplossing: Method Overriding (Methode Overschrijven)</strong>.
-            We definiëren in de Kind-klasse (<code>Servo</code>) een methode met <em>exact dezelfde naam</em> als in de Ouder-klasse (<code>RobotComponent</code>).
-        </p>
-        <p>
-            Python zal dan *altijd* de methode van het Kind kiezen. Het "kind" overschrijft het gedrag van de "ouder".
+            Dit noemen we <strong>Method Overriding</strong> (Overschrijven).
+            We maken in de <strong>Child class</strong> (<code>Servo</code>) een methode met <em>exact dezelfde naam</em> als in de Parent class. Python zal dan de methode van het Child kiezen in plaats van die van de Parent.
         </p>
 
         <hr>
-        <h3>Python Voorbeeld (`servo.py`)</h3>
-        <p>We voegen de <code>reset</code> methode toe aan <code>Servo</code>, die de <code>reset</code> van <code>RobotComponent</code> zal overschrijven.</p>
+        <h3>Stap 1: Override in Servo</h3>
+        <p>
+            Open <code>spiderpi_core/servo.py</code> en voeg de <code>reset</code> methode toe.
+        </p>
 
         <pre><code class="language-python"># In spiderpi_core/servo.py
 class Servo(RobotComponent):
-    # ... (init, set_angle, etc.)
+    # ... (rest van de code) ...
 
     # DIT IS DE OVERRIDE:
     def reset(self) -> None:
@@ -85,21 +84,27 @@ class Servo(RobotComponent):
         Overschrijft de standaard reset.
         Een Servo reset zet de hoek naar 90 graden.
         """
-        print(f"SERVO RESET: {self.name} gaat naar 90 graden.")
-        self.set_angle(90.0) # Specifiek gedrag
+        print(f"SERVO RESET: {self.name} going to 90 degrees.")
+        self.set_angle(90.0) # Specifiek gedrag voor een Servo</code></pre>
 
-# --- In main.py ---
-# test_servo = my_robot.leg_front_r.hip_servo
-# test_leg = my_robot.leg_front_r
+        <h3>Stap 2: Testen</h3>
+        <p>
+            We testen nu opnieuw.
+        </p>
+        <pre><code class="language-python"># In main.py
+motor = Servo(1, 150.0) # Zet hem eerst op 150
+motor.reset()           # Reset hem
+print(f"Current angle: {motor.current_angle}")</code></pre>
 
-# Servo gebruikt nu zijn EIGEN reset:
-# test_servo.reset()
-# Output: "SERVO RESET: Servo_1 gaat naar 90 graden."
-
-# Leg gebruikt nog steeds de OUDER-methode:
-# test_leg.reset()
-# Output: "Component 'Leg_1_2_3' voert een STANDAARD reset uit."</code></pre>
-
+        <h3>Uitleg: Het Resultaat</h3>
+        <p>
+            Output:
+            <br><code>SERVO RESET: Servo_1 going to 90 degrees.</code>
+            <br><code>Current angle: 90.0</code>
+        </p>
+        <p>
+            De saaie tekst van de Parent class ("STANDARD reset") is weg. De Child class heeft het overgenomen.
+        </p>
     </main>
 </div>
 

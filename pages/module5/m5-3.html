@@ -14,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m5-2.html">« M5.2: Abstracte Methoden</a>
-            <a href="m5-4.html">M5.4: Implementatie (Complex) »</a>
+            <a href="../module4/m4-1.html">« M4: Overerving</a>
+            <a href="../module6/m6-1.html">M6: Vision »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -59,53 +59,62 @@
     <main>
         <h2>M5.3: Implementatie (Simpel)</h2>
 
-        <h3>Theorie: Het Contract Vervullen</h3>
+        <h3>Uitleg: Het Contract Vervullen</h3>
         <p>
-            Een abstracte klasse (contract) is nutteloos totdat een 'concrete' (niet-abstracte) kind-klasse het <strong>implementeert</strong>.
+            Een abstracte klasse is nutteloos totdat een 'concrete' (echte) Child class het contract <strong>implementeert</strong>.
         </p>
         <p>
-            Om het contract te vervullen, moet de kind-klasse:
+            Om het contract te vervullen, moet de Child class:
         </p>
         <ol>
-            <li>Erven van de abstracte klasse.</li>
-            <li>Een <em>echte</em> methode (met code) implementeren voor <em>elke</em> <code>@abstractmethod</code> van de ouder.</li>
+            <li>Erven van <code>AbstractRobotAction</code>.</li>
+            <li>Een <em>echte</em> methode (met code) maken voor <code>execute()</code>.</li>
         </ol>
-        <p>
-            Omdat <code>WalkAction</code> de <code>execute()</code> methode netjes implementeert, is het <em>geen</em> abstracte klasse meer, en kun je er <em>wel</em> objecten van maken.
-        </p>
 
         <hr>
-        <h3>Python Voorbeeld (`actions.py`)</h3>
-        <p>We voegen een *concrete* klasse toe die het contract vervult.</p>
+        <h3>Stap 1: WalkAction Maken</h3>
+        <p>
+            We voegen een nieuwe klasse toe aan <code>actions.py</code>. Deze actie laat de robot "lopen".
+        </p>
 
         <pre><code class="language-python"># In spiderpi_core/actions.py
-# ... (imports en AbstractRobotAction) ...
+# ... (bovenaan de imports en AbstractRobotAction) ...
 
 class WalkAction(AbstractRobotAction):
     """
     Een CONCRETE actie. Vervult het contract.
-    (Heeft geen __init__ nodig, erft die van de ouder)
     """
 
     def execute(self) -> None:
         """
         Implementatie van het 'execute' contract.
         """
-        print("Actie: Lopen...")
-        # We kunnen de robot (die we in de __init__ kregen) besturen:
-        # (We gaan ervan uit dat robot een 'leg_front_r' getter heeft)
-        self._robot.leg_front_r.move_to_angles(100, 100, 100)
+        print("Action: Walking forward...")
+        # Hier zou je code komen om de poten te bewegen
+        # self._robot.leg_front_left.move_to_angles(...)</code></pre>
 
-# --- In main.py ---
+        <h3>Stap 2: Testen</h3>
+        <p>
+            Nu kunnen we in <code>main.py</code> wél een object maken.
+        </p>
+
+        <pre><code class="language-python"># In main.py
 from spiderpi_core.actions import WalkAction
+from spiderpi_core.robot import SpiderPi
+
+my_robot = SpiderPi()
 
 # Dit crasht NIET, want het contract is vervuld:
-loop_actie = WalkAction(my_robot)
-loop_actie.execute()
+walk = WalkAction(my_robot)
 
-# Output:
-# Actie: Lopen...
-# (gevolgd door de servo-prints)</code></pre>
+# Voer de actie uit
+walk.execute()</code></pre>
+
+        <h3>Uitleg: Resultaat</h3>
+        <p>
+            In de terminal zie je: <code>Action: Walking forward...</code>.
+            Omdat <code>WalkAction</code> de <code>execute</code> methode heeft gemaakt, is hij niet meer abstract en mogen we hem gebruiken.
+        </p>
 
     </main>
 </div>

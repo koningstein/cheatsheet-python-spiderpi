@@ -15,7 +15,7 @@
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
             <a href="m6-7.html">« M6.7: Detectie (Pixels)</a>
-            <a href="../module7/m7-1.html">Module 7: Abstracte Vision »</a>
+            <a href="../module7/m7-1.html">M7: Interfaces »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -59,55 +59,35 @@
     <main>
         <h2>M6.8: Debuggen Vision (NumPy Arrays)</h2>
 
-        <h3>Theorie: Kijken *in* de Data</h3>
+        <h3>Uitleg: Kijken *in* de Data</h3>
         <p>
-            Dit is een *herhaling* van de <strong>Debugger</strong> (M3.5) [cite: 245-246], maar nu toegepast op de complexe datatypen van Computer Vision.
+            Soms werkt je vision-code niet. Bijvoorbeeld: je krijgt een zwart beeld. <code>print(frame)</code> helpt niet, want dat print miljoenen getallen.
         </p>
         <p>
-            <strong>Probleem:</strong> We gebruiken <code>frame</code> en <code>mask</code> als 'zwarte dozen'. Maar wat *zijn* het? <code>print(frame)</code> is nutteloos (duizenden getallen).
+            We gebruiken weer de Debugger. Bij plaatjes (NumPy arrays) letten we op de <strong>Shape</strong> (Vorm).
         </p>
-        <p>
-            <strong>Oplossing:</strong> De Debugger. We zetten een Breakpoint en inspecteren de variabelen in het "Variables" paneel. Bij NumPy arrays (zoals <code>frame</code> en <code>mask</code>) letten we op 2 dingen:
-        </p>
-        <ol>
-            <li><strong><code>shape</code> (Vorm):</strong>
-                <ul>
-                    <li><code>frame.shape</code> = <code>(480, 640, 3)</code></li>
-                    <li>Betekent: 480 rijen (hoogte), 640 kolommen (breedte), <strong>3 kanalen</strong> (Blauw, Groen, Rood).</li>
-                </ul>
-            </li>
-            <li><strong><code>mask.shape</code> (Vorm):</strong>
-                <ul>
-                    <li><code>mask.shape</code> = <code>(480, 640)</code></li>
-                    <li>Betekent: 480 rijen, 640 kolommen. Het heeft maar <strong>1 kanaal</strong> (het is zwart-wit).</li>
-                </ul>
-            </li>
-        </ol>
-        <p>Dit helpt ons te *zien* dat <code>cvtColor</code> en <code>inRange</code> de data daadwerkelijk transformeren.</p>
+        <ul>
+            <li><code>(480, 640, 3)</code>: Dit is een <strong>Kleurplaatje</strong>. 480 hoog, 640 breed, 3 kleuren (Blauw, Groen, Rood).</li>
+            <li><code>(480, 640)</code>: Dit is een <strong>Zwart-Wit plaatje</strong> (zoals ons masker). Geen 3e getal, want er is maar 1 kleur (grijs).</li>
+        </ul>
 
         <hr>
-        <h3>Python Voorbeeld (Debugger Stappen)</h3>
-        <p>Dit is een opdracht *zonder* nieuwe code. De opdracht is om de debugger te *gebruiken*.</p>
+        <h3>Opdracht: Inspecteren</h3>
+        <p>
+            Dit is een doe-opdracht. Gebruik je debugger om te kijken wat voor data er door je programma stroomt.
+        </p>
 
-        <pre><code class="language-python"># 1. Stel je Debugger in (bv. in VS Code 'launch.json')
-#    om met de juiste argumenten te draaien:
-#    "args": ["--action", "stream"]
+        <ol>
+            <li>Zet een <strong>Breakpoint</strong> in <code>camera.py</code>, op de regel <code>mask = ...</code>.</li>
+            <li>Start de debugger.</li>
+            <li>Kijk in het venster <strong>Variables</strong>.</li>
+            <li>Zoek <code>hsv_frame</code> en <code>mask</code>.</li>
+            <li>Kijk naar de <strong>shape</strong>. Zie je het verschil tussen 3 getallen en 2 getallen?</li>
+        </ol>
 
-# 2. Zet een Breakpoint in 'robot.py'
-#    in de 'stream' methode, op de regel NA:
-#    frame = self._camera.get_frame()
-
-# 3. Zet een Breakpoint in 'camera.py'
-#    in de 'get_color_amount' methode, op de regel NA:
-#    mask = self._check_hsv_range(...)
-
-# 4. Start Debugging (F5)
-# 5. Inspecteer 'frame' bij Breakpoint 1:
-#    - VARIABLES -> frame -> shape: (480, 640, 3)
-
-# 6. Druk 'Continue' (F5)
-# 7. Inspecteer 'mask' bij Breakpoint 2:
-#    - VARIABLES -> mask -> shape: (480, 640)</code></pre>
+        <pre><code class="language-text"># Voorbeeld in Debugger Venster:
+frame: ndarray (480, 640, 3)  <-- Kleur
+mask: ndarray (480, 640)      <-- Zwart-wit</code></pre>
 
     </main>
 </div>

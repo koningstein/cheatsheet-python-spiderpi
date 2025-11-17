@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M7.7: Abstracte Sensor Integratie</title>
+    <title>M7.7: Sensor Integratie</title>
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="../../script.js" defer></script>
@@ -14,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m7-6.html">« M7.6: Poly-koppeling</a>
-            <a href="m7-8.html">M7.8: Testing (Detectors) »</a>
+            <a href="../module6/m6-1.html">« M6: Vision</a>
+            <a href="../module8/m8-1.html">M8: Integratie »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -57,78 +57,92 @@
     </div>
 
     <main>
-        <h2>M7.7: Abstracte Sensor Integratie</h2>
+        <h2>M7.7: Sensor Integratie</h2>
 
-        <h3>Theorie: De 'Slimme' Sensor</h3>
+        <h3>Uitleg: Vision IS een Sensor</h3>
         <p>
-            We hebben twee 'contracten':
-        </p>
-        <ol>
-            <li><code>AbstractSensor</code> (M5.5) [cite: 249-250]: *Eist* een <code>.read_value() -> float</code> methode (geeft een <strong>getal</strong>).</li>
-            <li><code>VisionProcessorProtocol</code> (M7.1) : *Eist* een <code>.analyze_frame() -> np.ndarray</code> methode (geeft een <strong>beeld</strong>).</li>
-        </ol>
-        <p>
-            <strong>Probleem:</strong> Deze lijken onverenigbaar.
+            Soms willen we geen plaatje zien in een venster, maar willen we gewoon een getal. Bijvoorbeeld: "Hoeveel rood zie je?"
         </p>
         <p>
-            <strong>Oplossing:</strong> We maken een *nieuwe* klasse: <code>VisionSensor</code>. Dit is een "Adapter" klasse.
+            In Module 5.5 hebben we een contract gemaakt voor sensoren: <code>AbstractSensor</code>. Dat contract eist een methode <code>read_value()</code> die een getal teruggeeft.
         </p>
-        <ul>
-            <li><code>VisionSensor</code> <em>IS EEN</em> <code>AbstractSensor</code> (erft ervan, vervult <code>read_value()</code>).</li>
-            <li><code>VisionSensor</code> <em>HEEFT EEN</em> <code>Camera</code> (om te kijken).</li>
-            <li><code>VisionSensor</code> <em>HEEFT EEN</em> <code>ColorDetector</code> (om te analyseren).</li>
-        </ul>
-        <p>De <code>.read_value()</code> methode van de <code>VisionSensor</code> doet dan *zelf* de detectie en *telt* de pixels (herhaling M6.7) [cite: 251-252].</p>
+        <p>
+            Onze Vision Processors geven een <em>plaatje</em> terug. Dat past dus niet op de sensor-aansluiting.
+        </p>
+        <p>
+            We kunnen een <strong>Adapter</strong> maken. Dit is een klasse die zich gedraagt als een Sensor (hij geeft een getal), maar stiekem Vision gebruikt om dat getal te berekenen.
+        </p>
 
         <hr>
-        <h3>Python Voorbeeld (`sensors.py`)</h3>
-        <p>We maken een 'slimme sensor' die *is een* Sensor, maar *vision* gebruikt.</p>
+        <h3>Stap 1: De Adapter Maken</h3>
+        <p>
+            We maken <code>ColorVisionSensor</code> in <code>sensors.py</code>.
+            Hij moet erven van <code>AbstractSensor</code> (zodat de robot denkt dat het een gewone sensor is).
+            Maar hij moet een Camera en een Detector bezitten (zodat hij kan kijken).
+        </p>
 
         <pre><code class="language-python"># In spiderpi_core/sensors.py
 from .camera import Camera
 from .vision import ColorDetector
 import cv2
 import numpy as np
-
-# ... (AbstractSensor van M5.5) ...
+# ... (AbstractSensor) ...
 
 class ColorVisionSensor(AbstractSensor):
     """
-    IS EEN Sensor. HEEFT EEN Camera en Kleur-grenzen.
-    Implementeert .read_value() door pixels te tellen.
+    Gedraagt zich als een sensor (geeft een getal),
+    maar gebruikt de camera om rode pixels te tellen.
     """
     _camera: Camera
     _detector: ColorDetector
 
-    def __init__(self, camera: Camera, lower_bound: np.ndarray, upper_bound: np.ndarray):
+    def __init__(self, camera: Camera, lower: np.ndarray, upper: np.ndarray):
         self._camera = camera
-        # Maak de *specifieke* processor die deze sensor nodig heeft
-        self._detector = ColorDetector(lower_bound, upper_bound)
+        # We maken hier intern een detector aan
+        self._detector = ColorDetector(lower, upper)</code></pre>
 
-    def read_value(self) -> float:
+        <h3>Stap 2: De Vertaling</h3>
+        <p>
+            Nu implementeren we de <code>read_value</code> methode. Hier vindt de vertaling plaats van "Plaatje" naar "Getal".
+        </p>
+
+        <pre><code class="language-python">    def read_value(self) -> float:
         """Leest de sensor: telt de gekleurde pixels."""
+
+        # 1. Haal het plaatje op
         frame = self._camera.get_frame()
         if frame is None:
             return 0.0
 
-        # Gebruik de detector om het masker te krijgen
+        # 2. Vraag de detector om het masker (het zwart-wit plaatje)
         mask = self._detector.analyze_frame(frame)
 
-        # Tel de pixels (logica uit M6.7)
+        # 3. Tel de witte pixels
         count = cv2.countNonZero(mask)
-        return float(count)
 
-# --- In main.py ---
-# from spiderpi_core.camera import Camera
-# from spiderpi_core.sensors import ColorVisionSensor
-#
-# cam = Camera()
-# LOWER_RED = np.array([0, 120, 70])
-# UPPER_RED = np.array([10, 255, 255])
-# red_sensor = ColorVisionSensor(cam, LOWER_RED, UPPER_RED)
-#
-# print(f"Rode pixels gedetecteerd: {red_sensor.read_value()}")</code></pre>
+        # 4. Geef het aantal terug als float (zoals het contract eist)
+        return float(count)</code></pre>
 
+        <h3>Stap 3: Testen</h3>
+        <p>
+            Nu kunnen we de camera uitlezen alsof het een afstandssensor is.
+        </p>
+        <pre><code class="language-python"># In main.py
+from spiderpi_core.sensors import ColorVisionSensor
+from spiderpi_core.camera import Camera
+import numpy as np
+
+cam = Camera()
+# Rood filter
+L = np.array([0, 120, 70])
+U = np.array([10, 255, 255])
+
+# Maak de 'slimme' sensor
+red_sensor = ColorVisionSensor(cam, L, U)
+
+# Lees hem uit
+waarde = red_sensor.read_value()
+print(f"Aantal rode pixels: {waarde}")</code></pre>
     </main>
 </div>
 

@@ -14,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m5-7.html">« M5.7: Static Methoden</a>
-            <a href="../module6/m6-1.html">Module 6: Camera Vision »</a>
+            <a href="../module4/m4-1.html">« M4: Overerving</a>
+            <a href="../module6/m6-1.html">M6: Vision »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -59,35 +59,25 @@
     <main>
         <h2>M5.8: Class Variables</h2>
 
-        <h3>Theorie: 'van het Object' vs. 'van de Klasse'</h3>
+        <h3>Uitleg: Gedeelde Variabelen</h3>
         <p>
-            Er zijn twee soorten variabelen:
-        </p>
-        <p>
-            <strong>1. Instance Variable (Wat we al kennen):</strong>
+            Net als statische methoden (M5.7), bestaan er ook statische variabelen. We noemen dit <strong>Class Variables</strong>.
         </p>
         <ul>
-            <li>Gedefinieerd in <code>__init__</code> met <code>self.</code></li>
-            <li><code>self._current_angle = 90.0</code></li>
-            <li><strong>Uniek</strong> voor elk object. <code>motor1.current_angle</code> kan anders zijn dan <code>motor2.current_angle</code>.</li>
+            <li><strong>Instance Variable (<code>self.x</code>):</strong> Uniek voor elk object.</li>
+            <li><strong>Class Variable:</strong> Gedeeld door *alle* objecten van die klasse. Als je hem verandert, verandert hij voor iedereen.</li>
         </ul>
-
         <p>
-            <strong>2. Class Variable:</strong>
+            Dit is handig voor constanten (zoals de <code>MIN_ANGLE</code> uit Module 1) of standaardinstellingen.
         </p>
-        <ul>
-            <li>Gedefinieerd *direct* onder de <code>class</code> regel (buiten <code>__init__</code>).</li>
-            <li>Wordt <strong>gedeeld</strong> door *alle* objecten van die klasse.</li>
-            <li><strong>Vergelijking (Auto):</strong> <code>mijn_auto.kleur</code> (instance) vs <code>Auto.AANTAL_WIELEN = 4</code> (class).</li>
-        </ul>
 
         <hr>
-        <h3>Python Voorbeeld (`robot.py`)</h3>
-        <p>We voegen gedeelde constanten toe aan onze klassen.</p>
+        <h3>Stap 1: Class Variable Toevoegen</h3>
+        <p>
+            We voegen een standaard IP-adres toe aan de <code>SpiderPi</code> klasse in <code>robot.py</code>. We zetten dit *buiten* de <code>__init__</code>.
+        </p>
 
-        <h4>In <code>spiderpi_core/robot.py</code>:</h4>
-        <pre><code class="language-python">from .leg import Leg
-from .component import RobotComponent
+        <pre><code class="language-python"># In spiderpi_core/robot.py
 
 class SpiderPi(RobotComponent):
     # --- CLASS VARIABLES ---
@@ -95,38 +85,19 @@ class SpiderPi(RobotComponent):
     DEFAULT_IP: str = "192.168.1.100"
     LEG_COUNT: int = 6
 
-    _leg_front_r: Leg # Instance variable
-    # ...
+    # ... (rest van de klasse)</code></pre>
 
-    def __init__(self) -> None:
-        super().__init__(name="SpiderPi_Robot")
-        # --- INSTANCE VARIABLES ---
-        self._leg_front_r = Leg(...)
-        # ...</code></pre>
+        <h3>Stap 2: Gebruiken</h3>
+        <p>
+            Je kunt deze variabelen aanroepen via de klassenaam.
+        </p>
 
-        <h4>In <code>spiderpi_core/servo.py</code>:</h4>
-        <p>We verplaatsen <code>MIN_ANGLE</code> en <code>MAX_ANGLE</code> *in* de klasse, zodat ze logisch bij de <code>Servo</code> horen.</p>
-        <pre><code class="language-python">class Servo(RobotComponent):
-    # --- CLASS VARIABLES ---
-    MIN_ANGLE: float = 0.0
-    MAX_ANGLE: float = 180.0
-
-    _id: int # Instance variable
-    _current_angle: float # Instance variable
-
-    def set_angle(self, new_angle: float) -> None:
-        # Gebruik 'self.' of 'Servo.' om de class variable te lezen
-        if not (self.MIN_ANGLE <= new_angle <= self.MAX_ANGLE):
-            raise ValueError("Hoek buiten bereik")
-        # ...</code></pre>
-
-        <h4>In <code>main.py</code>:</h4>
-        <pre><code class="language-python">from spiderpi_core.robot import SpiderPi
-from spiderpi_core.servo import Servo
+        <pre><code class="language-python"># In main.py
+from spiderpi_core.robot import SpiderPi
 
 # Je kunt ze aanroepen ZONDER een object te maken:
-print(f"Een SpiderPi heeft {SpiderPi.LEG_COUNT} poten.")
-print(f"De max hoek van een Servo is {Servo.MAX_ANGLE} graden.")</code></pre>
+print(f"Connecting to default IP: {SpiderPi.DEFAULT_IP}")
+print(f"A SpiderPi has {SpiderPi.LEG_COUNT} legs.")</code></pre>
 
     </main>
 </div>

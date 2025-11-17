@@ -14,8 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="m8-2.html">« M8.2: Sturing (Lijnvolgen)</a>
-            <a href="m8-4.html">M8.4: Integratie (Gebaar) »</a>
+            <a href="m8-2.html">« M8.2: Lijnvolgen</a>
+            <a href="m8-4.html">M8.4: Gebaar Actie »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -39,18 +39,18 @@
 
     <div class="header-nav-block">
         <header>
-            <h1>Module 8: Integratie & Eindopdracht</h1>
-            <p>Alles samenbrengen in een 'Sense-Think-Act' loop.</p>
+            <h1>Module 8: Integratie & Sturing</h1>
+            <p>Vision en gedrag samenbrengen.</p>
         </header>
         <nav>
             <ul>
-                <li><a href="m8-1.html">M8.1: Integratie (Stop op Rood)</a></li>
-                <li><a href="m8-2.html">M8.2: Sturing (Lijnvolgen)</a></li>
-                <li><a href="m8-3.html" class="active">M8.3: Integratie (Gezicht Volgen)</a></li>
-                <li><a href="m8-4.html">M8.4: Integratie (Gebaar Actie)</a></li>
-                <li><a href="m8-5.html">M8.5: AI Logica (Gezicht)</a></li>
-                <li><a href="m8-6.html">M8.6: AI Logica (Gebaar)</a></li>
-                <li><a href="m8-7.html">M8.7: Code Kwaliteit</a></li>
+                <li><a href="m8-1.html">M8.1: Stop op Rood</a></li>
+                <li><a href="m8-2.html">M8.2: Lijnvolgen</a></li>
+                <li><a href="m8-3.html" class="active">M8.3: Gezicht Volgen</a></li>
+                <li><a href="m8-4.html">M8.4: Gebaar Actie</a></li>
+                <li><a href="m8-5.html">M8.5: AI Gezicht</a></li>
+                <li><a href="m8-6.html">M8.6: AI Gebaar</a></li>
+                <li><a href="m8-7.html">M8.7: Kwaliteit</a></li>
                 <li><a href="m8-8.html">M8.8: Eindopdracht</a></li>
             </ul>
         </nav>
@@ -59,100 +59,77 @@
     <main>
         <h2>M8.3: Integratie (Gezicht Volgen)</h2>
 
-        <h3>Theorie: De Camera Gimbal Besturen</h3>
+        <h3>Uitleg: De Camera Bewegen</h3>
         <p>
-            <strong>Probleem:</strong> De robot *ziet* een gezicht (M7.4) [cite: 253-254], maar kijkt ernaast. We willen dat de *camera* zelf (die op 2 servos zit, de 'gimbal') beweegt om het gezicht te centreren.
+            De SpiderPi heeft een "hoofd" (twee servo's voor de camera). We gaan nu een systeem maken dat een gezicht volgt. Als jij naar links beweegt, draait de robot zijn hoofd mee.
         </p>
-        <p><strong>Oplossing:</strong></p>
-        <ol>
-            <li><strong>Refactor <code>FaceDetector</code>:</strong> Moet het *midden* <code>(cX, cY)</code> van het (grootste) gezicht teruggeven. <code>return frame, (cX, cY)</code>.</li>
-            <li><strong>Maak <code>CameraGimbal</code> Klasse:</strong> Een nieuwe klasse (Compositie) die de 2 camera-servos (vaak ID 19 en 20) bestuurt.</li>
-            <li><strong>Integratie:</strong> De <code>SpiderPi</code> *heeft een* <code>CameraGimbal</code>.</li>
-            <li><strong>Logica:</strong> De <code>main</code> loop krijgt <code>(cX, cY)</code> en stuurt de gimbal aan om de "error" (afstand tot het midden) te minimaliseren.</li>
-        </ol>
+        <p>
+            Hiervoor moeten we eerst het hoofd (Head) programmeren.
+        </p>
 
         <hr>
-        <h3>Python Voorbeeld</h3>
+        <h3>Stap 1: De Head Klasse</h3>
+        <p>
+            Maak <code>spiderpi_core/head.py</code>. Deze klasse beheert twee servo's: Pan (draaien) en Tilt (knikken).
+        </p>
 
-        <h4>1. Nieuwe Klasse (in <code>spiderpi_core/gimbal.py</code>)</h4>
-        <pre><code class="language-python">from .component import RobotComponent
+        <pre><code class="language-python"># In spiderpi_core/head.py
 from .servo import Servo
+from .component import RobotComponent
 
-class CameraGimbal(RobotComponent):
-    """Beweegt de 2-assige gimbal van de camera."""
-    def __init__(self, id_x: int, id_y: int):
-        super().__init__("CameraGimbal")
-        self._x_servo = Servo(start_id=id_x, start_angle=90.0)
-        self._y_servo = Servo(start_id=id_y, start_angle=90.0)
+class Head(RobotComponent):
+    _pan: Servo
+    _tilt: Servo
 
-    def set_angles(self, x_angle: float, y_angle: float):
-        try:
-            self._x_servo.set_angle(x_angle)
-            self._y_servo.set_angle(y_angle)
-        except ValueError:
-            # Negeer ongeldige hoeken (bv. buiten 0-180)
-            pass </code></pre>
+    def __init__(self, pan_id: int, tilt_id: int):
+        super().__init__(name="RobotHead")
+        self._pan = Servo(pan_id, 90.0)
+        self._tilt = Servo(tilt_id, 90.0)
 
-        <h4>2. Integratie (in <code>robot.py</code>)</h4>
-        <pre><code class="language-python"># In spiderpi_core/robot.py
-from .gimbal import CameraGimbal
-# ...
+    def look(self, pan: float, tilt: float) -> None:
+        """Beweeg het hoofd."""
+        self._pan.set_angle(pan)
+        self._tilt.set_angle(tilt)</code></pre>
+
+        <h3>Stap 2: Robot Updaten</h3>
+        <p>
+            Voeg het hoofd toe aan <code>spiderpi_core/robot.py</code> (in de <code>__init__</code>).
+        </p>
+
+        <pre><code class="language-python"># In robot.py
+from .head import Head
+
 class SpiderPi(RobotComponent):
+    _head: Head
     # ...
-    _gimbal: CameraGimbal
-
-    def __init__(self) -> None:
-        super().__init__("SpiderPi_Robot")
-        # ... (poten) ...
-        # (Camera wordt ook in __init__ gemaakt)
-        self._gimbal = CameraGimbal(id_x=19, id_y=20)
+    def __init__(self):
+        # ...
+        self._head = Head(19, 20) # Voorbeeld ID's
 
     @property
-    def gimbal(self) -> CameraGimbal:
-        return self._gimbal</code></pre>
+    def head(self) -> Head:
+        return self._head</code></pre>
 
-        <h4>3. Refactor (in <code>vision.py</code>)</h4>
-        <pre><code class="language-python"># In spiderpi_core/vision.py
-class FaceDetector:
-    # ... (init)
-    def analyze_frame(self, frame: np.ndarray) -> tuple[np.ndarray, tuple | None]:
-        # ... (detectMultiScale) ...
-        if len(faces) > 0:
-            (x, y, w, h) = faces[0] # Pak (simpelweg) de eerste
-            cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
-            # Bereken midden
-            cX = x + w // 2
-            cY = y + h // 2
-            return frame, (cX, cY)
-        return frame, None</code></pre>
+        <h3>Stap 3: De Tracking Loop</h3>
+        <p>
+            Nu maken we de tracking logica. Als het gezicht links is, draaien we naar links.
+        </p>
 
-        <h4>4. De Loop (in <code>main.py</code>)</h4>
-        <pre><code class="language-python"># In main.py
-# ... (init robot, cam, en FaceDetector) ...
-current_x_angle = 90.0
-current_y_angle = 90.0
+        <pre><code class="language-python"># In main_track.py
+pan_angle = 90.0
 
 while True:
-    frame = cam.get_frame()
-    (frame, center) = processor.analyze_frame(frame)
+    # ... (Haal frame en analyseer met FaceDetector) ...
 
-    if center:
-        (cX, cY) = center
-        # Simpele 'Proportional Controller' (stuur-logica)
-        # cX (bv. 320) is het midden van het scherm
-        error_x = cX - 320
-        error_y = cY - 240
+    x = face_processor.last_x # (Zorg dat FaceDetector dit heeft!)
 
-        # Pas de hoek aan o.b.v. de 'error'.
-        # De '0.05' is de 'gain' (hoe snel hij reageert)
-        current_x_angle -= error_x * 0.05
-        current_y_angle += error_y * 0.05
+    if x < 300:
+        pan_angle += 2.0 # Draai links
+    elif x > 340:
+        pan_angle -= 2.0 # Draai rechts
 
-        my_robot.gimbal.set_angles(current_x_angle, current_y_angle)
-
-    cv2.imshow("Face Tracker", frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'): break
-cv2.destroyAllWindows()</code></pre>
+    # Stuur de servo's
+    my_robot.head.look(pan_angle, 90.0)</code></pre>
 
     </main>
 </div>
