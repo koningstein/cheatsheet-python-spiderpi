@@ -50,7 +50,7 @@
                 <li><a href="m1-4.html">M1.4: Setters</a></li>
                 <li><a href="m1-5.html">M1.5: Getters</a></li>
                 <li><a href="m1-6.html">M1.6: Constructor</a></li>
-                <li><a href="m1-7.html">M1.7: Named Arguments</a></li>
+                <li><a href="m1-7.html">M1.7: Class Variables</a></li>
                 <li><a href="m1-8.html">M1.8: Compositie</a></li>
                 <li><a href="m1-9.html" class="active">M1.9: Delegatie</a></li>
                 <li><a href="m1-10.html">M1.10: Hoofd-Klasse</a></li>
@@ -61,53 +61,92 @@
     <main>
         <h2>M1.9: Compositie Methoden (Delegatie)</h2>
 
-        <h3>Theorie: Werk Delegeren</h3>
-        <p>
-            Het is onhandig om <code>poot.hip_servo.set_angle(90)</code> te moeten schrijven (we gaan er even vanuit dat <code>hip_servo</code> een getter is die het object teruggeeft). De 'buitenwereld' wil niet weten dat een poot servo's *heeft*. De buitenwereld wil gewoon zeggen: "Poot, ga naar positie X".
-        </p>
-        <p>
-            We maken een *nieuwe methode* in de 'container'-klasse (<code>Leg</code>). Deze methode roept *zelf* de methoden van zijn eigen <code>Servo</code>-objecten aan. Dit heet <strong>Delegatie</strong>: de <code>Leg</code>-klasse delegeert het 'zet hoek'-werk aan de <code>Servo</code>-klassen die hij bezit.
-        </p>
+        <h3>Leeruitkomsten</h3>
+        <ul>
+            <li>Ik kan methoden maken in een 'container' class die acties doorgeven aan sub-objecten.</li>
+            <li>Ik begrijp het principe van <strong>Delegatie</strong>: de "baas" laat de "medewerkers" het werk doen.</li>
+            <li>Ik kan de interactie met complexe objecten vereenvoudigen (Abstraction).</li>
+        </ul>
 
         <hr>
-        <h3>Python Voorbeeld</h3>
+
+        <h3>1. Het Probleem: Micromanagement</h3>
+        <p>
+            In de vorige les (M1.8) moesten we in <code>main.py</code> diep graven om een servo te bewegen:
+            <br><code>front_left_leg.knee_servo.set_angle(90)</code>.
+        </p>
+        <p>
+            Dit is "micromanagement". De code in <code>main.py</code> moet precies weten hoe een poot in elkaar zit (dat hij een knie heeft, en dat die knie een servo is). Als we de poot later veranderen, breekt onze code in main.
+        </p>
+        <p>
+            <strong>De Oplossing:</strong> We geven de <code>Leg</code> class zijn eigen commando's. We willen gewoon kunnen zeggen: "Poot, ga naar stand X". De poot regelt intern wel hoe de servo's moeten bewegen. Dit heet <strong>Delegatie</strong>.
+        </p>
+
+        <h3>2. Code: De Methode Toevoegen</h3>
+        <p>
+            We voegen een methode <code>set_all_angles</code> toe aan de <code>Leg</code> klasse in <code>leg.py</code>. Deze methode neemt drie hoeken aan (voor heup, knie, enkel) en geeft ze door aan de juiste servo's.
+        </p>
 
         <pre><code class="language-python"># In leg.py
 from .servo import Servo
 
 class Leg:
-    # ... (init met _hip_servo, etc.) ...
-    # ... (getters voor de servo's) ...
+    # ... (properties en __init__ uit M1.8) ...
 
-    # Een nieuwe, slimmere methode
-    def move_to_angles(self, hip: float, knee: float, ankle: float) -> None:
+    def set_all_angles(self, hip_angle: float, knee_angle: float, ankle_angle: float) -> None:
         """
-        Beweegt de hele poot in één keer.
-        DELEGEERT het werk aan de individuele servo-objecten.
+        Zet de hoeken van alle drie de servo's in deze poot tegelijk.
+        De Leg DELEGEERT het echte werk naar zijn Servo-objecten.
         """
-        print(f"Poot (ID {self._hip_servo.id}) beweegt...")
+        print(f"Poot (met heup-ID {self.hip_servo.id}) beweegt naar posities...")
 
-        # Delegatie aan de methoden van de sub-objecten
-        self._hip_servo.set_angle(hip)
-        self._knee_servo.set_angle(knee)
-        self._ankle_servo.set_angle(ankle)
+        # We roepen de methoden van de interne objecten aan
+        self.hip_servo.set_angle(hip_angle)
+        self.knee_servo.set_angle(knee_angle)
+        self.ankle_servo.set_angle(ankle_angle)</code></pre>
 
-# --- In main.py ---
-from spiderpi_core.leg import Leg
+        <h3>3. Uitleg: Wat gebeurt hier?</h3>
+        <p>
+            De <code>Leg</code> klasse fungeert nu als een <strong>interface</strong> (tussenpersoon).
+        </p>
+        <ul>
+            <li>De buitenwereld roept <strong>1</strong> methode aan op de Poot.</li>
+            <li>De Poot roept <strong>3</strong> methoden aan op de Servo's.</li>
+        </ul>
+        <p>
+            Dit maakt onze code in <code>main.py</code> veel schoner en leesbaarder. We hoeven niet meer te weten dat er servo-objecten in de poot zitten; we praten alleen met de poot.
+        </p>
 
-front_leg = Leg(id_hip=1, id_knee=2, id_ankle=3)
+        <h3>4. Code: De Nieuwe Aanroep</h3>
+        <p>
+            Laten we dit testen in <code>main.py</code>. We vervangen de oude, ingewikkelde aanroepen door de nieuwe, simpele methode.
+        </p>
 
-# De nieuwe, schone aanroep:
-front_leg.move_to_angles(hip=100.0, knee=110.0, ankle=120.0)
+        <pre><code class="language-python"># In main.py
+from .leg import Leg
 
-# Oude manier (willen we niet meer gebruiken):
-# (via getters, als je die hebt gemaakt)
-# front_leg.hip_servo.set_angle(100.0)</code></pre>
+# 1. Maak de poot aan (Compositie)
+front_leg = Leg(hip_id=1, knee_id=2, ankle_id=3)
+
+# 2. Beweeg de hele poot in één keer (Delegatie)
+#    We hoeven niet meer 'front_leg.hip_servo.set_angle' te typen.
+print("\n--- Beweging Start ---")
+front_leg.set_all_angles(90.0, 110.0, 15.5)
+
+# Output verwachting:
+# Poot (met heup-ID 1) beweegt naar posities...
+# Motor 1 beweegt naar 90.0 graden.
+# Motor 2 beweegt naar 110.0 graden.
+# Motor 3 beweegt naar 15.5 graden.</code></pre>
 
     </main>
 </div>
 
-<div id="footer-placeholder"></div>
+<footer>
+    <div class="footer-content">
+        <p>&copy; 2025 Techniek College Rotterdam</p>
+    </div>
+</footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
