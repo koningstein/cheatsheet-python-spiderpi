@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M1.10: De Hoofd-Class</title>
+    <title>M1.9: Compositie Methoden</title>
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="../../script.js" defer></script>
@@ -14,7 +14,8 @@
     <div class="top-bar-content">
         <div class="nav-group">
             <a href="../../index.html">« Overzicht</a>
-            <a href="../module2/m2-1.html">Module 2: Structuur »</a>
+            <a href="m1-8.html">« M1.8: Compositie</a>
+            <a href="m1-10.html">M1.10: Hoofd-Klasse »</a>
         </div>
         <div class="nav-group theme-switcher">
             <label for="theme-switcher">Thema: </label>
@@ -49,7 +50,7 @@
                 <li><a href="m1-4.html">M1.4: Setters</a></li>
                 <li><a href="m1-5.html">M1.5: Getters</a></li>
                 <li><a href="m1-6.html">M1.6: Constructor</a></li>
-                <li><a href="m1-7.html">M1.7: Class Variables</a></li>
+                <li><a href="m1-7.html">M1.7: Named Arguments</a></li>
                 <li><a href="m1-8.html">M1.8: Compositie</a></li>
                 <li><a href="m1-9.html" class="active">M1.9: Delegatie</a></li>
                 <li><a href="m1-10.html">M1.10: Hoofd-Klasse</a></li>
@@ -58,117 +59,55 @@
     </div>
 
     <main>
-        <h2>M1.10: De Hoofd-Class (Integratie)</h2>
+        <h2>M1.9: Compositie Methoden (Delegatie)</h2>
 
-        <h3>Leeruitkomsten</h3>
-        <ul>
-            <li>Ik kan een hoofd-klasse ontwerpen die het volledige systeem (de robot) modelleert.</li>
-            <li>Ik kan compositie op meerdere niveaus toepassen.</li>
-            <li>Ik kan een hoog-niveau methode schrijven die werk delegeert.</li>
-        </ul>
-
-        <h3>Uitleg: De Top van de Piramide</h3>
+        <h3>Theorie: Werk Delegeren</h3>
         <p>
-            We hebben de bouwstenen voltooid: <code>Servo</code> (laagste niveau) en <code>Leg</code> (middenniveau).
-            Nu is het tijd voor het hoogste niveau: de <strong><code>SpiderPi</code></strong> klasse. Deze klasse is de "baas" van het hele systeem.
+            Het is onhandig om <code>poot.hip_servo.set_angle(90)</code> te moeten schrijven (we gaan er even vanuit dat <code>hip_servo</code> een getter is die het object teruggeeft). De 'buitenwereld' wil niet weten dat een poot servo's *heeft*. De buitenwereld wil gewoon zeggen: "Poot, ga naar positie X".
         </p>
         <p>
-            Dit is weer <strong>Compositie</strong>:
-        </p>
-        <ul>
-            <li><code>SpiderPi</code> <strong>heeft</strong> 6 <code>Leg</code> objecten.</li>
-            <li>Elke <code>Leg</code> <strong>heeft</strong> 3 <code>Servo</code> objecten.</li>
-        </ul>
-
-        <pre><code class="language-python"># In een nieuw bestand: robot.py
-from .leg import Leg
-
-class SpiderPi:
-    """Modelleert de complete robot."""
-
-    # Properties voor alle 6 de poten
-    leg_front_left: Leg
-    leg_front_right: Leg
-    leg_mid_left: Leg
-    leg_mid_right: Leg
-    leg_back_left: Leg
-    leg_back_right: Leg
-
-    def __init__(self):
-        """Bouwt de robot door alle 6 poten aan te maken."""
-        print("SpiderPi robot wordt gebouwd...")
-
-        # Compositie op het hoogste niveau
-        # (Pas de ID's aan naar je eigen robot)
-        self.leg_front_left  = Leg(hip_id=10, knee_id=11, ankle_id=12)
-        self.leg_front_right = Leg(hip_id=1, knee_id=2, ankle_id=3)
-        self.leg_mid_left    = Leg(hip_id=13, knee_id=14, ankle_id=15)
-        self.leg_mid_right   = Leg(hip_id=4, knee_id=5, ankle_id=6)
-        self.leg_back_left   = Leg(hip_id=16, knee_id=17, ankle_id=18)
-        self.leg_back_right  = Leg(hip_id=7, knee_id=8, ankle_id=9)
-
-        print("Robot is klaar.")</code></pre>
-
-        <h3>Uitleg: Delegatie op Hoog Niveau</h3>
-        <p>
-            Net als de <code>Leg</code> een "gemaksmethode" had (<code>set_all_angles</code>), moet de <code>SpiderPi</code> ook "gemaksmethoden" hebben, zoals <code>wake_up()</code>.
-        </p>
-        <p>
-            Deze methode <strong>delegeert</strong> het werk aan al zijn <code>Leg</code> objecten, die het werk <strong>vervolgens</strong> weer delegeren aan hun <code>Servo</code> objecten.
+            We maken een *nieuwe methode* in de 'container'-klasse (<code>Leg</code>). Deze methode roept *zelf* de methoden van zijn eigen <code>Servo</code>-objecten aan. Dit heet <strong>Delegatie</strong>: de <code>Leg</code>-klasse delegeert het 'zet hoek'-werk aan de <code>Servo</code>-klassen die hij bezit.
         </p>
 
-        <pre><code class="language-python"># In robot.py (vervolg)
-class SpiderPi:
-    # ... (init van hierboven) ...
+        <hr>
+        <h3>Python Voorbeeld</h3>
 
-    def wake_up(self) -> None:
-        """Delegeer 'wake_up' naar alle 6 de poten."""
-        print("Robot is aan het opstaan...")
-        # Zet alle poten in een standaard 'staande' positie (bv. 90 graden)
-        self.leg_front_left.set_all_angles(90.0, 90.0, 90.0)
-        self.leg_front_right.set_all_angles(90.0, 90.0, 90.0)
-        self.leg_mid_left.set_all_angles(90.0, 90.0, 90.0)
-        self.leg_mid_right.set_all_angles(90.0, 90.0, 90.0)
-        self.leg_back_left.set_all_angles(90.0, 90.0, 90.0)
-        self.leg_back_right.set_all_angles(90.0, 90.0, 90.0)
-        print("Robot staat.")
+        <pre><code class="language-python"># In leg.py
+from .servo import Servo
 
-    def sleep(self) -> None:
-        """Delegeer 'sleep' naar alle 6 de poten."""
-        print("Robot gaat slapen...")
-        # Zet alle poten in een 'rust' positie
-        self.leg_front_left.set_all_angles(90.0, 150.0, 150.0)
-        self.leg_front_right.set_all_angles(90.0, 150.0, 150.0)
-        # ... (en zo verder voor alle 6 de poten) ...
-        print("Robot slaapt.")</code></pre>
+class Leg:
+    # ... (init met _hip_servo, etc.) ...
+    # ... (getters voor de servo's) ...
 
-        <h3>Uitleg: De Finale Test</h3>
-        <p>
-            Nu kunnen we met één commando in <code>main.py</code> de hele kettingreactie starten. Eén <code>SpiderPi</code> object maken roept 19 constructors aan (1 SpiderPi, 6 Legs, 18 Servos). Eén <code>wake_up()</code> call roept 6 keer <code>set_all_angles()</code> aan, wat weer 18 keer <code>set_angle()</code> aanroept.
-        </p>
+    # Een nieuwe, slimmere methode
+    def move_to_angles(self, hip: float, knee: float, ankle: float) -> None:
+        """
+        Beweegt de hele poot in één keer.
+        DELEGEERT het werk aan de individuele servo-objecten.
+        """
+        print(f"Poot (ID {self._hip_servo.id}) beweegt...")
 
-        <pre><code class="language-python"># In main.py
-from .robot import SpiderPi
-import time
+        # Delegatie aan de methoden van de sub-objecten
+        self._hip_servo.set_angle(hip)
+        self._knee_servo.set_angle(knee)
+        self._ankle_servo.set_angle(ankle)
 
-# Dit ene commando start de hele kettingreactie
-my_robot = SpiderPi()
+# --- In main.py ---
+from spiderpi_core.leg import Leg
 
-print("Robot aanroepen...")
-my_robot.wake_up()
+front_leg = Leg(id_hip=1, id_knee=2, id_ankle=3)
 
-time.sleep(2) # Wacht 2 seconden
+# De nieuwe, schone aanroep:
+front_leg.move_to_angles(hip=100.0, knee=110.0, ankle=120.0)
 
-my_robot.sleep()
-</code></pre>
+# Oude manier (willen we niet meer gebruiken):
+# (via getters, als je die hebt gemaakt)
+# front_leg.hip_servo.set_angle(100.0)</code></pre>
+
     </main>
 </div>
 
-<footer>
-    <div class="footer-content">
-        <p>&copy; 2025 Techniek College Rotterdam</p>
-    </div>
-</footer>
+<div id="footer-placeholder"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
